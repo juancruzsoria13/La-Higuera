@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Confirmá tu correo | La Higuera</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f1f6ff;color:#102249;font-family:Arial,Helvetica,sans-serif;">
+    <div style="display:none;font-size:1px;line-height:1px;color:#f1f6ff;max-height:0;max-width:0;opacity:0;overflow:hidden;">Un paso más para usar La Higuera: confirmá tu correo electrónico.</div>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;background:#f1f6ff;">
+      <tr>
+        <td align="center" style="padding:36px 16px 48px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;max-width:560px;">
+            <tr>
+              <td style="padding:0 0 20px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                  <tr>
+                    <td align="center" valign="middle" width="42" height="42" style="width:42px;height:42px;border-radius:12px;background:#164bfa;color:#ffffff;font-size:29px;font-weight:800;line-height:42px;">h</td>
+                    <td style="padding-left:10px;color:#102249;font-size:22px;font-weight:800;letter-spacing:-1px;">la higuera<span style="color:#164bfa;">.</span></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="border:1px solid #dbe6fa;border-radius:18px;background:#ffffff;padding:38px 36px 40px;">
+                <p style="margin:0 0 12px;color:#164bfa;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;">Tu cuenta en La Higuera</p>
+                <h1 style="margin:0 0 16px;color:#102249;font-size:29px;line-height:1.2;letter-spacing:-0.7px;">Confirmá tu correo</h1>
+                <p style="margin:0 0 26px;color:#506182;font-size:16px;line-height:1.65;">Para terminar de crear tu cuenta y empezar a publicar tus anuncios, confirmá que esta dirección de correo es tuya.</p>
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                  <tr>
+                    <td align="center" style="border-radius:10px;background:#164bfa;">
+                      <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email" style="display:inline-block;padding:16px 25px;color:#ffffff;font-size:15px;font-weight:700;line-height:1.2;text-decoration:none;">Confirmar mi correo</a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:27px 0 8px;color:#506182;font-size:13px;line-height:1.6;">Si el botón no funciona, copiá y pegá este enlace en tu navegador:</p>
+                <p style="margin:0;word-break:break-all;font-size:12px;line-height:1.6;"><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email" style="color:#164bfa;text-decoration:underline;">{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email</a></p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px 4px 0;color:#687895;font-size:12px;line-height:1.6;">
+                <p style="margin:0 0 6px;">Si no creaste una cuenta en La Higuera, podés ignorar este correo.</p>
+                <p style="margin:0;">La Higuera · San Juan, Argentina</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,1 @@
+export default function Loading() {return <div className="shell space-y-6 py-12" role="status" aria-label="Cargando"><div className="h-36 animate-pulse rounded-2xl bg-muted" /><div className="grid gap-5 sm:grid-cols-3">{[1,2,3].map(i => <div className="h-72 animate-pulse rounded-2xl bg-muted" key={i} />)}</div><span className="sr-only">Cargando…</span></div>;}
