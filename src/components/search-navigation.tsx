@@ -2,14 +2,15 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { CarFront, House, LayoutGrid, Search, Shapes, Smartphone } from "lucide-react";
+import { CarFront, Wrench, House, LayoutGrid, Search, Shapes, Smartphone } from "lucide-react";
 import { categories } from "@/modules/products/schema";
 
 const categoryIcons = [Smartphone, House, CarFront, Shapes];
 
 export function SearchNavigation() {
   const params = useSearchParams();
-  const isHome = usePathname() === "/";
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const q = isHome ? (params.get("q") ?? "").slice(0, 120) : "";
   const category = isHome ? categories.find(item => item === params.get("category")) ?? "" : "";
 
@@ -30,6 +31,9 @@ export function SearchNavigation() {
             </Link>
           );
         })}
+        <Link href="/servicios" aria-current={pathname.startsWith("/servicios") ? "page" : undefined} className={`category-link ml-auto font-semibold ${pathname.startsWith("/servicios") ? "category-link-active" : "bg-white/15"}`}>
+          <Wrench className="size-4 shrink-0" aria-hidden="true" />Servicios
+        </Link>
       </nav>
     </>
   );

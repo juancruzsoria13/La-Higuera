@@ -29,6 +29,7 @@ beforeAll(async () => {
     alter table storage.objects enable row level security;
   `);
   await db.exec(readFileSync("supabase/migrations/202610020001_initial.sql", "utf8"));
+  await db.exec(readFileSync("supabase/migrations/202610070001_services.sql", "utf8"));
   await db.query("insert into auth.users(id, raw_user_meta_data) values ($1, $2), ($3, $4)", [a, {display_name: "Ana"}, b, {display_name: "Bruno"}]);
 });
 afterAll(async () => { await db?.close(); });
@@ -99,5 +100,30 @@ describe("Migración y permisos con dos identidades en PostgreSQL local", () => 
     expect((await db.query("select * from businesses where owner_id=$1", [a])).rows).toHaveLength(0);
     expect((await db.query("select * from profiles where id=$1", [b])).rows).toHaveLength(1);
     expect((await db.query("select * from businesses where owner_id=$1", [b])).rows).toHaveLength(1);
+  });
+});
+describe("Servicios de oficio matriculados", () => {
+  const c = "55555555-5555-4555-8555-555555555555";
+  const d = "66666666-6666-4666-8666-666666666666";
+  let service = "";
+  const row = "insert into service_providers(owner_id,name,trade,license_number,license_body,description,phone,locality) values($1,'Juan Gas','Gasista','1234','ENARGAS','Instalaciones de gas',$2,'Capital') returning id";
+  it("no permite a quien publica marcar su matrícula como verificada", async () => {
+    await db.query("insert into auth.users(id, raw_user_meta_data) values ($1, $2), ($3, $4)", [c, {display_name: "Carla"}, d, {display_name: "Diego"}]);
+    await asUser(c, async () => {
+      await expect(db.query("insert into service_providers(owner_id,name,trade,license_number,license_body,description,phone,locality,verified) values($1,'X Y','Gasista','1','E','Instalaciones de gas','2644123456','Capital',true)", [c])).rejects.toThrow();
+      service = (await db.query<{id: string}>(row, [c, "2644123456"])).rows[0].id;
+      expect((await db.query("select verified from service_providers where id=$1", [service])).rows[0]).toEqual({verified: false});
+      await expect(db.query("update service_providers set verified=true where id=$1", [service])).rejects.toThrow();
+      await expect(db.query(row, [d, "2644123456"])).rejects.toThrow();
+      await expect(db.query("update service_providers set phone='abc' where id=$1", [service])).rejects.toThrow();
+    });
+  });
+  it("retira la verificación al cambiar la matrícula y respeta visibilidad y propiedad", async () => {
+    await db.query("update service_providers set verified=true where id=$1", [service]);
+    await asUser(null, async () => {expect((await db.query("select verified from service_providers")).rows).toEqual([{verified: true}]);});
+    await asUser(d, async () => {expect((await db.query("update service_providers set name='Hack' where id=$1 returning id", [service])).rows).toHaveLength(0); expect((await db.query("delete from service_providers where id=$1 returning id", [service])).rows).toHaveLength(0);});
+    await asUser(c, async () => {await db.query("update service_providers set license_number='9999' where id=$1", [service]); expect((await db.query("select verified from service_providers where id=$1", [service])).rows[0]).toEqual({verified: false}); await db.query("update service_providers set status='pausado' where id=$1", [service]);});
+    await asUser(d, async () => {expect((await db.query("select * from service_providers")).rows).toHaveLength(0);});
+    await asUser(null, async () => {expect((await db.query("select * from service_providers")).rows).toHaveLength(0);});
   });
 });

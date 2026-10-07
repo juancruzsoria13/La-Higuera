@@ -113,3 +113,11 @@ button:not(:disabled), select { cursor: pointer; }
   *, *::before, *::after { scroll-behavior: auto !important; }
   .home-carousel, .carousel-slide, .carousel-dot span { transition: none; transform: none; }
 }
+
+.fig-loader { position: relative; width: 96px; height: 96px; }
+.fig-loader > svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; animation: fig-cycle 1.8s linear infinite; }
+@keyframes fig-cycle { 0%, 11.1% { opacity: 1; } 11.2%, 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .fig-loader > svg { animation: none; }
+  .fig-loader > svg:first-child { opacity: 1; }
+}

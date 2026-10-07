@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
-import { LogOut, MapPin, Package, Plus, UserRound } from "lucide-react";
+import { LogOut, MapPin, Package, Wrench, Plus, UserRound } from "lucide-react";
 import { currentUser } from "@/modules/users/session";
 import { logout } from "@/modules/users/actions";
 import { Brand } from "@/components/brand";
@@ -29,6 +29,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               {user ? (
                 <AccountMenu>
                     <Link href="/mis-productos" className="account-link"><Package className="size-4" />Mis anuncios</Link>
+                    <Link href="/mis-servicios" className="account-link"><Wrench className="size-4" />Mis servicios</Link>
                     <Link href="/mi-perfil" className="account-link"><UserRound className="size-4" />Mi perfil</Link>
                     <form action={logout}><button type="submit" className="account-link w-full"><LogOut className="size-4" />Salir</button></form>
                 </AccountMenu>
