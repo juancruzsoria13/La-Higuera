@@ -1,142 +1,221 @@
 # La Higuera
 
-Sitio de anuncios de productos para San Juan, Argentina. Primera versión con Next.js App Router, TypeScript, Tailwind CSS, componentes shadcn/ui basados en Radix y Supabase (PostgreSQL, Auth y Storage). No procesa compras ni pagos.
+Sitio de anuncios de productos y de servicios de oficio matriculados para San Juan, Argentina. Conecta personas: no procesa compras, pagos ni envíos.
 
-## Ejecutar
+| Parte | Tecnología | Carpeta |
+| --- | --- | --- |
+| Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, componentes shadcn/ui sobre Radix | [`frontend/`](frontend/) |
+| Backend | Python 3.12+, FastAPI, httpx, Pillow | [`backend/`](backend/) |
+| Base de datos, Auth y Storage | Supabase (PostgreSQL con RLS) | [`database/`](database/) |
+| CI | GitHub Actions | [`.github/workflows/ci.yml`](.github/workflows/ci.yml) |
 
-Requiere Node.js 22.17 o superior compatible con Next.js 16 y npm. Versiones reproducibles en `package-lock.json`.
+La arquitectura completa está en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) y el historial de cambios en [`CHANGELOG.md`](CHANGELOG.md).
 
-```powershell
-cd 'C:\Users\juanc\OneDrive\Documentos\La Higuera'
-npm.cmd ci
-Copy-Item .env.example .env.local
-# Completar .env.local con los valores del proyecto Supabase.
-npm.cmd run dev
+## Estructura
+
+```text
+.
+├── frontend/               Aplicación Next.js
+│   ├── src/app/            Rutas y páginas
+│   ├── src/components/     Interfaz compartida (ui/ = shadcn/ui, fig.tsx = ilustraciones)
+│   ├── src/modules/        Productos, servicios y usuarios: validación, consultas, acciones, formularios
+│   ├── src/lib/            Cliente de la API, cliente Supabase (sesión) y utilidades
+│   └── tests/              Vitest (validación + migraciones en PGlite) y Playwright (e2e)
+├── backend/                API FastAPI
+│   ├── app/                main, configuración, dependencias, cliente Supabase, imágenes, routers
+│   ├── scripts/            Limpieza de Storage y prueba de integración contra Supabase real
+│   └── tests/              pytest
+├── database/
+│   ├── migrations/         Esquema, funciones, RLS y Storage, en orden de aplicación
+│   └── templates/          Plantilla HTML del correo de confirmación
+├── docs/                   Arquitectura y registro de verificación
+├── .github/workflows/      CI
+├── Makefile                Atajos (make install, make check, …)
+├── CHANGELOG.md
+└── README.md
 ```
 
-Abrir http://localhost:3000. Sin variables válidas se muestra un aviso de configuración pendiente: no se simula una base conectada ni se incluyen anuncios ficticios.
+## Requisitos
 
-En PowerShell, usá `npm.cmd` y `npx.cmd` como en los ejemplos. Así se ejecutan los archivos `.cmd` de Node.js aunque PowerShell bloquee `npm.ps1` o `npx.ps1`; no hace falta cambiar la política de ejecución del sistema.
+- Node.js 22 o superior y npm.
+- Python 3.12 o superior con el módulo `venv`. En Debian/Ubuntu: `sudo apt install python3-venv` (o `python3.X-venv` según la versión).
+- Un proyecto Supabase para usar la app con datos. Sin él, el sitio arranca y muestra un aviso de configuración pendiente.
+
+## Puesta en marcha
+
+### 1. Instalar dependencias
+
+```bash
+make install
+```
+
+Equivale a:
+
+```bash
+cd frontend && npm ci && cd ..
+python3 -m venv backend/.venv
+backend/.venv/bin/pip install -r backend/requirements-dev.txt
+```
+
+El entorno virtual de Python vive en `backend/.venv` y no se versiona. Para activarlo en una terminal: `source backend/.venv/bin/activate`.
+
+### 2. Variables de entorno
+
+```bash
+cp frontend/.env.example frontend/.env.local
+cp backend/.env.example backend/.env
+```
+
+| Variable | Dónde | Uso |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | frontend | URL del proyecto Supabase |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | frontend | Clave publishable (o `anon` heredada). Solo para la sesión de Auth |
+| `NEXT_PUBLIC_SITE_URL` | frontend | URL del sitio; arma el enlace de confirmación de correo |
+| `API_URL` | frontend | Dirección de la API. Por defecto `http://127.0.0.1:8000` |
+| `SUPABASE_URL` | backend | Misma URL del proyecto |
+| `SUPABASE_PUBLISHABLE_KEY` | backend | Misma clave publishable |
+| `SUPABASE_SERVICE_ROLE_KEY` | backend | Clave `sb_secret_…` (o `service_role` heredada). Solo para eliminar cuentas y para los scripts. **Nunca** con prefijo `NEXT_PUBLIC_` |
+| `CORS_ORIGINS` | backend | Opcional. Next llama a la API desde el servidor, así que normalmente queda vacío |
+
+Los archivos `.env*` están excluidos de Git, salvo los `.env.example`.
+
+### 3. Levantar los dos servidores
+
+En dos terminales:
+
+```bash
+make dev-backend    # API en http://127.0.0.1:8000  (docs interactivas en /docs)
+make dev-frontend   # Sitio en http://localhost:3000
+```
+
+Los cambios de código se recargan solos. Hay que reiniciar solo al cambiar variables de entorno.
 
 ## Configurar Supabase
 
-1. Crear un proyecto en Supabase y copiar su URL y su clave **publishable** a `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. La clave `anon` anterior también sirve si el proyecto todavía usa ese formato.
-2. Copiar la clave **secret** (`sb_secret_...`) a `SUPABASE_SERVICE_ROLE_KEY`; también funciona la clave heredada **service_role**. El nombre de la variable se conserva en el código, pero acepta cualquiera de las dos claves privilegiadas. Solo la usa el servidor para eliminar la cuenta de Auth y sus archivos, y los scripts administrativos de prueba/mantenimiento. Nunca usar un prefijo `NEXT_PUBLIC_` para esta clave. `.env.local` está excluido de Git.
-3. Configurar `NEXT_PUBLIC_SITE_URL=http://localhost:3000` en desarrollo; usar la URL HTTPS del despliegue en producción.
-4. Aplicar la migración completa `supabase/migrations/202610020001_initial.sql` en el **SQL Editor** de un proyecto nuevo. Se ejecuta en una transacción. No aplicarla repetidamente al mismo proyecto; las siguientes modificaciones deben ser nuevas migraciones. Elegí este método o la CLI de la sección siguiente, sin ejecutar ambos para la misma migración: el SQL Editor no actualiza el historial de migraciones de la CLI.
-5. En **Authentication → URL Configuration**, establecer Site URL en `http://localhost:3000` y permitir `http://localhost:3000/auth/confirm`. Agregar también la URL exacta de producción al desplegar.
-6. En **Authentication → Providers → Email**, habilitar correo/contraseña y mantener activada o desactivada la confirmación según la política del proyecto. La app admite ambos casos. Configurar una longitud mínima de contraseña de 8 caracteres o más. Si se aumenta, el servidor mostrará el rechazo de Auth aunque el formulario admita 8.
-7. En el panel actual del proyecto, **Authentication → Emails** exige configurar **Custom SMTP** antes de editar las plantillas. En la pestaña **SMTP Settings**, conectar un proveedor SMTP y establecer **Sender name** en `La Higuera` y **Sender email** en una dirección propia verificada (por ejemplo, `hola@tu-dominio.com`), además de host, puerto y credenciales del proveedor. El dominio de envío deberá tener los registros DNS que solicite ese proveedor. No guardar credenciales SMTP en este repositorio ni pegarlas en el chat. El correo predeterminado de Supabase tiene restricciones de destinatarios y envío; para registros públicos se necesita un proveedor SMTP propio.
-8. Una vez activo SMTP, abrir **Authentication → Emails → Templates → Confirm sign up**. Poner como asunto `Confirmá tu correo | La Higuera` y pegar el contenido de [`supabase/templates/confirm-signup.html`](supabase/templates/confirm-signup.html) en el cuerpo HTML. Guardar los cambios en el panel: el archivo del repositorio no se sincroniza automáticamente. La plantilla enlaza a `/auth/confirm` con `token_hash`, para permitir confirmar incluso desde otro dispositivo. También se admite el callback PKCE con `?code=...` cuando el enlace se abre en el mismo navegador que inició el registro. No se acepta un destino de redirección enviado por el navegador. En producción, actualizar Site URL y los destinos permitidos con la URL HTTPS real antes de probar el enlace de confirmación.
-9. La migración crea el bucket **privado** `product-images`, con un máximo de 5 MB y MIME `image/webp`. No hacerlo público ni agregar políticas permisivas. El servidor acepta JPG, PNG y WebP y los decodifica y convierte a WebP antes de subirlos.
+1. Crear un proyecto y copiar la URL, la clave **publishable** y la clave **secret** a las variables de arriba.
+2. Aplicar las migraciones de [`database/migrations/`](database/migrations/) **en orden**, desde el **SQL Editor** de un proyecto nuevo:
+   1. `202610020001_initial.sql`: perfiles, comercios, anuncios, imágenes, RLS y Storage.
+   2. `202610070001_services.sql`: servicios de oficio matriculados.
 
-### Migraciones con Supabase CLI (alternativa)
+   Cada una corre en una transacción. No repetirlas sobre el mismo proyecto: los cambios futuros van en migraciones nuevas.
+3. En **Authentication → URL Configuration**, establecer Site URL en `http://localhost:3000` y permitir `http://localhost:3000/auth/confirm`. Al desplegar, agregar la URL de producción.
+4. En **Authentication → Providers → Email**, habilitar correo y contraseña con una longitud mínima de 8 caracteres. La app funciona con o sin confirmación de correo.
+5. Para registros públicos hace falta **Custom SMTP** (Authentication → Emails → SMTP Settings), con remitente `La Higuera` y una dirección propia verificada. No guardar credenciales SMTP en el repositorio.
+6. En **Authentication → Emails → Templates → Confirm sign up**, poner como asunto `Confirmá tu correo | La Higuera` y pegar [`database/templates/confirm-signup.html`](database/templates/confirm-signup.html). El archivo no se sincroniza solo.
+7. La migración inicial crea el bucket **privado** `product-images` (5 MB, solo `image/webp`). No hacerlo público.
 
-Con la CLI oficial disponible, **en lugar de aplicar el SQL en el Editor**:
+### Con Supabase CLI (alternativa al SQL Editor)
 
-```powershell
-npx.cmd supabase init
-npx.cmd supabase login
-npx.cmd supabase link --project-ref TU_PROJECT_REF
-npx.cmd supabase db push
+La CLI busca las migraciones en `supabase/migrations`. Desde la raíz:
+
+```bash
+npx supabase init
+mkdir -p supabase && cp database/migrations/*.sql supabase/migrations/
+npx supabase link --project-ref TU_PROJECT_REF
+npx supabase db push
 ```
 
-`init` agrega la configuración local; no reemplaza las migraciones existentes. No ejecutar `db reset` contra un proyecto con datos que deban conservarse. Para desarrollo local, iniciar Docker Desktop, ejecutar `npx.cmd supabase start` y después `npx.cmd supabase db reset`. Usar las URL/claves locales resultantes en `.env.local`. La instalación local y la remota son alternativas.
+La carpeta `supabase/` de la raíz está en `.gitignore`: la fuente de verdad sigue siendo `database/migrations/`. Elegir un solo método por proyecto: el SQL Editor no actualiza el historial de migraciones de la CLI. Para desarrollo local con Docker: `npx supabase start` y luego `npx supabase db reset`, usando las URL y claves locales en los `.env`.
+
+### Verificar matrículas de servicios
+
+Quien publica un servicio declara su matrícula; la insignia **Matrícula verificada** solo la otorga la administración, después de comprobarla:
+
+```sql
+update public.service_providers set verified = true where id = '<id del servicio>';
+```
+
+Si el profesional cambia el número, la entidad o el oficio, la verificación se retira sola.
 
 ## Funcionalidad
 
-- Inicio público con búsqueda literal por título, categorías y páginas de 12 resultados, ordenados por fecha e identificador.
-- Detalle de anuncio con imagen, precio en ARS/USD, condición, localidad y nombre público del vendedor.
+- Inicio con carrusel, bloque destacado de **Servicios**, buscador por título, categorías y páginas de 12 anuncios.
+- Detalle de anuncio con imagen, precio en ARS o USD, condición, localidad y nombre público del vendedor.
 - Registro, confirmación de correo, ingreso y cierre de sesión.
-- Perfil propio: consulta y edición de nombre/localidad; correo privado de Auth.
-- Anuncios propios: alta, consulta, edición, eliminación confirmada y estados activo/pausado/vendido.
-- Una imagen opcional por anuncio, reemplazo y eliminación. Placeholder si no existe o falla la carga.
-- Eliminación de cuenta con confirmación escrita y eliminación real del usuario de Auth.
-- `businesses` en SQL, con varios comercios por propietario y sin pantallas de gestión en esta etapa.
-- Interfaz adaptable en español de Argentina, estados de carga/error/vacío y confirmaciones accesibles con Radix.
-- Identidad visual en azul intenso, celeste y blanco, logo vectorial y buscador global con categorías debajo.
-- Carrusel de tres mensajes en el inicio, sin descuentos ficticios. Cambia cada 6 segundos, tiene controles manuales y pausa, y respeta la preferencia de movimiento reducido del dispositivo.
+- Perfil propio: nombre y localidad; el correo queda privado en Auth.
+- Anuncios propios: alta, edición, eliminación confirmada y estados activo, pausado y vendido. Una imagen opcional, convertida a WebP.
+- **Servicios de oficio**: gasistas, plomeros, electricistas y más, con matrícula, entidad emisora, teléfono y botón de WhatsApp. Búsqueda, filtro por oficio y gestión en *Mis servicios*.
+- **Estudios de higo**: 9 ilustraciones SVG para momentos vacíos o de espera (sin foto, sin resultados, 404, carga y guardado).
+- Eliminación de cuenta con confirmación escrita y borrado real del usuario de Auth.
+- Interfaz adaptable en español de Argentina, accesible y con preferencia de movimiento reducido.
 
-## Organización y seguridad
+Fuera de alcance: gestión visual de comercios, stock, chat, reputación, pagos, envíos y pantalla de administración.
 
-```text
-src/app/                  Rutas App Router y composición de páginas
-src/components/           Interfaz compartida; ui/ contiene componentes shadcn/ui
-src/modules/users/        Sesión, validaciones, acciones y formularios de cuentas/perfil
-src/modules/products/     Validaciones, consultas, acciones, formularios e imágenes
-src/lib/supabase/          Clientes de servidor y administrativo separados
-supabase/migrations/      Esquema, integridad, funciones y RLS versionados
-tests/                    Validaciones, PostgreSQL local y recorridos Playwright
-scripts/                  Pruebas Supabase reales y limpieza de Storage
-```
+## Seguridad
 
-Las operaciones ordinarias usan el cliente de la sesión y RLS. `getUser()` verifica la sesión contra Auth en el servidor; el proxy mantiene sus cookies con `getClaims()`. El servidor obtiene el propietario de la sesión. En edición/eliminación también filtra por propietario. No hay cliente administrativo en el navegador.
+- El navegador nunca habla con la base de datos directamente: el servidor de Next llama a la API con el token de la sesión, y la API consulta Supabase **con esa misma identidad**. Las políticas RLS deciden qué puede leer o modificar cada usuario.
+- La API verifica cada token contra Supabase Auth. Nunca acepta un `owner_id` ni un `user_id` enviado por el cliente.
+- Los permisos por columna impiden cambiar el dueño de un registro o marcar una matrícula como verificada.
+- La clave secreta solo existe en el backend y solo se usa para eliminar cuentas.
+- Las imágenes se sirven por `/api/images/…` con `private, no-store`, pasando por las políticas de Storage. La API valida tamaño, MIME y decodificación real, limita a 20 megapíxeles, rechaza animaciones, quita metadatos y convierte a WebP de hasta 1600 px.
 
-Los visitantes solo leen anuncios activos. Los propietarios ven también los pausados y vendidos. `profiles` solo es consultable por su dueño; la función `product_seller(product_id)` devuelve únicamente el nombre del vendedor de un anuncio visible. No hay correo de Auth en las tablas públicas ni en la respuesta de esa función. Los identificadores UUID de propietario forman parte del anuncio, pero no permiten consultar el perfil ajeno.
+### Imágenes y fallas parciales
 
-Los permisos por columna impiden cambiar `owner_id` o el identificador de un registro. Una FK compuesta `(business_id, owner_id)` garantiza que el comercio pertenezca al dueño del anuncio. Las restricciones SQL repiten las validaciones relevantes del servidor. El alta de Auth crea el perfil con un trigger en la misma transacción.
+Storage y PostgreSQL son servicios separados y no comparten transacción. Por eso:
 
-Las imágenes se sirven por `/api/images/...`, pasando por RLS, con `private, no-store`. No se usa la caché compartida de Next Image ni se generan URLs públicas o firmadas. El servidor valida tamaño, MIME y decodificación real, limita a 20 megapíxeles, rechaza animaciones, elimina metadatos y convierte a WebP de hasta 1600 px. Storage impide sobrescrituras y accesos a carpetas de otro usuario. Los formularios conservan los campos de texto ante errores; por restricciones del navegador los archivos deben seleccionarse nuevamente.
-
-### Limpieza de imágenes y fallas parciales
-
-Storage y PostgreSQL son servicios separados: **no existe una transacción distribuida entre ambos**. La app usa reservas y una cola durable para evitar declarar una atomicidad inexistente:
-
-1. Reserva una ruta nueva en `storage_cleanup` antes de cargar.
-2. Sube la imagen validada y guarda el anuncio. En la misma transacción SQL se consume la reserva y se encola la imagen anterior.
-3. Intenta borrar los archivos pendientes. Si Storage falla, conserva la tarea y muestra una advertencia; las siguientes operaciones del usuario reintentan la limpieza.
-4. Si falla el guardado, marca la carga nueva para eliminación. Las reservas abandonadas por interrupciones quedan recuperables tras 24 horas. El anuncio original no se modifica si el guardado falla.
+1. Antes de subir, se reserva una ruta en `storage_cleanup`.
+2. Se sube la imagen y se guarda el anuncio. En la misma transacción SQL se consume la reserva y se encola la imagen anterior.
+3. Se borran los archivos pendientes. Si Storage falla, la tarea queda y se reintenta en la próxima operación del usuario.
+4. Si falla el guardado, la carga nueva queda marcada para borrar. Las reservas abandonadas se recuperan tras 24 horas.
 5. Las ediciones usan `updated_at` como control de concurrencia: una pestaña desactualizada no pisa cambios de otra.
 
-Ejecutar periódicamente o tras una falla de Storage:
+Mantenimiento periódico, o después de una falla de Storage:
 
-```powershell
-npm.cmd run storage:cleanup
+```bash
+cd backend && .venv/bin/python -m scripts.cleanup
 ```
 
-El script procesa tareas listas y reservas de más de 24 horas, verifica que el archivo no esté asociado y conserva las tareas fallidas para reintentar. Las reservas vencidas no se pueden asociar a productos. La tabla de limpieza tiene RLS y no contiene información pública. No hay una automatización externa creada por esta entrega.
+## Pruebas y calidad
 
-Para eliminar una cuenta, el servidor deriva la identidad de la sesión, marca la cuenta para bloquear escrituras nuevas, elimina sus archivos y llama a `auth.admin.deleteUser`. La cascada de PostgreSQL elimina perfil, comercios y productos de forma atómica. Storage exige borrar antes los objetos de ese usuario. Si falla algún paso, el perfil permite reintentar la eliminación; la cuenta puede quedar bloqueada para nuevas escrituras y con imágenes ya eliminadas. La eliminación de archivos no puede revertirse. Nunca se acepta un `user_id` del formulario para esta operación.
-
-## Verificación
-
-```powershell
-npm.cmd run typecheck
-npm.cmd run lint
-npm.cmd test
-npm.cmd run build
-npx.cmd playwright install chromium
-npm.cmd run test:e2e
+```bash
+make check          # lint + tipos + tests de frontend y backend
 ```
 
-- `npm.cmd test`: validaciones, contenido real de imágenes y migración completa en PostgreSQL embebido (PGlite), con dos identidades y roles RLS. Las tablas mínimas de Auth/Storage son fixtures; **no sustituye una prueba del servicio Supabase**.
-- Playwright: navegación pública, búsqueda, filtros, protección de rutas y adaptación móvil/escritorio. El recorrido real de CRUD se omite explícitamente si faltan las credenciales de prueba.
-- Si ya hay un servidor local ejecutándose, se puede reutilizar en PowerShell con `$env:PLAYWRIGHT_BASE_URL='http://localhost:3000'` antes de `npm.cmd run test:e2e`, evitando iniciar otra instancia de Next.js.
-- Para probar contra un **proyecto Supabase de prueba** con la migración aplicada, configurar las tres claves y `ALLOW_INTEGRATION_TESTS=true` en `.env.local`, luego:
+| Comando | Qué cubre |
+| --- | --- |
+| `cd frontend && npm run lint && npm run typecheck` | ESLint y TypeScript |
+| `cd frontend && npm test` | Validación de formularios y migraciones ejecutadas en PostgreSQL embebido (PGlite) con dos identidades y RLS real |
+| `cd frontend && npm run build` | Build de producción |
+| `cd frontend && npx playwright install chromium && npm run test:e2e` | Navegación pública, búsqueda, carrusel, protección de rutas, escritorio y móvil |
+| `cd backend && .venv/bin/ruff check . && .venv/bin/ruff format --check .` | Lint y formato de Python |
+| `cd backend && .venv/bin/pytest` | Validación, imágenes, cliente Supabase y endpoints con una base en memoria |
 
-  ```powershell
-  npm.cmd run test:integration
-  npm.cmd run test:e2e
-  ```
+PGlite ejecuta las políticas reales de la migración, pero sus tablas de Auth y Storage son mínimas: **no reemplaza una prueba contra Supabase**.
 
-El script de integración crea dos usuarios temporales confirmados y verifica persistencia con una sesión nueva, CRUD, privacidad de perfiles, estados, intentos de cambiar dueño o comercio, Storage privado y borrado de Auth/cascadas. Limpia sus propios usuarios temporales al finalizar. Playwright entra con dos sesiones independientes, crea un anuncio con imagen, recarga, edita el perfil, pausa, verifica denegaciones al segundo usuario y elimina la cuenta mediante el formulario y la acción real del servidor.
+### Contra un proyecto Supabase de pruebas
 
-El envío/recepción de correo debe comprobarse manualmente con una dirección real: registrar, abrir la confirmación, ingresar, salir y volver a entrar. Las pruebas automatizadas usan cuentas confirmadas por el administrador y no afirman probar la entrega de correo.
+Con las migraciones aplicadas y las claves en `backend/.env`:
 
-### Estado de esta entrega
+```bash
+cd backend && ALLOW_INTEGRATION_TESTS=true .venv/bin/python -m scripts.integration
+```
 
-Sin credenciales Supabase en el entorno de implementación. La compilación, los tipos, el lint, las pruebas de PostgreSQL local y la navegación pública pueden verificarse sin esas claves. La persistencia y el CRUD contra Supabase alojado, la entrega de correos y los recorridos autenticados necesitan la configuración anterior; no se consideran verificados hasta ejecutarlos. Consultar `VERIFICATION.md` para los resultados efectivamente obtenidos.
+Crea dos usuarios temporales y verifica persistencia, CRUD, RLS, servicios, Storage privado y borrado de cuenta en cascada. Limpia sus usuarios al terminar.
 
-## Despliegue posterior en Vercel
+El recorrido Playwright autenticado (`frontend/tests/e2e/crud.spec.ts`) necesita además `ALLOW_INTEGRATION_TESTS=true` y `SUPABASE_SERVICE_ROLE_KEY` en `frontend/.env.local`, y la API corriendo. Sin eso se omite explícitamente.
 
-Importar este repositorio como proyecto Next.js, usar Node 22, configurar las variables de `.env.example` en Vercel y ejecutar el build estándar `npm.cmd run build` desde PowerShell. Ajustar `NEXT_PUBLIC_SITE_URL`, Site URL, redirects y SMTP de Supabase. No establecer `ALLOW_INTEGRATION_TESTS=true` en producción. Las migraciones se aplican por separado; el build no altera la base. Esta entrega no publica ni despliega el sitio.
+El envío de correos se prueba a mano: registrarse con una dirección real, confirmar, ingresar, salir y volver a entrar.
 
-## Documentación oficial de referencia
+## CI
 
-- [Next.js: instalación y App Router](https://nextjs.org/docs/app/getting-started/installation)
-- [Supabase: clientes SSR y cookies](https://supabase.com/docs/guides/auth/server-side/creating-a-client)
-- [Supabase: usuarios, perfiles y eliminación](https://supabase.com/docs/guides/auth/managing-user-data)
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) corre en cada push a `main` o a ramas `commit-inicial-*`, y en cada pull request:
+
+- **frontend**: `npm ci`, lint, typecheck, Vitest y build (Node 22).
+- **e2e**: Playwright con Chromium, sin Supabase.
+- **backend**: ruff (lint y formato) y pytest (Python 3.13).
+
+No hay despliegue automático.
+
+## Despliegue
+
+- **Frontend**: cualquier hosting de Next.js (por ejemplo Vercel) con *Root Directory* = `frontend`, Node 22 y las variables de `frontend/.env.example`. `API_URL` debe apuntar a la API desplegada.
+- **Backend**: cualquier servicio que corra Python, con `pip install -r requirements.txt` y `uvicorn app.main:app --host 0.0.0.0 --port $PORT`, más las variables de `backend/.env.example`.
+- Ajustar en Supabase la Site URL, los redirects y el SMTP con la URL real. Nunca usar `ALLOW_INTEGRATION_TESTS=true` en producción. Las migraciones se aplican aparte; ningún build modifica la base.
+
+## Referencias
+
+- [Next.js App Router](https://nextjs.org/docs/app)
+- [FastAPI](https://fastapi.tiangolo.com/)
+- [Supabase: Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security)
 - [Supabase: control de acceso a Storage](https://supabase.com/docs/guides/storage/security/access-control)
-- [shadcn/ui: instalación manual](https://ui.shadcn.com/docs/installation/manual)
-
-Fuera de alcance: gestión visual de comercios, stock, catálogo universal, chat, reputación, pagos, envíos, campañas y scraping.
+- [Supabase: claves de API](https://supabase.com/docs/guides/api/api-keys)
