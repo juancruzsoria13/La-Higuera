@@ -4,6 +4,38 @@ Todos los cambios relevantes de La Higuera se registran en este archivo.
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
+## [0.3.0] - 2026-10-08
+
+Adapta la API y el frontend al modelo de `database/migrations/202610070003_marketplace_model.sql`. Esta versión no funciona contra una base sin esa migración, y la anterior no funciona con ella.
+
+### Agregado
+
+- `GET /api/catalog`: rubros, localidades y oficios activos, leídos de las tablas `categories`, `localities` y `trades`.
+- **Varias fotos por anuncio** (hasta 8): el formulario permite agregar, quitar y reordenar; la primera es la portada. El detalle muestra todas con miniaturas y las tarjetas, la portada. La API las aplica con `set_product_images()` en una sola transacción.
+- **Contacto en anuncios**: teléfono (con botón de WhatsApp) y correo. Un anuncio activo exige al menos uno.
+- **Venta o alquiler** para el rubro Inmuebles.
+- **Vencimiento a 60 días**: *Mis anuncios* y el detalle marcan los vencidos, con botón **Renovar** (`POST /api/products/{id}/renew`).
+- Correo de contacto opcional en servicios.
+- Íconos para los 8 rubros en la cabecera.
+
+### Cambiado
+
+- Rubro, localidad y oficio son selectores cargados desde la API, en anuncios, servicios y perfil. La API valida que existan y estén activos.
+- La matrícula se pide solo si el oficio la exige (`requires_license`); en los demás no se muestra ni se guarda.
+- Textos de Servicios (inicio, `/servicios`, *Mis servicios*, título de la página y README): la sección ya no se presenta como "oficios matriculados", porque incluye oficios con y sin matrícula.
+- El listado público de anuncios filtra explícitamente activos, sin ocultar y sin vencer; el de servicios, activos y sin ocultar, ordenados por matrícula verificada, referencias comprobadas, puntaje y fecha.
+- `Supabase.select()` acepta `columns` para traer fotos y nombres embebidos.
+- Las respuestas de anuncios traen `images`, `category_name` y `locality_name`; las de servicios, `trade_name`, `requires_license` y `locality_name`.
+- `scripts/cleanup.py` busca las fotos vinculadas en `product_images`.
+- `scripts/integration.py` y las pruebas de PGlite cubren el modelo nuevo y cargan las cuatro migraciones.
+- Límite de cuerpo de las server actions: de 6 MB a 41 MB, para 8 fotos de 5 MB.
+- README y `docs/ARCHITECTURE.md` describen las cuatro migraciones y `database/supabase_setup.sql`.
+
+### Eliminado
+
+- Constantes de rubros y oficios en `backend/app/schemas.py` y en `frontend/src/modules/*/schema.ts`.
+- Campos `image` y `remove_image` del formulario de anuncios, reemplazados por `images` e `image_order`.
+
 ## [0.2.0] - 2026-10-07
 
 ### Agregado

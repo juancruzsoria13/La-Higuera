@@ -7,6 +7,7 @@ import { logout } from "@/modules/users/actions";
 import { Brand } from "@/components/brand";
 import { AccountMenu } from "@/components/account-menu";
 import { SearchNavigation, SearchNavigationFallback } from "@/components/search-navigation";
+import { getCatalog } from "@/lib/catalog";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const user = await currentUser();
+  const [user, {categories}] = await Promise.all([currentUser(), getCatalog()]);
   return (
     <html lang="es-AR">
       <body className="flex min-h-screen flex-col antialiased">
@@ -24,7 +25,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <header className="site-header">
           <div className="shell header-grid">
             <Link href="/" className="header-logo w-fit" aria-label="La Higuera, inicio"><Brand inverted /></Link>
-            <Suspense fallback={<SearchNavigationFallback />}><SearchNavigation /></Suspense>
+            <Suspense fallback={<SearchNavigationFallback />}><SearchNavigation categories={categories} /></Suspense>
             <nav aria-label="Navegación principal" className="header-actions">
               {user ? (
                 <AccountMenu>

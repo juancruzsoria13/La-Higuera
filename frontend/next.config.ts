@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
   turbopack: { root: process.cwd() },
-  experimental: { serverActions: { bodySizeLimit: "6mb" } },
+  // Hasta 8 fotos de 5 MB por anuncio, más el margen de multipart.
+  experimental: { serverActions: { bodySizeLimit: "41mb" } },
   async headers() {
     return [{ source: "/(.*)", headers: [
       { key: "X-Content-Type-Options", value: "nosniff" },

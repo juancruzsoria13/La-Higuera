@@ -7,6 +7,7 @@ from ..config import BUCKET
 from ..deps import AdminDbDep, DbDep, UserDep
 from ..schemas import AccountDeletion, ProfileIn
 from ..supabase import SupabaseError
+from .catalog import find, load_catalog
 
 router = APIRouter(tags=["cuenta"])
 log = logging.getLogger(__name__)
@@ -20,11 +21,13 @@ async def get_profile(db: DbDep, user: UserDep) -> dict[str, Any]:
         raise HTTPException(502, "No pudimos cargar tu perfil.") from error
     if not rows:
         raise HTTPException(404, "No pudimos cargar tu perfil.")
-    return {"display_name": rows[0]["display_name"], "locality": rows[0]["locality"], "email": user.email}
+    return {"display_name": rows[0]["display_name"], "locality_id": rows[0]["locality_id"], "email": user.email}
 
 
 @router.put("/profile")
 async def update_profile(body: ProfileIn, db: DbDep, user: UserDep) -> dict[str, Any]:
+    if not find((await load_catalog(db))["localities"], body.locality_id):
+        raise HTTPException(422, "Elegí una localidad de la lista.")
     message = "No pudimos guardar tu perfil. Si empezaste a eliminar la cuenta, volvé a intentar esa operación."
     try:
         saved = await db.update("profiles", [("id", f"eq.{user.id}")], body.model_dump())
@@ -32,7 +35,7 @@ async def update_profile(body: ProfileIn, db: DbDep, user: UserDep) -> dict[str,
         raise HTTPException(409, message) from error
     if not saved:
         raise HTTPException(409, message)
-    return {"display_name": saved[0]["display_name"], "locality": saved[0]["locality"]}
+    return {"display_name": saved[0]["display_name"], "locality_id": saved[0]["locality_id"]}
 
 
 @router.post("/account/delete")

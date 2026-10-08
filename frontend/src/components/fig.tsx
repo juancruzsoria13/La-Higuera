@@ -192,5 +192,5 @@ export function Fig({ variant, className, label, style }: { variant: FigVariant;
   );
 }
 
-/** Higo de placeholder según la categoría del anuncio. */
-export const categoryFig: Record<string, FigVariant> = { Tecnología: 4, Hogar: 2, Vehículos: 8, Otros: 6 };
+/** Higo de placeholder según el rubro del anuncio (`category_id`). */
+export const categoryFig: Record<string, FigVariant> = { tecnologia: 4, muebles: 2, vehiculos: 8, otros: 6 };

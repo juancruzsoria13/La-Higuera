@@ -2,17 +2,20 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { CarFront, Wrench, House, LayoutGrid, Search, Shapes, Smartphone } from "lucide-react";
-import { categories } from "@/modules/products/schema";
+import { BrickWall, CarFront, Wrench, House, LayoutGrid, Refrigerator, Search, Shapes, Shirt, Smartphone, Sofa } from "lucide-react";
+import type { Option } from "@/lib/catalog";
 
-const categoryIcons = [Smartphone, House, CarFront, Shapes];
+const categoryIcons: Record<string, typeof Shapes> = {
+  inmuebles: House, tecnologia: Smartphone, vehiculos: CarFront, ropa: Shirt, muebles: Sofa,
+  electrodomesticos: Refrigerator, "materiales-construccion": BrickWall,
+};
 
-export function SearchNavigation() {
+export function SearchNavigation({ categories }: { categories: Option[] }) {
   const params = useSearchParams();
   const pathname = usePathname();
   const isHome = pathname === "/";
   const q = isHome ? (params.get("q") ?? "").slice(0, 120) : "";
-  const category = isHome ? categories.find(item => item === params.get("category")) ?? "" : "";
+  const category = isHome ? categories.find(item => item.id === params.get("category"))?.id ?? "" : "";
 
   return (
     <>
@@ -22,12 +25,12 @@ export function SearchNavigation() {
         <button type="submit" aria-label="Buscar" className="my-2 flex w-14 shrink-0 items-center justify-center border-l border-slate-200 text-primary transition hover:text-blue-800"><Search className="size-5" aria-hidden="true" /></button>
       </form>
       <nav aria-label="Categorías" className="header-categories">
-        {["", ...categories].map((item, index) => {
-          const Icon = index === 0 ? LayoutGrid : categoryIcons[index - 1];
-          const active = isHome && category === item;
+        {[{ id: "", name: "Todo" }, ...categories].map(item => {
+          const Icon = item.id ? categoryIcons[item.id] ?? Shapes : LayoutGrid;
+          const active = isHome && category === item.id;
           return (
-            <Link key={item} href={`/?${new URLSearchParams({ ...(q ? { q } : {}), ...(item ? { category: item } : {}) })}`} aria-current={active ? "page" : undefined} className={`category-link ${active ? "category-link-active" : ""}`}>
-              <Icon className="size-4 shrink-0" aria-hidden="true" />{item || "Todo"}
+            <Link key={item.id} href={`/?${new URLSearchParams({ ...(q ? { q } : {}), ...(item.id ? { category: item.id } : {}) })}`} aria-current={active ? "page" : undefined} className={`category-link ${active ? "category-link-active" : ""}`}>
+              <Icon className="size-4 shrink-0" aria-hidden="true" />{item.name}
             </Link>
           );
         })}

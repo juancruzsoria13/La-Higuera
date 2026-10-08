@@ -15,7 +15,7 @@ PRIVATE = {"Cache-Control": "private, no-store"}
 async def get_image(owner: str, file: str, db: DbDep) -> Response:
     if not OWNER.match(owner) or not FILE.match(file):
         return Response(status_code=404, headers=PRIVATE)
-    # Las políticas de Storage solo entregan imágenes de anuncios activos o propios.
+    # Las políticas de Storage solo entregan fotos de anuncios visibles o propios.
     data = await db.download(BUCKET, f"{owner}/{file}")
     if data is None:
         return Response(status_code=404, headers=PRIVATE)

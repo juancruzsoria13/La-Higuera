@@ -42,12 +42,13 @@ class Supabase:
         table: str,
         filters: list[tuple[str, str]] | None = None,
         *,
+        columns: str = "*",
         order: str | None = None,
         offset: int | None = None,
         limit: int | None = None,
         count: bool = False,
     ) -> tuple[list[dict[str, Any]], int | None]:
-        params = [("select", "*"), *(filters or [])]
+        params = [("select", columns), *(filters or [])]
         if order:
             params.append(("order", order))
         if offset is not None:

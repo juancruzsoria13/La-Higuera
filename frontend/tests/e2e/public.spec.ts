@@ -7,16 +7,22 @@ test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({p
   await page.getByRole("textbox", {name: "Buscar por título"}).fill("bicicleta");
   await page.getByRole("button", {name: "Buscar", exact: true}).click();
   await expect(page).toHaveURL(/q=bicicleta/);
-  await page.getByRole("link", {name: "Hogar", exact: true}).click();
-  await expect(page).toHaveURL(/category=Hogar/);
-  await expect(page.getByRole("textbox", {name: "Buscar por título"})).toHaveValue("bicicleta");
-  await page.getByRole("textbox", {name: "Buscar por título"}).fill("mesa");
-  await page.getByRole("button", {name: "Buscar", exact: true}).click();
-  await expect(page).toHaveURL(/category=Hogar/);
-  await expect(page).toHaveURL(/q=mesa/);
+  let term = "bicicleta";
+  // Los rubros vienen de la API: sin Supabase (como en CI) la barra solo muestra "Todo" y "Servicios".
+  const furniture = page.getByRole("link", {name: "Muebles", exact: true});
+  if (await furniture.count()) {
+    await furniture.click();
+    await expect(page).toHaveURL(/category=muebles/);
+    await expect(page.getByRole("textbox", {name: "Buscar por título"})).toHaveValue("bicicleta");
+    term = "mesa";
+    await page.getByRole("textbox", {name: "Buscar por título"}).fill(term);
+    await page.getByRole("button", {name: "Buscar", exact: true}).click();
+    await expect(page).toHaveURL(/category=muebles/);
+    await expect(page).toHaveURL(/q=mesa/);
+  }
   await page.getByRole("link", {name: "Todo", exact: true}).click();
   await expect(page).not.toHaveURL(/category=/);
-  await expect(page.getByRole("textbox", {name: "Buscar por título"})).toHaveValue("mesa");
+  await expect(page.getByRole("textbox", {name: "Buscar por título"})).toHaveValue(term);
   const overflowing = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflowing).toBe(false);
 });

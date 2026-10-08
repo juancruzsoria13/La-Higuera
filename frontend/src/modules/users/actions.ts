@@ -37,7 +37,7 @@ export async function logout() {
 }
 export async function updateProfile(_previous: ActionState, form: FormData): Promise<ActionState> {
   await requireUser();
-  const values = fields(form, ["display_name", "locality"]);
+  const values = fields(form, ["display_name", "locality_id"]);
   const parsed = profileSchema.safeParse(values);
   if (!parsed.success) return {error: parsed.error.issues[0].message, values};
   try { await api("/profile", json(parsed.data, "PUT")); }

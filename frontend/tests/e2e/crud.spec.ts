@@ -24,16 +24,20 @@ test("CRUD real, recarga, privacidad con dos usuarios y eliminación de cuenta",
       await target.getByRole("button",{name:"Ingresar",exact:true}).click();
       await expect(target).toHaveURL(/mis-productos/);
     }
-    await page.goto("/mi-perfil"); await page.getByLabel("Localidad",{exact:true}).fill("Rivadavia"); await page.getByRole("button",{name:"Guardar perfil"}).click(); await expect(page.getByRole("status")).toContainText("se guardó"); await page.reload(); await expect(page.getByLabel("Localidad",{exact:true})).toHaveValue("Rivadavia");
+    await page.goto("/mi-perfil"); await page.getByLabel("Localidad",{exact:true}).selectOption("rivadavia"); await page.getByRole("button",{name:"Guardar perfil"}).click(); await expect(page.getByRole("status")).toContainText("se guardó"); await page.reload(); await expect(page.getByLabel("Localidad",{exact:true})).toHaveValue("rivadavia");
     await page.goto("/productos/nuevo");
     await page.getByLabel("Título del anuncio").fill("Bicicleta de integración");
     await page.getByLabel("Descripción").fill("Una bicicleta de prueba para verificar la persistencia.");
     await page.getByLabel("Precio",{exact:true}).fill("15000,50");
-    const bytes = await sharp({create:{width:32,height:32,channels:3,background:"green"}}).png().toBuffer();
-    await page.getByLabel("Elegí una imagen").setInputFiles({name:"foto.png",mimeType:"image/png",buffer:bytes});
+    await expect(page.getByLabel("Localidad",{exact:true})).toHaveValue("rivadavia");
+    await page.getByLabel("Teléfono / WhatsApp").fill("2644123456");
+    const photo = (background: string) => sharp({create:{width:32,height:32,channels:3,background}}).png().toBuffer();
+    await page.getByLabel("Agregar fotos").setInputFiles([{name:"verde.png",mimeType:"image/png",buffer:await photo("green")},{name:"azul.png",mimeType:"image/png",buffer:await photo("blue")}]);
+    await page.getByRole("button",{name:"Mover la foto 2 antes"}).click();
     await page.getByRole("button",{name:"Publicar anuncio"}).click();
     await expect(page).toHaveURL(/productos\/[0-9a-f-]+\?guardado/); const productUrl = page.url().split("?")[0];
     await page.reload(); await expect(page.getByRole("heading",{name:"Bicicleta de integración"})).toBeVisible();
+    await expect(page.getByRole("button",{name:/Ver foto \d de 2/})).toHaveCount(2); await expect(page.getByRole("link",{name:"WhatsApp"})).toHaveAttribute("href","https://wa.me/2644123456");
     const imageUrl = await page.getByRole("img",{name:"Bicicleta de integración"}).getAttribute("src");
     await other.goto(productUrl); await expect(other.getByRole("heading",{name:"Bicicleta de integración"})).toBeVisible(); await expect(other.getByRole("link",{name:"Editar anuncio"})).toHaveCount(0); await expect(other.getByText(users[0].email)).toHaveCount(0);
     await other.goto(`${productUrl}/editar`); await expect(other.getByRole("heading",{name:"Este anuncio no está disponible"})).toBeVisible();

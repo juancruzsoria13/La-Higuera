@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import get_settings
-from .routers import account, images, products, services
+from .routers import account, catalog, images, products, services
 
 
 @asynccontextmanager
@@ -18,7 +18,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         yield
 
 
-app = FastAPI(title="La Higuera API", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="La Higuera API", version="0.3.0", lifespan=lifespan)
 
 origins = [origin.strip() for origin in get_settings().cors_origins.split(",") if origin.strip()]
 if origins:
@@ -41,5 +41,5 @@ async def health() -> dict[str, object]:
     return {"status": "ok", "supabase": settings.configured}
 
 
-for router in (products.router, services.router, account.router, images.router):
+for router in (catalog.router, products.router, services.router, account.router, images.router):
     app.include_router(router, prefix="/api")

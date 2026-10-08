@@ -33,5 +33,5 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 export const json = (body: unknown, method = "POST"): RequestInit => ({method, body: JSON.stringify(body), headers: {"Content-Type": "application/json"}});
 export const query = (params: Record<string, string | number | boolean | undefined>) =>
   new URLSearchParams(Object.entries(params).filter(([, v]) => v !== undefined && v !== "").map(([k, v]) => [k, String(v)])).toString();
-export type Profile = {display_name: string; locality: string; email: string};
+export type Profile = {display_name: string; locality_id: string; email: string};
 export const getProfile = () => api<Profile>("/profile");

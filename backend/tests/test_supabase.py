@@ -39,8 +39,11 @@ def test_filtros_orden_y_paginacion_en_la_url():
     )
     params = dict(urls[0].params)
     assert urls[0].path == "/rest/v1/products"
+    assert params["select"] == "*"
     assert params["updated_at"] == "eq.2026-10-07T12:00:00+00:00"
     assert params["order"] == "created_at.desc" and params["offset"] == "12" and params["limit"] == "12"
+    asyncio.run(client(handler).select("products", columns="*,images:product_images(path,sort_order)"))
+    assert dict(urls[1].params)["select"] == "*,images:product_images(path,sort_order)"
 
 
 def test_errores_y_usuario_invalido():

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, SlidersHorizontal, Wrench } from "lucide-react";
-import { categories } from "@/modules/products/schema";
+import { getCatalog } from "@/lib/catalog";
 import { listProducts } from "@/modules/products/queries";
 import { HomeCarousel } from "@/components/home-carousel";
 import { Fig } from "@/components/fig";
@@ -9,13 +9,14 @@ import { Pagination } from "@/components/pagination";
 import { SetupNotice } from "@/components/setup-notice";
 import { isConfigured } from "@/lib/env";
 import { listServices } from "@/modules/services/queries";
-import { trades } from "@/modules/services/schema";
 import { ServiceCard } from "@/components/service-card";
 
 export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const params = await searchParams;
   const q = typeof params.q === "string" ? params.q.slice(0, 120) : "";
-  const category = categories.find(c => c === params.category) ?? "";
+  const {categories, trades} = await getCatalog();
+  const selected = categories.find(c => c.id === params.category);
+  const category = selected?.id ?? "";
   const page = Math.max(1, Math.min(10000, Number.parseInt(params.page ?? "1", 10) || 1));
   let result: Awaited<ReturnType<typeof listProducts>> = { products: [], count: 0 };
   let error = "";
@@ -35,13 +36,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
         <section className="mt-9 overflow-hidden rounded-3xl bg-gradient-to-br from-[#0a2463] to-[#1d4ed8] p-6 text-white sm:mt-11 sm:p-9" aria-labelledby="servicios-titulo">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div className="max-w-xl">
-              <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.18em] text-sky-200"><Wrench className="size-3.5" />SERVICIOS · OFICIOS MATRICULADOS</p>
-              <h2 id="servicios-titulo" className="text-2xl font-bold tracking-tight sm:text-4xl">Gasistas, plomeros y más, con matrícula.</h2>
-              <p className="mt-3 text-sm text-blue-100">Encontrá profesionales de oficio en San Juan, mirá su matrícula y contactalos directo.</p>
+              <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.18em] text-sky-200"><Wrench className="size-3.5" />SERVICIOS · OFICIOS DE SAN JUAN</p>
+              <h2 id="servicios-titulo" className="text-2xl font-bold tracking-tight sm:text-4xl">Gasistas, pintores, plomeros y más, cerca tuyo.</h2>
+              <p className="mt-3 text-sm text-blue-100">Encontrá profesionales de oficio en San Juan, con y sin matrícula, y contactalos directo.</p>
             </div>
             <Link href="/servicios" className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-lg bg-white px-5 text-sm font-semibold text-primary transition hover:bg-sky-100">Ver todos los servicios <ArrowUpRight className="size-4" /></Link>
           </div>
-          <div className="mt-6 flex flex-wrap gap-2">{trades.map(t => <Link key={t} href={`/servicios?${new URLSearchParams({ category: t })}`} className="rounded-full bg-white/15 px-4 py-2 text-sm font-medium transition hover:bg-white/25">{t}</Link>)}</div>
+          <div className="mt-6 flex flex-wrap gap-2">{trades.map(t => <Link key={t.id} href={`/servicios?${new URLSearchParams({ category: t.id })}`} className="rounded-full bg-white/15 px-4 py-2 text-sm font-medium transition hover:bg-white/25">{t.name}</Link>)}</div>
           {featured.length > 0 && <div className="mt-7 grid gap-4 text-foreground sm:grid-cols-2 lg:grid-cols-3">{featured.map(s => <ServiceCard service={s} key={s.id} />)}</div>}
           {isConfigured() && featured.length === 0 && <p className="mt-6 text-sm text-blue-100">Todavía no hay profesionales publicados. <Link href="/servicios/nuevo" className="font-semibold underline">Sé el primero en sumar tu oficio</Link>.</p>}
         </section>
@@ -49,7 +50,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="mb-2 text-[10px] font-bold uppercase tracking-[.18em] text-primary">EXPLORÁ LA HIGUERA</p>
-              <h2 className="text-2xl font-bold tracking-tight sm:text-[28px]">{q ? `Resultados para “${q}”` : category || "Descubrí lo que hay cerca"}</h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-[28px]">{q ? `Resultados para “${q}”` : selected?.name || "Descubrí lo que hay cerca"}</h2>
               <p className="mt-2 text-sm text-muted-foreground">{isConfigured() && !error ? `${result.count} ${result.count === 1 ? "anuncio disponible" : "anuncios disponibles"}` : "Encontrá algo para vos, acá en San Juan."}</p>
             </div>
             <span className="flex items-center gap-2 rounded-lg border bg-white px-3 py-2.5 text-xs text-muted-foreground"><SlidersHorizontal className="size-3.5" />Más recientes primero</span>
@@ -66,7 +67,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
               <Fig variant={q || category ? 5 : 1} className="mx-auto mb-4 size-36" />
               <h3 className="text-lg font-semibold">{q || category ? "Todavía no hay coincidencias" : "El próximo anuncio puede ser el tuyo"}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{q || category ? "Probá con otra palabra o explorá todas las categorías." : "Publicá tu primer producto y compartilo con San Juan."}</p>
-              {(q || category) && <div className="mt-5 flex flex-wrap justify-center gap-2">{categories.map(item => <Link key={item} href={`/?${new URLSearchParams({ category: item })}`} className="inline-flex min-h-9 items-center rounded-lg border bg-white px-3 text-sm hover:border-primary">{item}</Link>)}</div>}
+              {(q || category) && <div className="mt-5 flex flex-wrap justify-center gap-2">{categories.map(item => <Link key={item.id} href={`/?${new URLSearchParams({ category: item.id })}`} className="inline-flex min-h-9 items-center rounded-lg border bg-white px-3 text-sm hover:border-primary">{item.name}</Link>)}</div>}
               <Link className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary" href={q || category || page > 1 ? "/" : "/productos/nuevo"}>{q || category || page > 1 ? "Ver todos los anuncios" : "Crear un anuncio"}<ArrowUpRight className="size-4" /></Link>
             </div>
           )}

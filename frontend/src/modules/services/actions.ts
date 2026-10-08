@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/modules/users/session";
 import { type ActionState, fields } from "@/lib/action-state";
 import { api, json } from "@/lib/api";
+import { getCatalog } from "@/lib/catalog";
 import { uuidSchema } from "@/modules/products/schema";
-import { serviceSchema } from "./schema";
-const names = ["name", "trade", "license_number", "license_body", "description", "phone", "locality", "status"];
+import { LICENSE_REQUIRED, serviceSchema } from "./schema";
+const names = ["name", "trade_id", "license_number", "license_body", "description", "phone", "locality_id", "contact_email", "status"];
 
 export async function saveService(id: string | null, _previous: ActionState, form: FormData): Promise<ActionState> {
   await requireUser();
@@ -14,6 +15,8 @@ export async function saveService(id: string | null, _previous: ActionState, for
   const result = serviceSchema.safeParse(values);
   if (!result.success) return {error: result.error.issues[0].message, values};
   if (id && !uuidSchema.safeParse(id).success) return {error: "Servicio inválido.", values};
+  const trade = (await getCatalog()).trades.find(t => t.id === result.data.trade_id);
+  if (trade?.requires_license && !(result.data.license_number && result.data.license_body)) return {error: LICENSE_REQUIRED, values};
   let saved: {id: string};
   try { saved = await api(id ? `/services/${id}` : "/services", json({...result.data, version: String(form.get("version") ?? "")}, id ? "PUT" : "POST")); }
   catch (error) { return {error: error instanceof Error ? error.message : "No pudimos guardar el servicio.", values}; }

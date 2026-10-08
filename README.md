@@ -1,6 +1,6 @@
 # La Higuera
 
-Sitio de anuncios de productos y de servicios de oficio matriculados para San Juan, Argentina. Conecta personas: no procesa compras, pagos ni envíos.
+Sitio de anuncios de productos y de servicios de oficio, con y sin matrícula, para San Juan, Argentina. Conecta personas: no procesa compras, pagos ni envíos.
 
 | Parte | Tecnología | Carpeta |
 | --- | --- | --- |
@@ -27,6 +27,7 @@ La arquitectura completa está en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 │   └── tests/              pytest
 ├── database/
 │   ├── migrations/         Esquema, funciones, RLS y Storage, en orden de aplicación
+│   ├── supabase_setup.sql  Las cuatro migraciones en un solo archivo, para un proyecto nuevo
 │   └── templates/          Plantilla HTML del correo de confirmación
 ├── docs/                   Arquitectura y registro de verificación
 ├── .github/workflows/      CI
@@ -93,11 +94,15 @@ Los cambios de código se recargan solos. Hay que reiniciar solo al cambiar vari
 ## Configurar Supabase
 
 1. Crear un proyecto y copiar la URL, la clave **publishable** y la clave **secret** a las variables de arriba.
-2. Aplicar las migraciones de [`database/migrations/`](database/migrations/) **en orden**, desde el **SQL Editor** de un proyecto nuevo:
+2. Aplicar las migraciones de [`database/migrations/`](database/migrations/) **en orden**, desde el **SQL Editor**:
    1. `202610020001_initial.sql`: perfiles, comercios, anuncios, imágenes, RLS y Storage.
-   2. `202610070001_services.sql`: servicios de oficio matriculados.
+   2. `202610070001_services.sql`: servicios de oficio.
+   3. `202610070002_supabase_hardening.sql`: permisos explícitos para `service_role`, límite de imágenes en trámite y ajustes de funciones.
+   4. `202610070003_marketplace_model.sql`: rubros, localidades y oficios en tablas; contacto, operación, vencimiento a 60 días y hasta 8 fotos por anuncio; matrícula solo para los oficios que la exigen; perfiles públicos con puntaje; y las tablas de comercios verificados, reseñas, denuncias y administración (todavía sin pantallas).
 
-   Cada una corre en una transacción. No repetirlas sobre el mismo proyecto: los cambios futuros van en migraciones nuevas.
+   En un proyecto **nuevo** se puede pegar en cambio [`database/supabase_setup.sql`](database/supabase_setup.sql), que reúne las cuatro en una sola transacción. Si el proyecto ya tiene alguna aplicada, ejecutar solo las que falten, en orden.
+
+   Cada una corre en una transacción. No repetirlas sobre el mismo proyecto: los cambios futuros van en migraciones nuevas. La cuarta cambia columnas que usa el código: requiere la versión 0.3.0 de la API y del frontend.
 3. En **Authentication → URL Configuration**, establecer Site URL en `http://localhost:3000` y permitir `http://localhost:3000/auth/confirm`. Al desplegar, agregar la URL de producción.
 4. En **Authentication → Providers → Email**, habilitar correo y contraseña con una longitud mínima de 8 caracteres. La app funciona con o sin confirmación de correo.
 5. Para registros públicos hace falta **Custom SMTP** (Authentication → Emails → SMTP Settings), con remitente `La Higuera` y una dirección propia verificada. No guardar credenciales SMTP en el repositorio.
@@ -119,33 +124,35 @@ La carpeta `supabase/` de la raíz está en `.gitignore`: la fuente de verdad si
 
 ### Verificar matrículas de servicios
 
-Quien publica un servicio declara su matrícula; la insignia **Matrícula verificada** solo la otorga la administración, después de comprobarla:
+En los oficios que la exigen (gasista, electricista y plomero, según `trades.requires_license`), quien publica declara su matrícula; la insignia **Matrícula verificada** solo la otorga la administración, después de comprobarla. Desde el SQL Editor:
 
 ```sql
 update public.service_providers set verified = true where id = '<id del servicio>';
 ```
 
-Si el profesional cambia el número, la entidad o el oficio, la verificación se retira sola.
+Si el profesional cambia el número, la entidad o el oficio, la verificación se retira sola. La migración 4 agrega además la función `admin_set_service_badges()` para un futuro panel de administración.
 
 ## Funcionalidad
 
-- Inicio con carrusel, bloque destacado de **Servicios**, buscador por título, categorías y páginas de 12 anuncios.
-- Detalle de anuncio con imagen, precio en ARS o USD, condición, localidad y nombre público del vendedor.
+- Inicio con carrusel, bloque destacado de **Servicios**, buscador por título, rubros y páginas de 12 anuncios.
+- Rubros, localidades (los 19 departamentos de San Juan) y oficios vienen de tablas de la base y se eligen de una lista.
+- Detalle de anuncio con todas sus fotos, precio en ARS o USD, condición, venta o alquiler (inmuebles), localidad, nombre público del vendedor y contacto: WhatsApp, teléfono y correo.
 - Registro, confirmación de correo, ingreso y cierre de sesión.
-- Perfil propio: nombre y localidad; el correo queda privado en Auth.
-- Anuncios propios: alta, edición, eliminación confirmada y estados activo, pausado y vendido. Una imagen opcional, convertida a WebP.
-- **Servicios de oficio**: gasistas, plomeros, electricistas y más, con matrícula, entidad emisora, teléfono y botón de WhatsApp. Búsqueda, filtro por oficio y gestión en *Mis servicios*.
+- Perfil propio: nombre y localidad; el correo de acceso queda privado en Auth.
+- Anuncios propios: alta, edición, eliminación confirmada y estados activo, pausado y vendido. Hasta 8 fotos opcionales, convertidas a WebP, que se pueden quitar y reordenar (la primera es la portada). Teléfono o correo de contacto obligatorio para publicar.
+- Vencimiento: un anuncio activo deja de verse a los 60 días. *Mis anuncios* marca los vencidos y permite renovarlos.
+- **Servicios de oficio**: gasistas, plomeros, electricistas, pintores y más, con teléfono, botón de WhatsApp y correo opcional. La matrícula y su entidad emisora se piden solo en los oficios que la exigen. Búsqueda, filtro por oficio y gestión en *Mis servicios*.
 - **Estudios de higo**: 9 ilustraciones SVG para momentos vacíos o de espera (sin foto, sin resultados, 404, carga y guardado).
 - Eliminación de cuenta con confirmación escrita y borrado real del usuario de Auth.
 - Interfaz adaptable en español de Argentina, accesible y con preferencia de movimiento reducido.
 
-Fuera de alcance: gestión visual de comercios, stock, chat, reputación, pagos, envíos y pantalla de administración.
+Fuera de alcance por ahora: pantallas de comercios y su verificación, reseñas y respuestas, denuncias, referencias de servicios y panel de administración (las tablas y funciones ya existen en la base), además de stock, chat, pagos y envíos.
 
 ## Seguridad
 
 - El navegador nunca habla con la base de datos directamente: el servidor de Next llama a la API con el token de la sesión, y la API consulta Supabase **con esa misma identidad**. Las políticas RLS deciden qué puede leer o modificar cada usuario.
 - La API verifica cada token contra Supabase Auth. Nunca acepta un `owner_id` ni un `user_id` enviado por el cliente.
-- Los permisos por columna impiden cambiar el dueño de un registro o marcar una matrícula como verificada.
+- Los permisos por columna impiden cambiar el dueño de un registro, marcar una matrícula como verificada u ocultar, desocultar o extender el vencimiento de un anuncio. `products` y `businesses` solo aceptan INSERT en las columnas listadas en la migración 4.
 - La clave secreta solo existe en el backend y solo se usa para eliminar cuentas.
 - Las imágenes se sirven por `/api/images/…` con `private, no-store`, pasando por las políticas de Storage. La API valida tamaño, MIME y decodificación real, limita a 20 megapíxeles, rechaza animaciones, quita metadatos y convierte a WebP de hasta 1600 px.
 
@@ -153,11 +160,13 @@ Fuera de alcance: gestión visual de comercios, stock, chat, reputación, pagos,
 
 Storage y PostgreSQL son servicios separados y no comparten transacción. Por eso:
 
-1. Antes de subir, se reserva una ruta en `storage_cleanup`.
-2. Se sube la imagen y se guarda el anuncio. En la misma transacción SQL se consume la reserva y se encola la imagen anterior.
+1. Antes de subir cada foto nueva, se reserva una ruta en `storage_cleanup` (`reserve_image()`).
+2. Se suben las fotos y se guarda el anuncio. Después, `set_product_images(product_id, paths)` deja las fotos exactamente como la lista final: en una sola transacción SQL consume las reservas nuevas, reordena y encola las fotos quitadas.
 3. Se borran los archivos pendientes. Si Storage falla, la tarea queda y se reintenta en la próxima operación del usuario.
-4. Si falla el guardado, la carga nueva queda marcada para borrar. Las reservas abandonadas se recuperan tras 24 horas.
+4. Si falla algo, cada carga nueva se marca para borrar (`abandon_image()`). En un alta, el anuncio recién creado se elimina para no dejarlo publicado sin sus fotos; en una edición, la API avisa que los datos se guardaron pero las fotos no. Las reservas abandonadas se recuperan tras 24 horas.
 5. Las ediciones usan `updated_at` como control de concurrencia: una pestaña desactualizada no pisa cambios de otra.
+
+El formulario envía las fotos por la server action de Next, cuyo límite de cuerpo es de 41 MB (`frontend/next.config.ts`) para admitir 8 fotos de 5 MB.
 
 Mantenimiento periódico, o después de una falla de Storage:
 
@@ -190,7 +199,7 @@ Con las migraciones aplicadas y las claves en `backend/.env`:
 cd backend && ALLOW_INTEGRATION_TESTS=true .venv/bin/python -m scripts.integration
 ```
 
-Crea dos usuarios temporales y verifica persistencia, CRUD, RLS, servicios, Storage privado y borrado de cuenta en cascada. Limpia sus usuarios al terminar.
+Crea dos usuarios temporales y verifica listas de referencia, perfiles públicos, persistencia, CRUD, contacto y operación, ocultos y vencidos, renovación, varias fotos con `set_product_images`, RLS, matrícula según el oficio, Storage privado y borrado de cuenta en cascada. Limpia sus usuarios al terminar.
 
 El recorrido Playwright autenticado (`frontend/tests/e2e/crud.spec.ts`) necesita además `ALLOW_INTEGRATION_TESTS=true` y `SUPABASE_SERVICE_ROLE_KEY` en `frontend/.env.local`, y la API corriendo. Sin eso se omite explícitamente.
 
@@ -201,7 +210,7 @@ El envío de correos se prueba a mano: registrarse con una dirección real, conf
 [`.github/workflows/ci.yml`](.github/workflows/ci.yml) corre en cada push a `main` o a ramas `commit-inicial-*`, y en cada pull request:
 
 - **frontend**: `npm ci`, lint, typecheck, Vitest y build (Node 22).
-- **e2e**: Playwright con Chromium, sin Supabase.
+- **e2e**: Playwright con Chromium, sin Supabase (sin API, la barra no muestra rubros y esa parte del recorrido se omite).
 - **backend**: ruff (lint y formato) y pytest (Python 3.13).
 
 No hay despliegue automático.
