@@ -4,25 +4,37 @@ test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({p
   await expect(page.getByRole("heading", {name: /Lo que buscás/})).toBeVisible();
   await expect(page.getByRole("button", {name: "Pausar carrusel"})).toBeVisible();
   await page.screenshot({path: testInfo.outputPath("inicio.png"), fullPage: true, animations: "disabled"});
-  await page.getByRole("textbox", {name: "Buscar por título"}).fill("bicicleta");
+  const search = page.getByRole("textbox", {name: "Qué buscás"});
+  await search.fill("bicicleta");
   await page.getByRole("button", {name: "Buscar", exact: true}).click();
   await expect(page).toHaveURL(/q=bicicleta/);
+  // "Anuncios" abre el menú de rubros; Escape lo cierra y devuelve el foco al botón.
+  const ads = page.getByRole("button", {name: "Anuncios"});
+  await ads.click();
+  await expect(ads).toHaveAttribute("aria-expanded", "true");
+  await expect(page.getByRole("navigation", {name: "Rubros"})).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(ads).toHaveAttribute("aria-expanded", "false");
+  await expect(ads).toBeFocused();
   let term = "bicicleta";
-  // Los rubros vienen de la API: sin Supabase (como en CI) la barra solo muestra "Todo" y "Servicios".
+  // Los rubros vienen de la API: sin Supabase (como en CI) el menú solo trae "Todos los anuncios".
+  await ads.click();
   const furniture = page.getByRole("link", {name: "Muebles", exact: true});
   if (await furniture.count()) {
     await furniture.click();
     await expect(page).toHaveURL(/category=muebles/);
-    await expect(page.getByRole("textbox", {name: "Buscar por título"})).toHaveValue("bicicleta");
+    await expect(search).toHaveValue("bicicleta");
     term = "mesa";
-    await page.getByRole("textbox", {name: "Buscar por título"}).fill(term);
+    await search.fill(term);
     await page.getByRole("button", {name: "Buscar", exact: true}).click();
     await expect(page).toHaveURL(/category=muebles/);
     await expect(page).toHaveURL(/q=mesa/);
+    await ads.click();
   }
-  await page.getByRole("link", {name: "Todo", exact: true}).click();
+  await page.getByRole("link", {name: "Todos los anuncios", exact: true}).click();
   await expect(page).not.toHaveURL(/category=/);
-  await expect(page.getByRole("textbox", {name: "Buscar por título"})).toHaveValue(term);
+  await expect(search).toHaveValue(term);
+  await expect(ads).toHaveAttribute("aria-expanded", "false");
   const overflowing = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflowing).toBe(false);
 });

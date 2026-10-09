@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Servicios y oficios · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="page" style="font-family: Figtree, 'Segoe UI', system-ui, sans-serif; background: #f5f7fb; color: #10213b">
+  <dc-import name="Header" active="servicios" hint-size="100%,170px"></dc-import>
+  <main class="main">
+    <div class="shell" style="display: flex; flex-direction: column; gap: 28px">
+      <section class="band-navy" aria-labelledby="servicios-h1">
+        <div style="display: flex; flex-direction: column; gap: 12px; max-width: 680px">
+          <h1 class="lh-h1" id="servicios-h1">Profesionales de oficio, cerca tuyo.</h1>
+          <p class="lh-lead">Gasistas, electricistas, pintores, albañiles y más oficios en San Juan. En los oficios que exigen matrícula, mirá si está verificada, y contactá directamente a cada profesional.</p>
+        </div>
+        <form class="lh-search" role="search" aria-label="Buscar profesionales" style="max-width: 560px">
+          <input id="srv-q" aria-label="Buscar por nombre" placeholder="Buscar por nombre…">
+          <button type="submit" aria-label="Buscar"><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></button>
+        </form>
+      </section>
+
+      <nav aria-label="Oficios" style="display: flex; flex-wrap: wrap; gap: 8px">
+        <a class="filter-chip filter-chip--active" href="Servicios.dc.html" aria-current="page">Todos</a>
+        <a class="filter-chip" href="Servicios.dc.html">Gasista</a>
+        <a class="filter-chip" href="Servicios.dc.html">Electricista</a>
+        <a class="filter-chip" href="Servicios.dc.html">Plomero</a>
+        <a class="filter-chip" href="Servicios.dc.html">Pintor</a>
+        <a class="filter-chip" href="Servicios.dc.html">Albañil</a>
+        <a class="filter-chip" href="Servicios.dc.html">Carpintero</a>
+        <a class="filter-chip" href="Servicios.dc.html">Jardinero</a>
+      </nav>
+
+      <section style="display: flex; flex-direction: column; gap: 24px" aria-labelledby="oficios">
+        <div class="lh-section-head" style="align-items: center">
+          <div>
+            <h2 class="lh-h2" id="oficios">Todos los oficios</h2>
+            <p class="lh-body-sm lh-muted">36 profesionales en San Juan</p>
+          </div>
+          <a class="lh-btn lh-btn--primary" href="OfrecerServicio.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Ofrecer mis servicios</a>
+        </div>
+        <div class="grid-services">
+          <sc-for list="{{services}}" as="s" hint-placeholder-count="6">
+            <article class="lh-card">
+              <a href="DetalleServicio.dc.html" style="display: flex; flex-direction: column; height: 100%; box-sizing: border-box; padding: 20px">
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px">
+                  <span class="avatar" style="border-radius: 12px"><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></span>
+                  <sc-if value="{{s.verified}}" hint-placeholder-val="{{ true }}"><span class="lh-pill lh-pill--verified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg>Matrícula verificada</span></sc-if>
+                  <sc-if value="{{s.declared}}" hint-placeholder-val="{{ false }}"><span class="lh-pill lh-pill--muted">Matrícula declarada</span></sc-if>
+                </div>
+                <p class="lh-overline" style="color: #164bfa">{{s.trade}}</p>
+                <h3 class="lh-title" style="margin-top: 8px">{{s.name}}</h3>
+                <p class="lh-body-sm lh-muted" style="margin-top: 8px">{{s.description}}</p>
+                <sc-if value="{{s.license}}" hint-placeholder-val="{{ true }}"><p class="lh-caption lh-muted" style="margin-top: 12px">{{s.license}}</p></sc-if>
+                <div class="lh-card-meta" style="margin-top: auto; padding-top: 16px"><span class="lh-caption"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>{{s.locality}}</span></div>
+              </a>
+            </article>
+          </sc-for>
+        </div>
+        <nav class="pager" aria-label="Paginación">
+          <span class="lh-body-sm lh-muted">Página 1 de 3</span>
+          <a class="lh-btn lh-btn--outline" href="Servicios.dc.html">Siguiente</a>
+        </nav>
+      </section>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,130px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      services: [
+        { trade: 'Gasista', name: 'Martín Quiroga · Gas y plomería', description: 'Instalaciones, reparación de artefactos y pruebas de hermeticidad para Ecogas.', license: 'Mat. 1234 · ENARGAS', locality: 'Santa Lucía', verified: true, declared: false },
+        { trade: 'Electricista', name: 'Electricidad Godoy', description: 'Instalaciones domiciliarias, tableros y urgencias las 24 horas en Gran San Juan.', license: 'Mat. 5521 · Colegio de Técnicos', locality: 'Rivadavia', verified: false, declared: true },
+        { trade: 'Pintor', name: 'Lucas Ferreyra', description: 'Pintura de interiores y exteriores, impermeabilización de techos y frentes.', license: '', locality: 'Rawson', verified: false, declared: false },
+        { trade: 'Plomero', name: 'Plomería Herrera', description: 'Destapaciones, cambio de cañerías y colocación de termotanques.', license: '', locality: 'Chimbas', verified: false, declared: false },
+        { trade: 'Albañil', name: 'Construcciones Molina', description: 'Ampliaciones, revoques, contrapisos y pequeñas reformas con presupuesto sin cargo.', license: '', locality: 'Pocito', verified: false, declared: false },
+        { trade: 'Jardinero', name: 'Verde Cuyo', description: 'Mantenimiento de jardines, poda y riego por goteo en casas y barrios privados.', license: '', locality: 'Rivadavia', verified: false, declared: false }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

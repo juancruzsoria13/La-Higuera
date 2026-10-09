@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ofrecer mis servicios · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="page" style="font-family: Figtree, 'Segoe UI', system-ui, sans-serif; background: #f5f7fb; color: #10213b">
+  <dc-import name="Header" active="servicios" logged="true" hint-size="100%,170px"></dc-import>
+  <main class="main">
+    <div class="shell form-page">
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px">
+        <a class="back" href="Servicios.dc.html" style="margin-bottom: 12px"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Servicios</a>
+        <h1 class="lh-h1">Ofrecé tus servicios</h1>
+        <p class="lh-lead lh-muted">Armá tu perfil de oficio con tus datos de contacto y, si tu oficio la exige, tu matrícula.</p>
+      </div>
+      <form style="display: flex; flex-direction: column; gap: 24px">
+        <section class="panel panel--form" aria-labelledby="s-oficio">
+          <h2 class="lh-h3" id="s-oficio">Tu oficio</h2>
+          <div class="lh-field">
+            <label class="lh-label" for="name">Nombre o razón social</label>
+            <input class="lh-input" id="name" placeholder="Ej.: Juan Pérez · Gas y plomería">
+          </div>
+          <div class="lh-field">
+            <label class="lh-label" for="trade_id">Oficio</label>
+            <select class="lh-input select" id="trade_id"><option>Gasista</option><option>Electricista</option><option>Plomero</option><option>Pintor</option><option>Albañil</option><option>Carpintero</option><option>Jardinero</option></select>
+          </div>
+          <div class="lh-field">
+            <label class="lh-label" for="description">Descripción de tus servicios</label>
+            <textarea class="lh-input textarea" id="description" placeholder="Ej.: Instalaciones y reparaciones de gas domiciliario, habilitaciones…"></textarea>
+            <p class="lh-caption lh-muted">Trabajos que realizás, zonas, horarios y si atendés urgencias.</p>
+          </div>
+        </section>
+
+        <section class="panel panel--form" aria-labelledby="s-matricula">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <h2 class="lh-h3" id="s-matricula">Matrícula</h2>
+            <p class="lh-body-sm lh-muted">Este oficio exige matrícula. Se muestra como declarada; la insignia “Matrícula verificada” la otorga La Higuera después de comprobarla, y se retira si cambiás el número, la entidad o el oficio.</p>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="lh-field">
+              <label class="lh-label" for="license_number">Número de matrícula</label>
+              <input class="lh-input" id="license_number">
+            </div>
+            <div class="lh-field">
+              <label class="lh-label" for="license_body">Entidad que la emitió</label>
+              <input class="lh-input" id="license_body">
+              <p class="lh-caption lh-muted">Ej.: ENARGAS, Colegio de Técnicos, ente municipal.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel panel--form" aria-labelledby="s-contacto">
+          <h2 class="lh-h3" id="s-contacto">Contacto y zona</h2>
+          <div class="form-grid form-grid--2">
+            <div class="lh-field">
+              <label class="lh-label" for="phone">Teléfono / WhatsApp</label>
+              <input class="lh-input" id="phone" inputmode="tel">
+              <p class="lh-caption lh-muted">Con código de área, sin 0 ni 15. Ej.: 2644123456. Es público.</p>
+            </div>
+            <div class="lh-field">
+              <label class="lh-label" for="contact_email">Correo de contacto (opcional)</label>
+              <input class="lh-input" id="contact_email" type="email" autocomplete="email">
+              <p class="lh-caption lh-muted">Es público.</p>
+            </div>
+          </div>
+          <div class="lh-field">
+            <label class="lh-label" for="locality_id">Localidad</label>
+            <select class="lh-input select" id="locality_id"><option>Santa Lucía</option><option>Capital</option><option>Rivadavia</option><option>Chimbas</option><option>Rawson</option><option>Pocito</option></select>
+          </div>
+        </section>
+
+        <section class="panel panel--form">
+          <div class="lh-field">
+            <label class="lh-label" for="status">Estado del perfil</label>
+            <select class="lh-input select" id="status"><option>Activo · visible para todos</option><option>Pausado · solo lo ves vos</option></select>
+            <p class="lh-caption lh-muted">Solo los perfiles activos son visibles para otras personas.</p>
+          </div>
+        </section>
+
+        <div class="submit-row">
+          <button class="lh-btn lh-btn--primary" type="submit">Publicar servicio</button>
+          <a class="lh-btn lh-btn--ghost" href="MisServicios.dc.html" style="color: #596a82">Cancelar</a>
+        </div>
+        <p class="lh-caption lh-muted" style="font-weight: 400">La Higuera conecta personas. No procesa pagos ni garantiza los trabajos.</p>
+      </form>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,130px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2240}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

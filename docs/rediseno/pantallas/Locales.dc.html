@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Locales de San Juan · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="page" style="font-family: Figtree, 'Segoe UI', system-ui, sans-serif; background: #f5f7fb; color: #10213b">
+  <dc-import name="Header" active="locales" hint-size="100%,170px"></dc-import>
+  <main class="main">
+    <div class="shell" style="display: flex; flex-direction: column; gap: 28px">
+      <div style="display: flex; flex-direction: column; gap: 12px; max-width: 680px">
+        <h1 class="lh-h1">Locales de San Juan</h1>
+        <p class="lh-lead lh-muted">Comercios verificados por La Higuera: negocios reales, con ventas anteriores y marca establecida. Mirá dónde están y qué venden.</p>
+      </div>
+
+      <nav aria-label="Rubros" style="display: flex; flex-wrap: wrap; gap: 8px">
+        <a class="filter-chip filter-chip--active" href="Locales.dc.html" aria-current="page">Todos</a>
+        <a class="filter-chip" href="Locales.dc.html">Inmuebles</a>
+        <a class="filter-chip" href="Locales.dc.html">Tecnología</a>
+        <a class="filter-chip" href="Locales.dc.html">Vehículos</a>
+        <a class="filter-chip" href="Locales.dc.html">Ropa</a>
+        <a class="filter-chip" href="Locales.dc.html">Muebles</a>
+        <a class="filter-chip" href="Locales.dc.html">Electrodomésticos</a>
+        <a class="filter-chip" href="Locales.dc.html">Materiales de construcción</a>
+      </nav>
+
+      <div class="locales">
+        <section style="display: flex; flex-direction: column; gap: 16px; min-width: 0" aria-labelledby="lista-locales">
+          <div class="lh-section-head" style="align-items: center">
+            <div>
+              <h2 class="lh-h3" id="lista-locales">6 locales verificados</h2>
+              <p class="lh-body-sm lh-muted">Ordenados por reseñas</p>
+            </div>
+          </div>
+          <div class="local-list">
+            <sc-for list="{{locales}}" as="l" hint-placeholder-count="6">
+              <a class="{{l.cardClass}}" href="PerfilLocal.dc.html">
+                <span class="local-logo" aria-hidden="true">{{l.initials}}</span>
+                <span style="display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1">
+                  <span style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px">
+                    <span class="lh-overline">{{l.category}}</span>
+                    <span class="lh-pill lh-pill--verified" style="padding: 2px 8px; font-size: 12px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg>Verificado</span>
+                  </span>
+                  <span class="lh-title">{{l.name}}</span>
+                  <span class="lh-caption lh-muted" style="display: flex; align-items: center; gap: 6px"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>{{l.address}}</span>
+                  <span class="lh-caption rating"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>{{l.rating}}<span class="lh-muted" style="font-weight: 400">({{l.reviews}} reseñas)</span></span>
+                </span>
+              </a>
+            </sc-for>
+          </div>
+        </section>
+
+        <div class="locales-map">
+          <dc-import name="MapaSJ" mode="locales" hint-size="100%,560px"></dc-import>
+        </div>
+      </div>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,130px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const l = (name, initials, category, address, rating, reviews, selected) => ({ name, initials, category, address, rating, reviews, cardClass: selected ? 'local-card local-card--selected' : 'local-card' });
+    return {
+      locales: [
+        l('Inmobiliaria Sarmiento', 'IS', 'Inmuebles', 'Mendoza 530 sur, Capital', '4,9', 12),
+        l('TecnoCuyo', 'TC', 'Tecnología', 'Av. Ignacio de la Roza 245 oeste, Capital', '4,8', 23, true),
+        l('Boutique Lila', 'BL', 'Ropa', 'Av. Libertador 3300 este, Santa Lucía', '4,8', 9),
+        l('Mueblería San Martín', 'MS', 'Muebles', 'Av. Córdoba 980 oeste, Capital', '4,7', 18),
+        l('Corralón El Algarrobo', 'EA', 'Materiales de construcción', 'Rastreador Calívar 1450, Rivadavia', '4,6', 41),
+        l('Electro Hogar Rawson', 'EH', 'Electrodomésticos', 'Av. España 2100 sur, Rawson', '4,5', 30)
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Solicitud de comercio · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="page" style="font-family: Figtree, 'Segoe UI', system-ui, sans-serif; background: #f5f7fb; color: #10213b">
+  <dc-import name="Header" active="locales" logged="true" hint-size="100%,170px"></dc-import>
+  <main class="main">
+    <div class="shell medium" style="display: flex; flex-direction: column; gap: 28px">
+      <sc-if value="{{review}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px">
+          <dc-import name="Fig" variant="6" size="120" hint-size="120px,120px"></dc-import>
+          <h1 class="lh-h1">Recibimos tu solicitud</h1>
+          <p class="lh-lead lh-muted">Vamos a revisar los datos de TecnoCuyo y te avisamos a carla.paez@correo.com. Mientras tanto podés seguir publicando como siempre.</p>
+        </div>
+        <section class="panel" aria-labelledby="pasos">
+          <h2 class="lh-h3" id="pasos">Cómo sigue</h2>
+          <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 16px">
+            <li class="info-row"><span class="avatar" style="width: 32px; height: 32px; background: #ecfdf5; color: #065f46"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span><div style="display: flex; flex-direction: column; gap: 2px"><p class="lh-title">Solicitud enviada</p><p class="lh-caption lh-muted">8 de octubre de 2026</p></div></li>
+            <li class="info-row"><span class="avatar" style="width: 32px; height: 32px; background: #164bfa; color: #ffffff; font: 700 14px/1 Figtree, sans-serif">2</span><div style="display: flex; flex-direction: column; gap: 2px"><p class="lh-title">Revisamos el comercio</p><p class="lh-body-sm lh-muted">Controlamos el CUIT, la dirección y que el local esté activo. Si falta algo, te escribimos.</p></div></li>
+            <li class="info-row"><span class="avatar" style="width: 32px; height: 32px; color: #596a82; font: 700 14px/1 Figtree, sans-serif">3</span><div style="display: flex; flex-direction: column; gap: 2px"><p class="lh-title" style="color: #596a82">Tu local aparece en el mapa</p><p class="lh-body-sm lh-muted">Con la insignia de verificado y tus anuncios en el perfil del local.</p></div></li>
+          </ol>
+        </section>
+        <div class="submit-row">
+          <a class="lh-btn lh-btn--primary" href="MisAnuncios.dc.html">Ir a mis anuncios</a>
+          <a class="lh-btn lh-btn--ghost" href="AltaComercio.dc.html" style="color: #596a82">Editar la solicitud</a>
+        </div>
+      </sc-if>
+      <sc-if value="{{rejected}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px">
+          <dc-import name="Fig" variant="5" size="120" hint-size="120px,120px"></dc-import>
+          <h1 class="lh-h1">No pudimos verificar TecnoCuyo</h1>
+          <p class="lh-lead lh-muted">Te contamos qué falta. Cuando lo corrijas, la solicitud vuelve a revisión.</p>
+        </div>
+        <p class="lh-notice lh-notice--error" role="alert" style="margin: 0">La razón social no coincide con la del CUIT 30-12345678-9. Revisá cómo figura en AFIP y corregila en la solicitud.</p>
+        <div class="submit-row">
+          <a class="lh-btn lh-btn--primary" href="AltaComercio.dc.html">Corregir la solicitud</a>
+          <a class="lh-btn lh-btn--ghost" href="Main.dc.html" style="color: #596a82">Volver al inicio</a>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,130px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"estado":{"editor":"enum","options":["en revisión","rechazada"],"default":"en revisión"},"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const rejected = (this.props.estado ?? 'en revisión') === 'rechazada';
+    return { review: !rejected, rejected };
+  }
+}
+</script>
+</body>
+</html>

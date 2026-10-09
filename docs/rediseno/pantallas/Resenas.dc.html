@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reseñas</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<section aria-labelledby="resenas" style="display: flex; flex-direction: column; gap: 24px; font-family: Figtree, 'Segoe UI', system-ui, sans-serif; color: #10213b; background: #f5f7fb">
+  <div class="lh-section-head" style="align-items: center">
+    <div>
+      <h2 class="lh-h2" id="resenas">Reseñas</h2>
+      <p class="lh-body-sm lh-muted">De clientes con correo o teléfono confirmado.</p>
+    </div>
+    <a class="lh-btn lh-btn--outline" href="DejarResena.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg>Dejar una reseña</a>
+  </div>
+
+  <div class="reviews-grid">
+    <div class="panel" style="gap: 12px">
+      <div style="display: flex; align-items: baseline; gap: 10px">
+        <p class="lh-price-lg">4,8</p>
+        <p class="lh-body-sm lh-muted">de 5 · 23 reseñas</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <sc-for list="{{bars}}" as="b" hint-placeholder-count="5">
+          <div style="display: grid; grid-template-columns: 52px minmax(0, 1fr) 24px; gap: 10px; align-items: center">
+            <span class="lh-caption lh-muted">{{b.label}}</span>
+            <span style="height: 8px; border-radius: 9999px; background: #edf3ff; overflow: hidden"><span style="display: block; height: 100%; width: {{b.pct}}%; background: #164bfa; border-radius: 9999px"></span></span>
+            <span class="lh-caption lh-muted" style="text-align: right; font-variant-numeric: tabular-nums">{{b.count}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 16px; min-width: 0">
+      <sc-for list="{{reviews}}" as="r" hint-placeholder-count="3">
+        <li class="panel" style="gap: 12px">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <span class="avatar" style="font: 700 14px/1 Figtree, sans-serif">{{r.initials}}</span>
+            <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1">
+              <p class="lh-title">{{r.name}}</p>
+              <p class="lh-caption lh-muted">{{r.date}}</p>
+            </div>
+            <span class="rating lh-caption" aria-label="{{r.stars}} de 5 estrellas"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>{{r.stars}}</span>
+          </div>
+          <p class="lh-body" style="max-width: 65ch">{{r.text}}</p>
+          <sc-if value="{{r.reply}}" hint-placeholder-val="{{ false }}">
+            <div style="margin-left: 16px; padding: 12px 16px; border-radius: 12px; background: #edf3ff; display: flex; flex-direction: column; gap: 4px">
+              <p class="lh-label">Respuesta de TecnoCuyo</p>
+              <p class="lh-body-sm lh-muted">{{r.reply}}</p>
+            </div>
+          </sc-if>
+          <a class="report-link" href="DenunciarResena.dc.html"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"></path></svg>Denunciar reseña</a>
+        </li>
+      </sc-for>
+      <li><a class="link" href="PerfilLocal.dc.html">Ver las 23 reseñas</a></li>
+    </ol>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const total = 23;
+    const counts = [17, 4, 1, 1, 0];
+    return {
+      bars: counts.map((count, i) => ({ label: (5 - i) + ' estr.', count, pct: Math.round(count / total * 100) })),
+      reviews: [
+        { initials: 'MG', name: 'Mariana Gil', date: 'Hace 3 días', stars: 5, text: 'Compré una notebook reacondicionada y me la entregaron configurada. Me explicaron la garantía sin vueltas.', reply: '¡Gracias, Mariana! Cualquier cosa con la notebook, pasá por el local.' },
+        { initials: 'JR', name: 'Joaquín Ríos', date: 'Hace 2 semanas', stars: 4, text: 'Buena atención y precios razonables. Tardaron un día más de lo prometido con el cambio de pantalla.', reply: '' },
+        { initials: 'SL', name: 'Sofía Lucero', date: 'Hace 1 mes', stars: 5, text: 'Respondieron rápido por WhatsApp y el celular estaba tal cual las fotos del anuncio.', reply: '' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

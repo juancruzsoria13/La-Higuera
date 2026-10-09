@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Footer de La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<footer class="ftr" style="font-family: Figtree, 'Segoe UI', system-ui, sans-serif; color: #10213b">
+  <div class="shell ftr-inner">
+    <div style="display: flex; align-items: center; gap: 16px">
+      <span class="lh-brand-tile"><svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true" style="color: #ffffff"><path fill="currentColor" d="M9 11h7v12c2-3 5-4 9-4 8 0 13 5 13 13v8h-8v-8c0-4-2-6-6-6s-8 3-8 7v7H9V11Z"></path><path fill="currentColor" d="M23 15C23 7 30 3 40 5c0 8-7 14-17 10Z"></path></svg></span>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <p class="lh-label">La Higuera</p>
+        <p class="lh-caption lh-muted">Hecho para encontrarnos en San Juan.</p>
+      </div>
+    </div>
+    <p class="lh-caption lh-muted" style="max-width: 320px">Conectamos personas. No procesamos compras ni pagos.</p>
+  </div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":140}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

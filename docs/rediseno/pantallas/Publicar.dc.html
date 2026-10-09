@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Publicar anuncio · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="page" style="font-family: Figtree, 'Segoe UI', system-ui, sans-serif; background: #f5f7fb; color: #10213b">
+  <dc-import name="Header" active="ninguna" logged="true" hint-size="100%,170px"></dc-import>
+  <main class="main">
+    <div class="shell form-page">
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px">
+        <a class="back" href="MisAnuncios.dc.html" style="margin-bottom: 12px"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Mis anuncios</a>
+        <h1 class="lh-h1">Dale una nueva historia</h1>
+        <p class="lh-lead lh-muted">Publicar es simple. Completá los datos de tu producto.</p>
+      </div>
+      <form style="display: flex; flex-direction: column; gap: 24px">
+        <section class="panel panel--form" aria-labelledby="p-que">
+          <h2 class="lh-h3" id="p-que">Contanos qué publicás</h2>
+          <div class="lh-field">
+            <label class="lh-label" for="title">Título del anuncio</label>
+            <input class="lh-input" id="title" placeholder="Ej.: Bicicleta urbana rodado 28">
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="lh-field">
+              <label class="lh-label" for="category_id">Rubro</label>
+              <select class="lh-input select" id="category_id"><option>Electrodomésticos</option><option>Inmuebles</option><option>Tecnología</option><option>Vehículos</option><option>Ropa</option><option>Muebles</option><option>Materiales de construcción</option><option>Otros</option></select>
+            </div>
+            <div class="lh-field">
+              <label class="lh-label" for="condition">Estado del producto</label>
+              <select class="lh-input select" id="condition"><option>Usado</option><option>Nuevo</option></select>
+            </div>
+          </div>
+          <div class="lh-field">
+            <label class="lh-label" for="description">Descripción</label>
+            <textarea class="lh-input textarea" id="description" placeholder="¿Qué debería saber la persona interesada?"></textarea>
+            <p class="lh-caption lh-muted">Incluí medidas, detalles y todo lo que ayude a conocer el producto.</p>
+          </div>
+        </section>
+
+        <section class="panel panel--form" aria-labelledby="p-precio">
+          <h2 class="lh-h3" id="p-precio">Precio y ubicación</h2>
+          <div class="form-grid form-grid--price">
+            <div class="lh-field">
+              <label class="lh-label" for="price">Precio</label>
+              <input class="lh-input" id="price" inputmode="decimal" placeholder="0,00">
+              <p class="lh-caption lh-muted">Sin separadores de miles. Podés usar hasta 2 decimales.</p>
+            </div>
+            <div class="lh-field">
+              <label class="lh-label" for="currency">Moneda</label>
+              <select class="lh-input select" id="currency"><option>ARS · Pesos</option><option>USD · Dólares</option></select>
+            </div>
+          </div>
+          <div class="lh-field">
+            <label class="lh-label" for="locality_id">Localidad</label>
+            <select class="lh-input select" id="locality_id"><option>Capital</option><option>Rivadavia</option><option>Santa Lucía</option><option>Chimbas</option><option>Rawson</option><option>Pocito</option></select>
+          </div>
+        </section>
+
+        <section class="panel panel--form" aria-labelledby="p-contacto">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <h2 class="lh-h3" id="p-contacto">Contacto</h2>
+            <p class="lh-body-sm lh-muted">Se muestran en el anuncio para que te escriban. Para publicarlo activo, completá al menos uno.</p>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="lh-field">
+              <label class="lh-label" for="contact_phone">Teléfono / WhatsApp</label>
+              <input class="lh-input" id="contact_phone" inputmode="tel" autocomplete="tel">
+              <p class="lh-caption lh-muted">Con código de área, sin 0 ni 15. Ej.: 2644123456.</p>
+            </div>
+            <div class="lh-field">
+              <label class="lh-label" for="contact_email">Correo de contacto</label>
+              <input class="lh-input" id="contact_email" type="email" autocomplete="email">
+            </div>
+          </div>
+        </section>
+
+        <section class="panel panel--form" aria-labelledby="p-fotos">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <h2 class="lh-h3" id="p-fotos">Las fotos hacen la diferencia</h2>
+            <p class="lh-body-sm lh-muted">Opcional. La primera es la portada.</p>
+          </div>
+          <ol class="photos" style="margin: 0; padding: 0; list-style: none">
+            <li class="photo"><div class="media-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-label="Foto 1"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg></div><span class="cover-tag">Portada</span>
+              <div class="photo-ctl"><span><button class="round-btn" type="button" aria-label="Mover la foto 1 antes" disabled style="opacity: .4"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button><button class="round-btn" type="button" aria-label="Mover la foto 1 después"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button></span><button class="round-btn" type="button" aria-label="Quitar la foto 1" style="color: #c62843"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div>
+            </li>
+            <li class="photo"><div class="media-ph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-label="Foto 2"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg></div>
+              <div class="photo-ctl"><span><button class="round-btn" type="button" aria-label="Mover la foto 2 antes"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg></button><button class="round-btn" type="button" aria-label="Mover la foto 2 después" disabled style="opacity: .4"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></button></span><button class="round-btn" type="button" aria-label="Quitar la foto 2" style="color: #c62843"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div>
+            </li>
+          </ol>
+          <div class="dropzone">
+            <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: #164bfa"><path d="M16 5h6"></path><path d="M19 2v6"></path><path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5"></path><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path><circle cx="9" cy="9" r="2"></circle></svg>
+            <label class="lh-label" for="image-files">Agregar fotos</label>
+            <input id="image-files" type="file" multiple accept="image/jpeg,image/png,image/webp" style="font: 400 14px/20px Figtree, sans-serif; color: #596a82">
+            <p class="lh-caption lh-muted" style="font-weight: 400">Hasta 8 fotos, en JPG, PNG o WebP, de hasta 5 MB cada una.</p>
+          </div>
+        </section>
+
+        <section class="panel panel--form" aria-labelledby="p-estado">
+          <div class="lh-field">
+            <label class="lh-label" for="status" id="p-estado">Estado del anuncio</label>
+            <select class="lh-input select" id="status"><option>Activo · visible para todos</option><option>Pausado · solo lo ves vos</option><option>Vendido · solo lo ves vos</option></select>
+            <p class="lh-caption lh-muted">Solo los anuncios activos son visibles para otras personas. Vencen a los 60 días y se renuevan desde Mis anuncios.</p>
+          </div>
+        </section>
+
+        <div class="submit-row">
+          <button class="lh-btn lh-btn--primary" type="submit">Publicar anuncio</button>
+          <a class="lh-btn lh-btn--ghost" href="MisAnuncios.dc.html" style="color: #596a82">Cancelar</a>
+        </div>
+        <p class="lh-caption lh-muted" style="font-weight: 400">La Higuera es un sitio de anuncios. No procesa compras ni pagos.</p>
+      </form>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,130px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2560}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

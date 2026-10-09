@@ -27,10 +27,10 @@ export function AccountMenu({ children }: { children: React.ReactNode }) {
     <details ref={ref} className="account-menu relative" onClick={event => {
       if (event.target instanceof Element && event.target.closest("a, button[type='submit']") && ref.current) ref.current.open = false;
     }}>
-      <summary aria-label="Mi cuenta" className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-medium">
-        <UserRound className="size-5" /><span className="hidden sm:inline">Mi cuenta</span><ChevronDown className="size-3" />
+      <summary aria-label="Mi cuenta" className="hdr-account cursor-pointer list-none">
+        <UserRound className="size-5" /><span className="hdr-account-text">Mi cuenta</span><ChevronDown className="size-3.5" />
       </summary>
-      <div className="absolute right-0 top-full z-40 mt-2 w-48 rounded-xl border bg-white p-2 text-foreground shadow-xl shadow-blue-950/15">{children}</div>
+      <div className="absolute right-0 top-full z-40 mt-2 w-52 rounded-xl border bg-card p-2 text-foreground shadow-[0_20px_25px_-5px_rgba(23,37,84,.15),0_8px_10px_-6px_rgba(23,37,84,.15)]">{children}</div>
     </details>
   );
 }

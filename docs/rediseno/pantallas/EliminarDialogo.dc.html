@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Eliminar anuncio · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(10, 36, 99, .55); font-family: Figtree, 'Segoe UI', system-ui, sans-serif; color: #10213b">
+  <div role="alertdialog" aria-labelledby="dlg-t" aria-describedby="dlg-d" style="width: 100%; max-width: 480px; box-sizing: border-box; background: #ffffff; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 20px 25px -5px rgba(23, 37, 84, .15), 0 8px 10px -6px rgba(23, 37, 84, .15)">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h2 class="lh-h3" id="dlg-t">¿Eliminar este anuncio?</h2>
+      <p class="lh-body-sm lh-muted" id="dlg-d">El anuncio se eliminará. Esta acción no se puede deshacer.</p>
+    </div>
+    <div class="lh-field">
+      <label class="lh-label" for="confirm-product">Escribí ELIMINAR para confirmar</label>
+      <input class="lh-input" id="confirm-product" autocomplete="off">
+    </div>
+    <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px">
+      <button class="lh-btn lh-btn--ghost" type="button">Cancelar</button>
+      <button class="lh-btn lh-btn--destructive" type="submit" disabled>Eliminar definitivamente</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

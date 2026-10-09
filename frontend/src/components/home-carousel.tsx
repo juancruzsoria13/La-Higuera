@@ -5,9 +5,9 @@ import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 import { BrandMark } from "./brand";
 
 const slides = [
-  { eyebrow: "DE ACÁ. PARA VOS.", first: "Lo que buscás,", second: "más cerca.", description: "Encontrá tu próximo producto en San Juan.", theme: "sky" },
-  { eyebrow: "ESO QUE YA NO USÁS", first: "Nueva historia.", second: "Nuevo dueño.", description: "Publicalo y hacé lugar para lo que viene.", theme: "blue" },
-  { eyebrow: "SAN JUAN NOS ENCUENTRA", first: "Tu próximo hallazgo", second: "está por acá.", description: "Explorá, descubrí y encontrá eso que te faltaba.", theme: "ice" },
+  { eyebrow: "De acá, para vos", first: "Lo que buscás,", second: "más cerca.", description: "Encontrá tu próximo producto en San Juan.", theme: "sky" },
+  { eyebrow: "Eso que ya no usás", first: "Nueva historia.", second: "Nuevo dueño.", description: "Publicalo y hacé lugar para lo que viene.", theme: "blue" },
+  { eyebrow: "San Juan nos encuentra", first: "Tu próximo hallazgo", second: "está por acá.", description: "Explorá, descubrí y encontrá eso que te faltaba.", theme: "ice" },
 ] as const;
 
 function subscribeMotion(callback: () => void) {
@@ -53,10 +53,10 @@ export function HomeCarousel() {
         <div className="carousel-slides" aria-live={rotating ? "off" : "polite"}>
           {slides.map((slide, index) => (
             <div key={slide.eyebrow} className="carousel-slide" data-active={index === active} aria-hidden={index !== active} inert={index !== active} role="group" aria-roledescription="mensaje" aria-label={`${index + 1} de ${slides.length}`}>
-              <div className="relative z-10 max-w-[750px]">
-                <p className="carousel-eyebrow">{slide.eyebrow}</p>
-                <h2 className="carousel-title">{slide.first}<br /><span>{slide.second}</span></h2>
-                <p className="carousel-description">{slide.description}</p>
+              <div className="relative z-10 flex max-w-[720px] flex-col gap-4">
+                <p className="eyebrow">{slide.eyebrow}</p>
+                <h2 className="display carousel-title">{slide.first}<br /><span>{slide.second}</span></h2>
+                <p className="lead max-w-[440px]">{slide.description}</p>
               </div>
             </div>
           ))}
@@ -72,7 +72,7 @@ export function HomeCarousel() {
             {!reducedMotion && <button className="carousel-play" onClick={() => setPaused(value => !value)} aria-label={paused ? "Reanudar carrusel" : "Pausar carrusel"}>{paused ? <Play className="size-3.5" /> : <Pause className="size-3.5" />}</button>}
           </div>
           <div className="flex items-center gap-2">
-            <span className="mr-3 text-xs font-medium tabular-nums">0{active + 1} <span className="opacity-45">/ 03</span></span>
+            <span className="carousel-count">0{active + 1} <span className="opacity-55">/ 03</span></span>
             <button className="carousel-arrow" aria-label="Mensaje anterior" onClick={() => showSlide(active - 1)}><ArrowLeft className="size-4" /></button>
             <button className="carousel-arrow" aria-label="Mensaje siguiente" onClick={() => showSlide(active + 1)}><ArrowRight className="size-4" /></button>
           </div>

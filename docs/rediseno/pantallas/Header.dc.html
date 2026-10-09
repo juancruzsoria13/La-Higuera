@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Header de La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<header style="position: relative; font-family: Figtree, 'Segoe UI', system-ui, sans-serif">
+  <div class="hdr">
+    <div class="shell hdr2-row">
+      <a class="hdr-logo" href="Main.dc.html" aria-label="La Higuera, inicio">
+        <span class="lh-brand lh-brand--inverted">
+          <span class="lh-brand-tile"><svg viewBox="0 0 48 48" width="32" height="32" aria-hidden="true" style="color: #164bfa"><path fill="currentColor" d="M9 11h7v12c2-3 5-4 9-4 8 0 13 5 13 13v8h-8v-8c0-4-2-6-6-6s-8 3-8 7v7H9V11Z"></path><path fill="currentColor" d="M23 15C23 7 30 3 40 5c0 8-7 14-17 10Z"></path></svg></span>
+          <span class="lh-brand-word">la higuera<span>.</span></span>
+        </span>
+      </a>
+      <form class="lh-search hdr2-search" role="search" aria-label="Buscar anuncios">
+        <input id="hdr-q" aria-label="Qué buscás" placeholder="¿Qué estás buscando hoy?">
+        <button type="submit" aria-label="Buscar"><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg></button>
+      </form>
+      <nav class="hdr-actions" aria-label="Tu cuenta">
+        <sc-if value="{{logged}}" hint-placeholder-val="{{ false }}">
+          <a class="hdr-account" href="MisAnuncios.dc.html"><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg><span>Mi cuenta</span><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></a>
+        </sc-if>
+        <sc-if value="{{guest}}" hint-placeholder-val="{{ true }}">
+          <a class="hdr-account" href="Ingresar.dc.html"><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg><span>Ingresar</span></a>
+        </sc-if>
+        <a class="lh-btn lh-btn--on-dark hdr-publish" href="Publicar.dc.html"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Publicar</a>
+      </nav>
+    </div>
+  </div>
+  <div class="hdr2-sub">
+    <div class="shell hdr2-sub-in">
+      <nav class="hdr2-tabs" aria-label="Secciones">
+        <button class="{{t.anuncios}}" type="button" aria-expanded="{{menuState}}" aria-controls="menu-categorias"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"></path><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"></circle></svg>Anuncios<svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>
+        <a class="{{t.locales}}" href="Locales.dc.html"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path></svg>Locales</a>
+        <a class="{{t.servicios}}" href="Servicios.dc.html"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>Servicios</a>
+      </nav>
+      <span class="hdr2-loc"><svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>San Juan, Argentina</span>
+    </div>
+  </div>
+  <sc-if value="{{menu}}" hint-placeholder-val="{{ false }}">
+    <div class="shell" style="position: relative">
+      <nav class="cat-menu hdr2-menu" id="menu-categorias" aria-label="Rubros">
+        <a class="cat-item cat-item--all" href="Main.dc.html"><span class="cat-icon"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg></span><span class="cat-text"><span>Todos los anuncios</span><span class="cat-count">248 anuncios</span></span></a>
+        <a class="cat-item" href="Main.dc.html"><span class="cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></span><span class="cat-text"><span>Inmuebles</span><span class="cat-count">31 anuncios</span></span></a><a class="cat-item" href="Main.dc.html"><span class="cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect><path d="M12 18h.01"></path></svg></span><span class="cat-text"><span>Tecnología</span><span class="cat-count">48 anuncios</span></span></a><a class="cat-item" href="Main.dc.html"><span class="cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8"></path><path d="M7 14h.01"></path><path d="M17 14h.01"></path><rect width="18" height="8" x="3" y="10" rx="2"></rect><path d="M5 18v2"></path><path d="M19 18v2"></path></svg></span><span class="cat-text"><span>Vehículos</span><span class="cat-count">27 anuncios</span></span></a><a class="cat-item" href="Main.dc.html"><span class="cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg></span><span class="cat-text"><span>Ropa</span><span class="cat-count">36 anuncios</span></span></a><a class="cat-item" href="Main.dc.html"><span class="cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"></path><path d="M2 16a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"></path><path d="M4 18v2"></path><path d="M20 18v2"></path><path d="M12 4v9"></path></svg></span><span class="cat-text"><span>Muebles</span><span class="cat-count">22 anuncios</span></span></a><a class="cat-item" href="Main.dc.html"><span class="cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"></path><path d="M5 10h14"></path><path d="M15 7v6"></path></svg></span><span class="cat-text"><span>Electrodomésticos</span><span class="cat-count">29 anuncios</span></span></a><a class="cat-item" href="Main.dc.html"><span class="cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M12 9v6"></path><path d="M16 15v6"></path><path d="M16 3v6"></path><path d="M3 15h18"></path><path d="M3 9h18"></path><path d="M8 15v6"></path><path d="M8 3v6"></path></svg></span><span class="cat-text"><span>Materiales de construcción</span><span class="cat-count">18 anuncios</span></span></a><a class="cat-item" href="Main.dc.html"><span class="cat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"></path><rect x="3" y="14" width="7" height="7" rx="1"></rect><circle cx="17.5" cy="17.5" r="3.5"></circle></svg></span><span class="cat-text"><span>Otros</span><span class="cat-count">37 anuncios</span></span></a>
+      </nav>
+    </div>
+  </sc-if>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"active":{"editor":"enum","options":["anuncios","locales","servicios","ninguna"],"default":"anuncios"},"logged":{"editor":"boolean","default":false},"menu":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    let active = this.props.active ?? 'anuncios';
+    if (active === 'todo' || active === 'categoria') active = 'anuncios';
+    const logged = this.props.logged === true || this.props.logged === 'true';
+    const menu = this.props.menu === true || this.props.menu === 'true';
+    const tab = (k) => 'hdr2-tab' + (active === k ? ' hdr2-tab--on' : '');
+    return {
+      logged: logged,
+      guest: !logged,
+      menu: menu,
+      menuState: menu ? 'true' : 'false',
+      t: { anuncios: tab('anuncios'), locales: tab('locales'), servicios: tab('servicios') }
+    };
+  }
+}
+</script>
+</body>
+</html>

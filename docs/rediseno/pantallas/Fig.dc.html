@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Higo — variantes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: {{size}}px; height: {{size}}px; color: {{ink}}">
+
+  <!-- 01 · Trazo vectorial numerado -->
+  <sc-if value="{{v1}}" hint-placeholder-val="{{ false }}">
+    <svg viewBox="0 0 200 200" width="100%" height="100%" role="img" aria-label="Higo dibujado como trazo vectorial con puntos de anclaje">
+      <path d="{{outline14}}" style="fill: none; stroke: {{pink}}; stroke-width: 1.3"></path>
+      <path d="M100 46 L 101 40" style="fill: none; stroke: {{pink}}; stroke-width: 1.3"></path>
+      <path d="M23 15C23 7 30 3 40 5c0 8-7 14-17 10Z" transform="translate(62 18.5) scale(1.7)" style="fill: none; stroke: {{pink}}; stroke-width: .65"></path>
+      <path d="{{anchors}}" style="fill: #111111"></path>
+      <circle cx="82" cy="40" r="5.5" style="fill: none; stroke: {{pink}}; stroke-width: .9"></circle>
+      <text x="82" y="42.2" text-anchor="middle" style="font: 500 6.5px 'IBM Plex Mono', monospace; fill: {{pink}}">1</text>
+      <circle cx="140" cy="20" r="5.5" style="fill: none; stroke: {{pink}}; stroke-width: .9"></circle>
+      <text x="140" y="22.2" text-anchor="middle" style="font: 500 6.5px 'IBM Plex Mono', monospace; fill: {{pink}}">2</text>
+      <circle cx="172" cy="104" r="5.5" style="fill: none; stroke: {{pink}}; stroke-width: .9"></circle>
+      <text x="172" y="106.2" text-anchor="middle" style="font: 500 6.5px 'IBM Plex Mono', monospace; fill: {{pink}}">3</text>
+    </svg>
+  </sc-if>
+
+  <!-- 02 · Capas recortadas superpuestas -->
+  <sc-if value="{{v2}}" hint-placeholder-val="{{ false }}">
+    <svg viewBox="0 0 200 200" width="100%" height="100%" role="img" aria-label="Higo armado con capas rectangulares superpuestas">
+      <defs><clipPath id="fig-clip-2"><path d="{{outline72}}"></path></clipPath></defs>
+      <g style="clip-path: url(#fig-clip-2)">
+        <rect x="40" y="56" width="70" height="54" style="fill: {{ink}}; opacity: .92"></rect>
+        <rect x="88" y="48" width="64" height="62" style="fill: {{pink}}; opacity: .75"></rect>
+        <rect x="58" y="92" width="84" height="40" style="fill: {{sky}}; opacity: .65"></rect>
+        <rect x="44" y="118" width="54" height="56" style="fill: {{ink}}; opacity: .85"></rect>
+        <rect x="94" y="108" width="62" height="66" style="fill: {{ink}}; opacity: .72"></rect>
+        <rect x="70" y="138" width="60" height="36" style="fill: {{pink}}; opacity: .6"></rect>
+        <rect x="108" y="76" width="46" height="46" style="fill: #0b1f6b; opacity: .55"></rect>
+        <rect x="52" y="72" width="32" height="30" style="fill: {{sky}}; opacity: .85"></rect>
+        <rect x="118" y="130" width="40" height="40" style="fill: {{sky}}; opacity: .5"></rect>
+      </g>
+      <rect x="140" y="96" width="28" height="28" style="fill: {{ink}}; opacity: .55"></rect>
+      <rect x="32" y="136" width="18" height="22" style="fill: {{pink}}; opacity: .6"></rect>
+      <rect x="96" y="36" width="8" height="10" style="fill: #0b1f6b"></rect>
+      <rect x="104" y="30" width="10" height="9" style="fill: {{ink}}"></rect>
+      <rect x="114" y="24" width="13" height="9" style="fill: {{ink}}; opacity: .85"></rect>
+      <rect x="127" y="22" width="7" height="7" style="fill: {{sky}}"></rect>
+    </svg>
+  </sc-if>
+
+  <!-- 03 · Una sola espiral continua -->
+  <sc-if value="{{v3}}" hint-placeholder-val="{{ false }}">
+    <svg viewBox="0 0 200 200" width="100%" height="100%" role="img" aria-label="Higo dibujado con una espiral continua">
+      <path d="{{spiral}}" style="fill: none; stroke: {{ink}}; stroke-width: 1.15; stroke-linejoin: round; stroke-linecap: round"></path>
+      <path d="{{scribble}}" style="fill: none; stroke: #111111; stroke-width: 1.1; stroke-linejoin: round"></path>
+      <path d="M23 15C23 7 30 3 40 5c0 8-7 14-17 10Z" transform="translate(62 18.5) scale(1.7)" style="fill: none; stroke: #111111; stroke-width: .55"></path>
+    </svg>
+  </sc-if>
+
+  <!-- 04 · Pixel art -->
+  <sc-if value="{{v4}}" hint-placeholder-val="{{ false }}">
+    <svg viewBox="0 0 200 200" width="100%" height="100%" role="img" aria-label="Higo en pixel art de baja resolución">
+      <path d="{{pxB}}" style="fill: {{ink}}"></path>
+      <path d="{{pxP}}" style="fill: {{pink}}"></path>
+      <path d="{{pxS}}" style="fill: #ffc4d8"></path>
+      <path d="{{pxK}}" style="fill: #0b1f6b"></path>
+      <path d="{{pxL}}" style="fill: {{sky}}"></path>
+    </svg>
+  </sc-if>
+
+  <!-- 05 · Ovillo caótico -->
+  <sc-if value="{{v5}}" hint-placeholder-val="{{ false }}">
+    <svg viewBox="0 0 200 200" width="100%" height="100%" role="img" aria-label="Higo dibujado como un ovillo de líneas">
+      <path d="{{ball}}" style="fill: none; stroke: {{ink}}; stroke-width: 1; stroke-linejoin: round; opacity: .92"></path>
+      <path d="{{ballStem}}" style="fill: none; stroke: {{ink}}; stroke-width: 1.2; stroke-linecap: round"></path>
+    </svg>
+  </sc-if>
+
+  <!-- 06 · Puntos concéntricos -->
+  <sc-if value="{{v6}}" hint-placeholder-val="{{ false }}">
+    <svg viewBox="0 0 200 200" width="100%" height="100%" role="img" aria-label="Higo formado por anillos de puntos">
+      <path d="{{rings}}" style="fill: {{ink}}"></path>
+      <path d="{{dotStem}}" style="fill: #111111"></path>
+    </svg>
+  </sc-if>
+
+  <!-- 07 · Franjas aerógrafo -->
+  <sc-if value="{{v7}}" hint-placeholder-val="{{ false }}">
+    <svg viewBox="0 0 200 200" width="100%" height="100%" role="img" aria-label="Higo en franjas horizontales difuminadas">
+      <defs>
+        <clipPath id="fig-clip-7"><path d="{{outline72}}"></path></clipPath>
+        <linearGradient id="fig-band-7" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" style="stop-color: {{ink}}; stop-opacity: 0"></stop>
+          <stop offset=".22" style="stop-color: {{ink}}; stop-opacity: 1"></stop>
+          <stop offset=".5" style="stop-color: {{sky}}; stop-opacity: .55"></stop>
+          <stop offset=".78" style="stop-color: {{ink}}; stop-opacity: 1"></stop>
+          <stop offset="1" style="stop-color: {{ink}}; stop-opacity: 0"></stop>
+        </linearGradient>
+        <filter id="fig-blur-7" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.4"></feGaussianBlur></filter>
+      </defs>
+      <g style="clip-path: url(#fig-clip-7)">
+        <g style="filter: url(#fig-blur-7)">
+          <rect x="30" y="50" width="140" height="11" style="fill: url(#fig-band-7)"></rect>
+          <rect x="30" y="69" width="140" height="13" style="fill: url(#fig-band-7)"></rect>
+          <rect x="30" y="90" width="140" height="15" style="fill: url(#fig-band-7)"></rect>
+          <rect x="30" y="113" width="140" height="16" style="fill: url(#fig-band-7)"></rect>
+          <rect x="30" y="137" width="140" height="15" style="fill: url(#fig-band-7)"></rect>
+          <rect x="30" y="159" width="140" height="13" style="fill: url(#fig-band-7)"></rect>
+        </g>
+      </g>
+      <path d="M23 15C23 7 30 3 40 5c0 8-7 14-17 10Z" transform="translate(62 18.5) scale(1.7)" style="fill: {{ink}}; filter: url(#fig-blur-7); opacity: .9"></path>
+    </svg>
+  </sc-if>
+
+  <!-- 08 · Low-poly con semillas -->
+  <sc-if value="{{v8}}" hint-placeholder-val="{{ false }}">
+    <svg viewBox="0 0 200 200" width="100%" height="100%" role="img" aria-label="Higo geométrico de caras planas">
+      <path d="M100 50 L 101 37" style="fill: none; stroke: #2a2a2a; stroke-width: 6"></path>
+      <path d="{{poly0}}" style="fill: {{ink}}"></path>
+      <path d="{{poly1}}" style="fill: #3557ff"></path>
+      <path d="{{poly2}}" style="fill: #142e9c"></path>
+      <path d="{{poly3}}" style="fill: #0f2477"></path>
+      <path d="M78 92 L 86 100 L 79 110 L 71 101 Z M124 86 L 133 92 L 128 103 L 119 96 Z M112 142 L 122 147 L 117 158 L 107 152 Z" style="fill: #111111"></path>
+    </svg>
+  </sc-if>
+
+  <!-- 09 · Semitono -->
+  <sc-if value="{{v9}}" hint-placeholder-val="{{ false }}">
+    <svg viewBox="0 0 200 200" width="100%" height="100%" role="img" aria-label="Higo impreso en semitono">
+      <path d="M100 48 L 101 39" style="fill: none; stroke: {{ink}}; stroke-width: 5; stroke-linecap: round"></path>
+      <path d="M23 15C23 7 30 3 40 5c0 8-7 14-17 10Z" transform="translate(62 18.5) scale(1.7)" style="fill: {{ink}}"></path>
+      <path d="{{halftone}}" style="fill: {{ink}}"></path>
+    </svg>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"variant":{"editor":"enum","options":["1","2","3","4","5","6","7","8","9"],"default":"1"},"size":{"editor":"int","default":240,"min":40,"max":800},"ink":{"editor":"color","default":"#1C3FD1","options":["#1C3FD1","#164BFA","#0F2FA8"]},"pink":{"editor":"color","default":"#F0528C"},"sky":{"editor":"color","default":"#5CDDFF"},"$preview":{"width":240,"height":240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const v = Number(this.props.variant ?? 1) || 1;
+    const CX = 100, CY = 116, R = 60;
+    const f = (n) => Math.round(n * 10) / 10;
+    // Silueta de higo: cuerpo ancho y redondo, base apenas achatada, hombros que se cierran rápido y una puntita corta arriba.
+    const fp = (t, s) => {
+      const sn = Math.sin(t), cs = Math.cos(t);
+      if (sn < 0) {
+        const w = 1 - 0.45 * Math.pow(-sn, 3);
+        return [CX + s * R * cs * w, CY + s * (R * sn - 10 * Math.exp(-cs * cs / 0.012))];
+      }
+      return [CX + s * R * cs, CY + s * R * 0.88 * sn];
+    };
+    let seed = 7 + v * 13;
+    const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    const poly = (n, s) => Array.from({ length: n }, (_, i) => fp(-Math.PI / 2 + i * 2 * Math.PI / n, s));
+    const pathOf = (pts, close) => pts.map((p, i) => (i ? 'L' : 'M') + f(p[0]) + ' ' + f(p[1])).join('') + (close ? 'Z' : '');
+    const dot = (x, y, r) => 'M' + f(x - r) + ' ' + f(y) + 'a' + f(r) + ' ' + f(r) + ' 0 1 0 ' + f(2 * r) + ' 0a' + f(r) + ' ' + f(r) + ' 0 1 0 ' + f(-2 * r) + ' 0';
+    const sq = (x, y, s) => 'M' + f(x) + ' ' + f(y) + 'h' + s + 'v' + s + 'h-' + s + 'Z';
+    const out = { size: this.props.size ?? 240, ink: this.props.ink ?? '#1C3FD1', pink: this.props.pink ?? '#F0528C', sky: this.props.sky ?? '#5CDDFF' };
+    for (let i = 1; i <= 9; i++) out['v' + i] = v === i;
+    const outline72pts = poly(72, 1);
+    out.outline72 = pathOf(outline72pts, true);
+
+    if (v === 1) {
+      const pts = poly(14, 1);
+      out.outline14 = pathOf(pts, true);
+      out.anchors = pts.concat([[101, 40], [130, 27]]).map(p => sq(p[0] - 3, p[1] - 3, 6)).join('');
+    }
+    if (v === 3) {
+      const turns = 6.5, steps = 900, max = turns * 2 * Math.PI, pts = [];
+      for (let i = 0; i <= steps; i++) {
+        const th = i / steps * max, s = 0.04 + 0.96 * (th / max);
+        const p = fp(th - Math.PI / 2, s);
+        pts.push([p[0] + (rnd() - .5) * 1.1, p[1] + (rnd() - .5) * 1.1]);
+      }
+      out.spiral = pathOf(pts, false);
+      const sc = [];
+      for (let i = 0; i < 8; i++) { sc.push([90 + i * 1.8, 46 - i * 1.1]); sc.push([102 + i * 1.8, 36 - i * 1.1]); }
+      out.scribble = pathOf(sc, false);
+    }
+    if (v === 4) {
+      const map = [
+        '........LLL..',
+        '.......LLLL..',
+        '......KLL....',
+        '......B......',
+        '.....BBB.....',
+        '...BBBBBBB...',
+        '..BBBBPBBBB..',
+        '.BBBBPPPBBBB.',
+        '.BBBPPSPPBBB.',
+        'BBBPPSSSPPBBB',
+        'BBPPSSPSSPPBB',
+        'BBPPSSSSSPPBB',
+        'BBBPPSSSPPBBB',
+        '.BBBPPPPPBBB.',
+        '..BBBBBBBBB..',
+        '....BBBBB....'
+      ];
+      const c = 11, ox = (200 - 13 * c) / 2, oy = 12, acc = { B: '', P: '', S: '', K: '', L: '' };
+      map.forEach((row, y) => row.split('').forEach((ch, x) => { if (acc[ch] !== undefined) acc[ch] += sq(ox + x * c, oy + y * c, c); }));
+      out.pxB = acc.B; out.pxP = acc.P; out.pxS = acc.S; out.pxK = acc.K; out.pxL = acc.L;
+    }
+    if (v === 5) {
+      const pts = [];
+      for (let k = 0; k < 24; k++) {
+        const c = fp(rnd() * 2 * Math.PI, rnd() * 0.4);
+        const rx = 16 + rnd() * 28, ry = 12 + rnd() * 26, rot = rnd() * Math.PI;
+        const a0 = rnd() * 2 * Math.PI;
+        for (let i = 0; i <= 30; i++) {
+          const a = a0 + i / 30 * 2 * Math.PI;
+          const x = rx * Math.cos(a), y = ry * Math.sin(a);
+          pts.push([c[0] + x * Math.cos(rot) - y * Math.sin(rot) + (rnd() - .5) * 2, c[1] + 6 + x * Math.sin(rot) + y * Math.cos(rot) + (rnd() - .5) * 2]);
+        }
+      }
+      out.ball = pathOf(pts, false);
+      const st = [];
+      for (let i = 0; i <= 18; i++) { const t = i / 18; st.push([100 + t * 3 + Math.sin(t * 18) * 2, 66 - t * 28]); }
+      out.ballStem = pathOf(st, false);
+    }
+    if (v === 6) {
+      let d = '';
+      [1, .8, .62, .45, .29, .14].forEach(s => {
+        const n = Math.max(6, Math.round(38 * s));
+        const r = 1.6 + 3.4 * s;
+        poly(n, s).forEach(p => { d += dot(p[0], p[1], r); });
+      });
+      out.rings = d + dot(CX, CY, 2.2);
+      let st = '';
+      for (let i = 0; i < 4; i++) { const t = i / 3; st += dot(100 + t * 4, 40 - t * 14, 1.4 + t * 1.4); }
+      out.dotStem = st;
+    }
+    if (v === 8) {
+      const ring = poly(9, 1), cpt = [108, 112], faces = ['', '', '', ''];
+      ring.forEach((p, i) => {
+        const q = ring[(i + 1) % ring.length];
+        faces[i % 4] += pathOf([cpt, p, q], true);
+      });
+      out.poly0 = faces[0]; out.poly1 = faces[1]; out.poly2 = faces[2]; out.poly3 = faces[3];
+    }
+    if (v === 9) {
+      const inside = (x, y) => {
+        let c = false;
+        for (let i = 0, j = outline72pts.length - 1; i < outline72pts.length; j = i++) {
+          const [xi, yi] = outline72pts[i], [xj, yj] = outline72pts[j];
+          if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c;
+        }
+        return c;
+      };
+      let d = '';
+      const step = 4.4;
+      for (let row = 0, y = 40; y < 174; y += step * 0.866, row++) {
+        for (let x = 38 + (row % 2) * step / 2; x < 164; x += step) {
+          if (!inside(x, y)) continue;
+          const hl = Math.hypot(x - 80, y - 90);
+          if (hl < 9) continue;
+          const n = Math.min(1, hl / 82);
+          const r = 0.3 + 2.15 * n;
+          d += dot(x, y, r);
+        }
+      }
+      out.halftone = d;
+    }
+    return out;
+  }
+}
+</script>
+</body>
+</html>

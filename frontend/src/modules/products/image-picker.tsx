@@ -30,18 +30,18 @@ export function ImagePicker({items, onChange, title}: {items: ImageItem[]; onCha
     setError(""); onChange(items.filter((_, i) => i !== index));
   }
   const control = "flex size-8 items-center justify-center rounded-full bg-card/95 text-foreground shadow hover:bg-white disabled:opacity-40";
-  return <div className="space-y-4">
+  return <div className="flex flex-col gap-4">
     {tokens.map(token => <input key={token} type="hidden" name="image_order" value={token} />)}
-    {items.length > 0 && <ol className="grid grid-cols-2 gap-3 sm:grid-cols-4">{items.map((item, index) => <li key={item.key} className="relative overflow-hidden rounded-xl border bg-muted">
+    {items.length > 0 && <ol className="grid grid-cols-2 gap-3 sm:grid-cols-4">{items.map((item, index) => <li key={item.key} className="relative overflow-hidden rounded-xl border border-border bg-muted">
       {/* eslint-disable-next-line @next/next/no-img-element -- vista previa local o imagen privada, fuera del cache de Next */}
       <img src={item.url} alt={`${title || "Anuncio"}, foto ${index + 1}`} className="aspect-[4/3] w-full object-cover" />
-      {index === 0 && <span className="absolute left-2 top-2 rounded-full bg-primary px-2.5 py-1 text-[11px] font-semibold text-white">Portada</span>}
+      {index === 0 && <span className="absolute left-2 top-2 rounded-full bg-primary px-2.5 py-1 text-xs leading-4 font-semibold text-primary-foreground">Portada</span>}
       <div className="absolute inset-x-2 bottom-2 flex justify-between gap-1">
         <span className="flex gap-1"><button type="button" className={control} onClick={() => move(index, -1)} disabled={index === 0} aria-label={`Mover la foto ${index + 1} antes`}><ArrowLeft className="size-4" /></button><button type="button" className={control} onClick={() => move(index, 1)} disabled={index === items.length - 1} aria-label={`Mover la foto ${index + 1} después`}><ArrowRight className="size-4" /></button></span>
         <button type="button" className={`${control} text-destructive`} onClick={() => remove(index)} aria-label={`Quitar la foto ${index + 1}`}><X className="size-4" /></button>
       </div>
     </li>)}</ol>}
     {error && <p role="alert" className="notice notice-error">{error}</p>}
-    {items.length < MAX_IMAGES && <div className="rounded-xl border border-dashed border-primary/30 bg-muted/40 p-6"><ImagePlus className="mb-3 size-6 text-primary" /><label className="field-label" htmlFor="image-files">Agregar fotos</label><input className="mt-2 block w-full text-sm file:mr-4 file:rounded-lg file:border-0 file:bg-primary/10 file:px-4 file:py-2 file:text-primary" id="image-files" type="file" multiple accept={TYPES.join(",")} onChange={event => { add(event.target.files); event.target.value = ""; }} /><p className="mt-2 text-xs leading-5 text-muted-foreground">Hasta {MAX_IMAGES} fotos · JPG, PNG o WebP · Hasta 5 MB y 20 megapíxeles cada una · Sin animación. La primera es la portada.</p></div>}
+    {items.length < MAX_IMAGES && <div className="flex flex-col items-start gap-2 rounded-xl border border-dashed border-border-strong bg-background p-6"><ImagePlus className="size-6 text-primary" /><label className="field-label" htmlFor="image-files">Agregar fotos</label><input className="block w-full text-sm text-muted-foreground file:mr-4 file:rounded-lg file:border-0 file:bg-primary/10 file:px-4 file:py-2 file:font-semibold file:text-primary" id="image-files" type="file" multiple accept={TYPES.join(",")} onChange={event => { add(event.target.files); event.target.value = ""; }} /><p className="caption font-normal text-muted-foreground">Hasta {MAX_IMAGES} fotos, en JPG, PNG o WebP, de hasta 5 MB cada una.</p></div>}
   </div>;
 }
