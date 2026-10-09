@@ -5,5 +5,5 @@ export function Pagination({page, count, base = "/", q = "", category = ""}: {pa
   const pages = Math.max(1, Math.ceil(count / PAGE_SIZE));
   const href = (p: number) => `${base}?${new URLSearchParams({q, category, page: String(p)})}`;
   if (pages === 1 && page === 1) return null;
-  return <nav aria-label="Paginación" className="mt-10 flex items-center justify-center gap-4">{page > 1 && <Link className={buttonVariants({variant: "outline"})} href={href(page - 1)}>Anterior</Link>}<span className="text-sm text-muted-foreground">Página {page} de {pages}</span>{page < pages && <Link className={buttonVariants({variant: "outline"})} href={href(page + 1)}>Siguiente</Link>}</nav>;
+  return <nav aria-label="Paginación" className="mt-2 flex items-center justify-center gap-4">{page > 1 && <Link className={buttonVariants({variant: "outline"})} href={href(page - 1)}>Anterior</Link>}<span className="body-sm text-muted-foreground">Página {page} de {pages}</span>{page < pages && <Link className={buttonVariants({variant: "outline"})} href={href(page + 1)}>Siguiente</Link>}</nav>;
 }

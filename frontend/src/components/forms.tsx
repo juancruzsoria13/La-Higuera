@@ -3,9 +3,9 @@ import { useFormStatus } from "react-dom";
 import { LoaderCircle } from "lucide-react";
 import { Button } from "./ui/button";
 import type { ActionState } from "@/lib/action-state";
-export function SubmitButton({children, disabled = false, destructive = false, outline = false}: {children: React.ReactNode; disabled?: boolean; destructive?: boolean; outline?: boolean}) {
+export function SubmitButton({children, disabled = false, destructive = false, outline = false, className}: {children: React.ReactNode; disabled?: boolean; destructive?: boolean; outline?: boolean; className?: string}) {
   const {pending} = useFormStatus();
-  return <Button type="submit" disabled={pending || disabled} variant={destructive ? "destructive" : outline ? "outline" : "default"}>{pending && <LoaderCircle className="size-4 animate-spin" />}{pending ? "Un momento…" : children}</Button>;
+  return <Button type="submit" disabled={pending || disabled} variant={destructive ? "destructive" : outline ? "outline" : "default"} className={className}>{pending && <LoaderCircle className="size-4 animate-spin" />}{pending ? "Un momento…" : children}</Button>;
 }
 export function FormMessage({state}: {state: ActionState}) {
   if (!state.error && !state.success) return null;

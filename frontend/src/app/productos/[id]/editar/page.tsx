@@ -12,5 +12,5 @@ export default async function EditProduct({params}: {params: Promise<{id: string
   const product = await getProduct(id);
   if (!product || product.owner_id !== user.id) notFound();
   const catalog = await getCatalog();
-  return <div className="shell max-w-3xl py-10"><PageHeading title="Editar anuncio" description="Actualizá los detalles o cambiá el estado de tu publicación." back={`/productos/${id}`} backLabel="Volver al anuncio" /><ProductForm product={product} catalog={catalog} /></div>;
+  return <div className="shell max-w-3xl py-7 sm:py-10"><PageHeading title="Editar anuncio" description="Actualizá los detalles o cambiá el estado de tu publicación." back={`/productos/${id}`} backLabel="Volver al anuncio" /><ProductForm product={product} catalog={catalog} /></div>;
 }

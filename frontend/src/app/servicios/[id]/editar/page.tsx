@@ -12,5 +12,5 @@ export default async function EditService({params}: {params: Promise<{id: string
   const service = await getService(id);
   if (!service || service.owner_id !== user.id) notFound();
   const catalog = await getCatalog();
-  return <div className="shell max-w-3xl py-10"><PageHeading title="Editar servicio" description="Actualizá tus datos o pausá tu perfil." back={`/servicios/${id}`} backLabel="Volver al perfil" /><ServiceForm service={service} catalog={catalog} /></div>;
+  return <div className="shell max-w-3xl py-7 sm:py-10"><PageHeading title="Editar servicio" description="Actualizá tus datos o pausá tu perfil." back={`/servicios/${id}`} backLabel="Volver al perfil" /><ServiceForm service={service} catalog={catalog} /></div>;
 }
