@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Menú de categorías abierto · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="page" style="min-height: 640px; font-family: Figtree, 'Segoe UI', system-ui, sans-serif; background: #f5f7fb; color: #10213b">
+  <dc-import name="Header" active="todo" menu="true" hint-size="100%,170px"></dc-import>
+  <div class="shell" style="padding-block: 40px; display: flex; flex-direction: column; gap: 8px">
+    <h2 class="lh-h2">Descubrí lo que hay cerca</h2>
+    <p class="lh-body-sm lh-muted">248 anuncios disponibles</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":640}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Denunciar · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(10, 36, 99, .55); font-family: Figtree, 'Segoe UI', system-ui, sans-serif; color: #10213b">
+  <div role="dialog" aria-labelledby="d-t" style="width: 100%; max-width: 540px; max-height: 852px; overflow-y: auto; box-sizing: border-box; background: #ffffff; border-radius: 16px; padding: 28px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 20px 25px -5px rgba(23, 37, 84, .15), 0 8px 10px -6px rgba(23, 37, 84, .15)">
+    <sc-if value="{{form}}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <h2 class="lh-h3" id="d-t">{{title}}</h2>
+        <p class="lh-body-sm lh-muted">{{subject}}</p>
+      </div>
+      <fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px">
+        <legend class="lh-label" style="padding: 0; margin-bottom: 8px">¿Qué pasa?</legend>
+        <sc-for list="{{reasons}}" as="r" hint-placeholder-count="5">
+          <label class="{{r.cls}}"><input type="radio" name="motivo" checked="{{r.on}}" onChange="{{r.pick}}">{{r.label}}</label>
+        </sc-for>
+      </fieldset>
+      <div class="lh-field">
+        <label class="lh-label" for="d-detalle">Contanos qué pasó <span class="lh-muted" style="font-weight: 400">(opcional)</span></label>
+        <textarea class="lh-input" id="d-detalle" style="min-height: 96px; resize: vertical" placeholder="Por ejemplo: me pidió una seña por transferencia antes de ver la heladera."></textarea>
+      </div>
+      <p class="lh-caption lh-muted" style="font-weight: 400">La denuncia queda registrada con tu cuenta. Si perdiste dinero o hubo un delito, hacé también la denuncia en la policía.</p>
+      <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px">
+        <button class="lh-btn lh-btn--ghost" type="button">Cancelar</button>
+        <a class="lh-btn lh-btn--primary" href="DenunciaEnviada.dc.html">Enviar denuncia</a>
+      </div>
+    </sc-if>
+    <sc-if value="{{guest}}" hint-placeholder-val="{{ false }}">
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <h2 class="lh-h3" id="d-t">Ingresá para denunciar</h2>
+        <p class="lh-body-sm lh-muted">Para evitar denuncias falsas, solo pueden denunciar las personas con una cuenta en La Higuera. Después de ingresar volvés a esta publicación.</p>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px">
+        <a class="lh-btn lh-btn--outline" href="Registro.dc.html">Crear cuenta</a>
+        <a class="lh-btn lh-btn--primary" href="Ingresar.dc.html">Ingresar</a>
+      </div>
+    </sc-if>
+    <sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+      <span class="avatar" style="width: 48px; height: 48px; background: #ecfdf5; color: #065f46"><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <h2 class="lh-h3" id="d-t">Recibimos tu denuncia</h2>
+        <p class="lh-body-sm lh-muted">El equipo de La Higuera la revisa. Si confirmamos el problema, pausamos la publicación y te avisamos por correo.</p>
+      </div>
+      <div style="display: flex; justify-content: flex-end">
+        <button class="lh-btn lh-btn--primary" type="button">Listo</button>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"sobre":{"editor":"enum","options":["anuncio","reseña","perfil"],"default":"anuncio"},"paso":{"editor":"enum","options":["formulario","enviada","sin sesión"],"default":"formulario"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const sobre = this.props.sobre ?? 'anuncio';
+    const paso = this.props.paso ?? 'formulario';
+    const sent = paso === 'enviada';
+    const guest = paso === 'sin sesión';
+    const sets = {
+      anuncio: {
+        title: 'Denunciar este anuncio',
+        subject: 'Heladera Gafa no frost 360 L, impecable · Carla Páez',
+        reasons: ['Parece una estafa o pide pagar por adelantado', 'Es un producto prohibido o ilegal', 'El precio, las fotos o la descripción no son reales', 'Ya se vendió o no está disponible', 'Está repetido o en el rubro equivocado', 'Otro motivo']
+      },
+      'reseña': {
+        title: 'Denunciar esta reseña',
+        subject: 'Reseña de Joaquín Ríos sobre TecnoCuyo',
+        reasons: ['No es de un cliente real', 'Tiene insultos o datos personales', 'Habla de otro comercio o persona', 'Otro motivo']
+      },
+      perfil: {
+        title: 'Denunciar este perfil',
+        subject: 'Martín Quiroga · Gas y plomería',
+        reasons: ['Se hace pasar por otra persona o comercio', 'La matrícula o los datos no son reales', 'Me estafó o no cumplió lo acordado', 'Otro motivo']
+      }
+    };
+    const set = sets[sobre] || sets.anuncio;
+    const picked = this.state && this.state.picked != null ? this.state.picked : 0;
+    return {
+      form: !sent && !guest,
+      sent,
+      guest,
+      title: set.title,
+      subject: set.subject,
+      reasons: set.reasons.map((label, i) => ({ label, on: i === picked, cls: i === picked ? 'reason reason--on' : 'reason', pick: () => this.setState({ picked: i }) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

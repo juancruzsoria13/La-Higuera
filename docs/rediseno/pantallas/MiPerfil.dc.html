@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mi perfil · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="page" style="font-family: Figtree, 'Segoe UI', system-ui, sans-serif; background: #f5f7fb; color: #10213b">
+  <dc-import name="Header" active="ninguna" logged="true" hint-size="100%,170px"></dc-import>
+  <main class="main">
+    <div class="shell medium" style="display: flex; flex-direction: column; gap: 24px">
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px">
+        <a class="back" href="Main.dc.html" style="margin-bottom: 12px"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Volver al inicio</a>
+        <h1 class="lh-h1">Mi perfil</h1>
+        <p class="lh-lead lh-muted">Así te conocen en La Higuera.</p>
+      </div>
+      <form class="panel panel--form" aria-labelledby="datos">
+        <h2 class="lh-h3" id="datos">Tus datos</h2>
+        <div class="lh-field">
+          <label class="lh-label" for="display_name">Nombre público</label>
+          <input class="lh-input" id="display_name" placeholder="Carla Páez">
+        </div>
+        <div class="lh-field">
+          <label class="lh-label" for="locality_id">Localidad</label>
+          <select class="lh-input select" id="locality_id"><option>Rivadavia</option><option>Capital</option><option>Santa Lucía</option><option>Chimbas</option><option>Rawson</option><option>Pocito</option></select>
+        </div>
+        <div class="lh-field">
+          <label class="lh-label" for="email">Correo de acceso</label>
+          <input class="lh-input" id="email" type="email" placeholder="carla.paez@correo.com" readonly style="background: #edf3ff">
+          <p class="lh-caption lh-muted">Solo vos podés ver este correo. No se publica en tus anuncios.</p>
+        </div>
+        <div><button class="lh-btn lh-btn--primary" type="submit">Guardar perfil</button></div>
+      </form>
+      <section class="panel panel--form panel--danger" aria-labelledby="borrar">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <h2 class="lh-h3" id="borrar">Eliminar cuenta</h2>
+          <p class="lh-body-sm lh-muted">Se eliminarán de forma definitiva tu perfil, tus anuncios, tus comercios y sus imágenes.</p>
+        </div>
+        <div><a class="lh-btn lh-btn--outline" href="EliminarDialogo.dc.html" style="color: #c62843"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" x2="10" y1="11" y2="17"></line><line x1="14" x2="14" y1="11" y2="17"></line></svg>Eliminar mi cuenta</a></div>
+      </section>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,130px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1260}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

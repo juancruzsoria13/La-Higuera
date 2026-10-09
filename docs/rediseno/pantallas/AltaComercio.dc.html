@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Sumá tu comercio · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="page" style="font-family: Figtree, 'Segoe UI', system-ui, sans-serif; background: #f5f7fb; color: #10213b">
+  <dc-import name="Header" active="locales" logged="true" hint-size="100%,170px"></dc-import>
+  <main class="main">
+    <div class="shell form-page">
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px">
+        <a class="back" href="Locales.dc.html" style="margin-bottom: 12px"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path></svg>Locales de San Juan</a>
+        <h1 class="lh-h1">Sumá tu comercio</h1>
+        <p class="lh-lead lh-muted">Los locales verificados aparecen en el mapa, llevan la insignia de verificado y tienen prioridad en los resultados. Revisamos cada solicitud a mano.</p>
+      </div>
+      <div class="safe" style="margin-bottom: 24px"><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+        <div style="display: flex; flex-direction: column; gap: 4px"><p class="lh-label" style="color: #10213b">Qué pedimos para verificar</p><p class="lh-body-sm">Un comercio real, con ventas anteriores y marca establecida. Cada cuenta puede tener un comercio.</p></div>
+      </div>
+      <form style="display: flex; flex-direction: column; gap: 24px">
+        <section class="panel panel--form" aria-labelledby="c-comercio">
+          <h2 class="lh-h3" id="c-comercio">Tu comercio</h2>
+          <div class="form-grid form-grid--2">
+            <div class="lh-field">
+              <label class="lh-label" for="c-nombre">Nombre comercial</label>
+              <input class="lh-input" id="c-nombre" placeholder="Ej.: TecnoCuyo">
+            </div>
+            <div class="lh-field">
+              <label class="lh-label" for="c-rubro">Rubro principal</label>
+              <select class="lh-input select" id="c-rubro"><option>Tecnología</option><option>Inmuebles</option><option>Vehículos</option><option>Ropa</option><option>Muebles</option><option>Electrodomésticos</option><option>Materiales de construcción</option><option>Otros</option></select>
+            </div>
+          </div>
+          <div class="lh-field">
+            <label class="lh-label" for="c-desc">Qué vendés</label>
+            <textarea class="lh-input textarea" id="c-desc" placeholder="Ej.: Celulares, notebooks y accesorios nuevos y usados con garantía."></textarea>
+            <p class="lh-caption lh-muted">Se muestra en el perfil del local. Dos o tres oraciones alcanzan.</p>
+          </div>
+          <div class="dropzone" style="flex-direction: row; align-items: center; gap: 16px">
+            <span class="local-logo" aria-hidden="true" style="background: #ffffff; border: 1px dashed #c9d4ea; color: #596a82"><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 5h6"></path><path d="M19 2v6"></path><path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5"></path><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path><circle cx="9" cy="9" r="2"></circle></svg></span>
+            <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0">
+              <label class="lh-label" for="c-logo">Logo del comercio</label>
+              <input id="c-logo" type="file" accept="image/jpeg,image/png,image/webp" style="font: 400 14px/20px Figtree, sans-serif; color: #596a82">
+              <p class="lh-caption lh-muted" style="font-weight: 400">Cuadrado, en JPG, PNG o WebP. Si no subís uno, usamos tus iniciales.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel panel--form" aria-labelledby="c-fiscal">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <h2 class="lh-h3" id="c-fiscal">Datos fiscales</h2>
+            <p class="lh-body-sm lh-muted">Solo los ve el equipo de La Higuera para verificar el comercio. No se publican.</p>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="lh-field">
+              <label class="lh-label" for="c-cuit">CUIT</label>
+              <input class="lh-input" id="c-cuit" inputmode="numeric" placeholder="30-12345678-9">
+            </div>
+            <div class="lh-field">
+              <label class="lh-label" for="c-razon">Razón social</label>
+              <input class="lh-input" id="c-razon" placeholder="Como figura en AFIP">
+            </div>
+          </div>
+        </section>
+
+        <section class="panel panel--form" aria-labelledby="c-ubicacion">
+          <h2 class="lh-h3" id="c-ubicacion">Ubicación del local</h2>
+          <div class="form-grid form-grid--price">
+            <div class="lh-field">
+              <label class="lh-label" for="c-dir">Dirección</label>
+              <input class="lh-input" id="c-dir" placeholder="Ej.: Av. Ignacio de la Roza 245 oeste">
+            </div>
+            <div class="lh-field">
+              <label class="lh-label" for="c-loc">Departamento</label>
+              <select class="lh-input select" id="c-loc"><option>Capital</option><option>Rivadavia</option><option>Santa Lucía</option><option>Chimbas</option><option>Rawson</option><option>Pocito</option></select>
+            </div>
+          </div>
+          <div class="lh-field">
+            <dc-import name="MapaSJ" mode="local" hint-size="100%,560px"></dc-import>
+            <p class="lh-caption lh-muted">Ubicamos el pin con la dirección. Movelo si no quedó justo en la puerta del local.</p>
+          </div>
+        </section>
+
+        <section class="panel panel--form" aria-labelledby="c-horarios">
+          <h2 class="lh-h3" id="c-horarios">Horarios de atención</h2>
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <sc-for list="{{days}}" as="d" hint-placeholder-count="3">
+              <div style="display: grid; grid-template-columns: minmax(120px, 1fr) minmax(0, 2fr); gap: 12px; align-items: center">
+                <span class="lh-label">{{d.label}}</span>
+                <input class="lh-input" aria-label="Horario de {{d.label}}" placeholder="{{d.hint}}">
+              </div>
+            </sc-for>
+          </div>
+          <p class="lh-caption lh-muted">Dejá vacío el día que no abrís.</p>
+        </section>
+
+        <section class="panel panel--form" aria-labelledby="c-contacto">
+          <h2 class="lh-h3" id="c-contacto">Contacto del local</h2>
+          <div class="form-grid form-grid--2">
+            <div class="lh-field">
+              <label class="lh-label" for="c-tel">Teléfono / WhatsApp</label>
+              <input class="lh-input" id="c-tel" inputmode="tel">
+              <p class="lh-caption lh-muted">Con código de área, sin 0 ni 15. Es público.</p>
+            </div>
+            <div class="lh-field">
+              <label class="lh-label" for="c-mail">Correo del local (opcional)</label>
+              <input class="lh-input" id="c-mail" type="email">
+              <p class="lh-caption lh-muted">Es público.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="submit-row">
+          <a class="lh-btn lh-btn--primary" href="SolicitudRevision.dc.html">Enviar solicitud</a>
+          <a class="lh-btn lh-btn--ghost" href="Locales.dc.html" style="color: #596a82">Cancelar</a>
+        </div>
+        <p class="lh-caption lh-muted" style="font-weight: 400">Te avisamos por correo cuando revisemos la solicitud.</p>
+      </form>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,130px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      days: [
+        { label: 'Lunes a viernes', hint: 'Ej.: 9 a 13 y 17 a 21' },
+        { label: 'Sábados', hint: 'Ej.: 9 a 13' },
+        { label: 'Domingos y feriados', hint: 'Cerrado' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

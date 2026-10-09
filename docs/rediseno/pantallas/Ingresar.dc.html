@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ingresar · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="page" style="font-family: Figtree, 'Segoe UI', system-ui, sans-serif; background: #f5f7fb; color: #10213b">
+  <dc-import name="Header" active="ninguna" hint-size="100%,170px"></dc-import>
+  <main class="main">
+    <div class="shell narrow" style="display: flex; flex-direction: column; gap: 32px">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <h1 class="lh-h1">Qué bueno verte de nuevo</h1>
+        <p class="lh-lead lh-muted">Ingresá para publicar y gestionar tus anuncios.</p>
+      </div>
+      <form class="panel panel--form">
+        <div class="lh-field">
+          <label class="lh-label" for="in-email">Correo electrónico</label>
+          <input class="lh-input" id="in-email" type="email" autocomplete="email" placeholder="nombre@correo.com">
+        </div>
+        <div class="lh-field">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px">
+            <label class="lh-label" for="in-pass">Contraseña</label>
+          </div>
+          <input class="lh-input" id="in-pass" type="password" autocomplete="current-password">
+        </div>
+        <button class="lh-btn lh-btn--primary" type="submit" style="width: 100%">Ingresar</button>
+        <p class="lh-body-sm lh-muted">¿Primera vez por acá? <a class="link" href="Registro.dc.html">Creá tu cuenta</a></p>
+      </form>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,130px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":980}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

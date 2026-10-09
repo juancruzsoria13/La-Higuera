@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mi comercio · La Higuera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/lahiguera/components/bundle.css">
+<link rel="stylesheet" href="lh-pages.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..900&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="page" style="font-family: Figtree, 'Segoe UI', system-ui, sans-serif; background: #f5f7fb; color: #10213b">
+  <dc-import name="Header" active="ninguna" logged="true" hint-size="100%,170px"></dc-import>
+  <main class="main">
+    <div class="shell">
+      <div class="page-head">
+        <div style="flex-direction: row; align-items: center; gap: 20px; max-width: none">
+          <span class="local-logo local-logo--lg" aria-hidden="true">TC</span>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <p class="lh-body-sm lh-muted">Mi comercio</p>
+            <h1 class="lh-h1">TecnoCuyo</h1>
+            <span class="lh-pill lh-pill--verified" style="align-self: flex-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg>Comercio verificado</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-direction: row; flex-wrap: wrap; gap: 8px; max-width: none">
+          <a class="lh-btn lh-btn--outline" href="PerfilLocal.dc.html">Ver perfil público</a>
+          <a class="lh-btn lh-btn--primary" href="Publicar.dc.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>Nuevo anuncio</a>
+        </div>
+      </div>
+
+      <div class="detail">
+        <section style="display: flex; flex-direction: column; gap: 20px; min-width: 0" aria-labelledby="anuncios">
+          <div class="lh-section-head" style="align-items: center">
+            <div>
+              <h2 class="lh-h2" id="anuncios">Anuncios del local</h2>
+              <p class="lh-body-sm lh-muted">14 activos · 2 pausados · 1 vencido</p>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <sc-for list="{{products}}" as="p" hint-placeholder-count="5">
+              <article class="local-card" style="align-items: center">
+                <span class="local-logo" aria-hidden="true" style="color: #c9d4ea"><svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect><circle cx="9" cy="9" r="2"></circle><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path></svg></span>
+                <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1">
+                  <p class="lh-title">{{p.title}}</p>
+                  <p class="lh-body-sm" style="font-weight: 700; font-variant-numeric: tabular-nums">{{p.price}}</p>
+                </div>
+                <span class="{{p.pillClass}}">{{p.status}}</span>
+                <a class="lh-btn lh-btn--ghost" href="Publicar.dc.html" style="padding: 10px 12px">{{p.action}}</a>
+              </article>
+            </sc-for>
+          </div>
+          <a class="link" href="MisAnuncios.dc.html">Ver los 17 anuncios</a>
+        </section>
+
+        <aside style="display: flex; flex-direction: column; gap: 20px; min-width: 0">
+          <section class="panel" aria-labelledby="sin-responder">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <h2 class="lh-h3" id="sin-responder">Reseñas sin responder</h2>
+              <p class="lh-body-sm lh-muted">Responder muestra que el local está atento. 4,8 de 5 en 23 reseñas.</p>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 4px">
+              <div style="display: flex; justify-content: space-between; gap: 12px"><p class="lh-title">Joaquín Ríos</p><span class="rating lh-caption"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"></path></svg>4</span></div>
+              <p class="lh-body-sm lh-muted">Buena atención y precios razonables. Tardaron un día más de lo prometido con el cambio de pantalla.</p>
+              <div class="lh-field">
+                <label class="lh-label" for="reply-1">Tu respuesta</label>
+                <textarea class="lh-input" id="reply-1" style="min-height: 88px; resize: vertical" placeholder="Gracias por contarnos…"></textarea>
+              </div>
+              <button class="lh-btn lh-btn--primary" type="button" style="align-self: flex-start">Responder</button>
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="datos-local">
+            <h2 class="lh-h3" id="datos-local">Datos del local</h2>
+            <div class="info-row"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg><p class="lh-body-sm">Av. Ignacio de la Roza 245 oeste, Capital</p></div>
+            <div class="info-row"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg><p class="lh-body-sm">Lunes a viernes de 9 a 13 y de 17 a 21 · Sábados de 9 a 13</p></div>
+            <div class="info-row"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><p class="lh-body-sm lh-muted">CUIT 30-12345678-9 · solo lo ves vos y el equipo de La Higuera</p></div>
+            <a class="lh-btn lh-btn--outline" href="AltaComercio.dc.html" style="align-self: flex-start">Editar datos del local</a>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <dc-import name="Footer" hint-size="100%,130px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const pill = (s) => 'lh-pill ' + (s === 'Vencido' ? 'lh-pill--expired' : s === 'Activo' ? 'lh-pill--brand' : 'lh-pill--muted');
+    const p = (title, price, status) => ({ title, price, status, pillClass: pill(status), action: status === 'Vencido' ? 'Renovar' : 'Editar' });
+    return {
+      products: [
+        p('Samsung Galaxy A55 128 GB', '$ 720.000', 'Activo'),
+        p('Notebook Lenovo IdeaPad 3, Ryzen 5, 16 GB', '$ 980.000', 'Activo'),
+        p('Auriculares JBL Tune 520BT', '$ 62.000', 'Activo'),
+        p('Cargador Samsung 25 W original', '$ 18.000', 'Pausado'),
+        p('Monitor Samsung 24 pulgadas Full HD', '$ 140.000', 'Vencido')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
