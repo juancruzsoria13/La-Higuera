@@ -16,24 +16,23 @@ test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({p
   await page.keyboard.press("Escape");
   await expect(ads).toHaveAttribute("aria-expanded", "false");
   await expect(ads).toBeFocused();
-  let term = "bicicleta";
-  // Los rubros vienen de la API: sin Supabase (como en CI) el menú solo trae "Todos los anuncios".
+  const term = "bicicleta";
   await ads.click();
-  const furniture = page.getByRole("link", {name: "Muebles", exact: true});
-  if (await furniture.count()) {
-    await furniture.click();
-    await expect(page).toHaveURL(/category=muebles/);
-    await expect(search).toHaveValue("bicicleta");
-    term = "mesa";
-    await search.fill(term);
-    await page.getByRole("button", {name: "Buscar", exact: true}).click();
-    await expect(page).toHaveURL(/category=muebles/);
-    await expect(page).toHaveURL(/q=mesa/);
-    await ads.click();
+  for (const name of ["Inmuebles", "Tecnología", "Vehículos", "Ropa", "Muebles", "Electrodomésticos", "Materiales de construcción", "Otros"]) {
+    await expect(page.getByRole("link", {name, exact: true})).toBeVisible();
   }
+  const furniture = page.getByRole("link", {name: "Muebles", exact: true});
+  await furniture.click();
+  await expect(page).toHaveURL(/category=muebles/);
+  await expect(search).toHaveValue(term);
+  await search.fill("mesa");
+  await page.getByRole("button", {name: "Buscar", exact: true}).click();
+  await expect(page).toHaveURL(/category=muebles/);
+  await expect(page).toHaveURL(/q=mesa/);
+  await ads.click();
   await page.getByRole("link", {name: "Todos los anuncios", exact: true}).click();
   await expect(page).not.toHaveURL(/category=/);
-  await expect(search).toHaveValue(term);
+  await expect(search).toHaveValue("mesa");
   await expect(ads).toHaveAttribute("aria-expanded", "false");
   const overflowing = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflowing).toBe(false);
