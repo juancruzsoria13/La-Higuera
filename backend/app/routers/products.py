@@ -8,9 +8,9 @@ from starlette.datastructures import UploadFile
 
 from ..config import PAGE_SIZE
 from ..deps import CurrentUser, DbDep, UserDep
-from ..images import ImageError, clean_images, upload_image
-from ..schemas import MAX_IMAGES, ProductIn, is_slug
-from ..supabase import Supabase, SupabaseError
+from ..images import ImageError, abandon_images, clean_images, image_order, upload_image
+from ..schemas import ProductIn, is_slug
+from ..supabase import SupabaseError
 from .catalog import find, load_catalog
 from .common import check_id, page_bounds, search_pattern
 
@@ -31,7 +31,6 @@ FIELDS = (
 # Fotos embebidas y nombres de rubro y localidad, en una sola consulta (RLS se aplica a cada tabla).
 COLUMNS = "*,images:product_images(path,sort_order),category:categories(name),locality:localities(name)"
 NOT_FOUND = "Este anuncio no está disponible."
-IMAGES_INVALID = "Revisá las fotos del anuncio: recargá la página y volvé a elegirlas."
 SAVE_ERROR = (
     "No pudimos guardar el anuncio. Puede haber cambiado en otra pestaña. Revisá la conexión e intentá nuevamente."
 )
@@ -103,30 +102,6 @@ async def get_product(product_id: str, db: DbDep) -> dict[str, Any]:
     return {**shape(rows[0]), "seller": seller}
 
 
-def _image_order(order: list[str], current: list[str], files: list[UploadFile]) -> list[str]:
-    """Lista final de fotos: rutas que ya tiene el anuncio o `new:<i>` para el archivo i de `images`."""
-    if not order:
-        order = [*current, *(f"new:{index}" for index in range(len(files)))]
-    if len(order) > MAX_IMAGES or len(files) > MAX_IMAGES:
-        raise HTTPException(422, f"Podés subir hasta {MAX_IMAGES} fotos por anuncio.")
-    if len(set(order)) != len(order):
-        raise HTTPException(422, IMAGES_INVALID)
-    for token in order:
-        index = token.removeprefix("new:")
-        if token.startswith("new:") and not (index.isdigit() and int(index) < len(files)):
-            raise HTTPException(422, IMAGES_INVALID)
-        if not token.startswith("new:") and token not in current:
-            raise HTTPException(422, IMAGES_INVALID)
-    return order
-
-
-async def _abandon(db: Supabase, paths: list[str]) -> None:
-    # Si falla, la reserva vence a las 24 h y la reclama scripts/cleanup.py.
-    for path in paths:
-        with suppress(SupabaseError):
-            await db.rpc("abandon_image", {"image": path})
-
-
 async def _save(product_id: str | None, request: Request, db: DbDep, user: UserDep) -> dict[str, Any]:
     form = await request.form()
     try:
@@ -153,7 +128,7 @@ async def _save(product_id: str | None, request: Request, db: DbDep, user: UserD
             raise HTTPException(409, "El anuncio cambió en otra pestaña. Recargá la página antes de guardar.")
         current = _paths(rows[0])
     files = [file for file in form.getlist("images") if isinstance(file, UploadFile) and file.size]
-    order = _image_order([str(token) for token in form.getlist("image_order")], current, files)
+    order = image_order([str(token) for token in form.getlist("image_order")], current, files, "anuncio")
     uploaded: dict[str, str] = {}
     saved_id: str | None = None
     try:
@@ -178,7 +153,7 @@ async def _save(product_id: str | None, request: Request, db: DbDep, user: UserD
         if paths != current:
             await db.rpc("set_product_images", {"product_id": saved_id, "paths": paths})
     except (ImageError, SupabaseError) as error:
-        await _abandon(db, list(uploaded.values()))
+        await abandon_images(db, list(uploaded.values()))
         if saved_id and not product_id:
             # Un alta sin sus fotos no queda publicada a medias: se deshace y el formulario conserva los datos.
             with suppress(SupabaseError):

@@ -16,5 +16,5 @@ export const serviceSchema = z.object({
 export const LICENSE_REQUIRED = "Este oficio exige matrícula: ingresá el número y la entidad que la emitió.";
 export type ServiceProvider = z.output<typeof serviceSchema> & {
   id: string; owner_id: string; verified: boolean; references_verified: boolean; trade_name: string | null; requires_license: boolean;
-  locality_name: string | null; created_at: string; updated_at: string;
+  locality_name: string | null; avatar: string | null; work_images: string[]; created_at: string; updated_at: string;
 };

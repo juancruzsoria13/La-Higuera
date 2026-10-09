@@ -4,10 +4,11 @@ import { ArrowLeft, ArrowRight, ImagePlus, X } from "lucide-react";
 import { MAX_IMAGE_BYTES, MAX_IMAGES } from "./schema";
 /** Foto del formulario: `path` si ya está guardada, `file` si se agrega ahora. */
 export type ImageItem = {key: string; url: string; path?: string; file?: File};
-const TYPES = ["image/jpeg", "image/png", "image/webp"];
+export const TYPES = ["image/jpeg", "image/png", "image/webp"];
 export const savedImages = (paths: string[]): ImageItem[] => paths.map(path => ({key: path, path, url: `/api/images/${path}`}));
 
-export function ImagePicker({items, onChange, title}: {items: ImageItem[]; onChange: (items: ImageItem[]) => void; title: string}) {
+/** `cover`: la primera foto es la portada (anuncios). `noun` arma los mensajes ("anuncio", "servicio"). */
+export function ImagePicker({items, onChange, title, cover = true, noun = "anuncio"}: {items: ImageItem[]; onChange: (items: ImageItem[]) => void; title: string; cover?: boolean; noun?: string}) {
   const [error, setError] = useState("");
   const counter = useRef(0);
   const latest = useRef(items);
@@ -19,7 +20,7 @@ export function ImagePicker({items, onChange, title}: {items: ImageItem[]; onCha
     const files = Array.from(list ?? []);
     const valid = files.filter(file => TYPES.includes(file.type) && file.size <= MAX_IMAGE_BYTES);
     const room = MAX_IMAGES - items.length;
-    setError(valid.length < files.length ? "Alguna foto no es JPG, PNG o WebP, o supera los 5 MB: no la agregamos." : valid.length > room ? `Podés subir hasta ${MAX_IMAGES} fotos por anuncio.` : "");
+    setError(valid.length < files.length ? "Alguna foto no es JPG, PNG o WebP, o supera los 5 MB: no la agregamos." : valid.length > room ? `Podés subir hasta ${MAX_IMAGES} fotos por ${noun}.` : "");
     onChange([...items, ...valid.slice(0, Math.max(0, room)).map(file => ({key: `new-${counter.current++}`, file, url: URL.createObjectURL(file)}))]);
   }
   function move(index: number, delta: number) {
@@ -34,8 +35,8 @@ export function ImagePicker({items, onChange, title}: {items: ImageItem[]; onCha
     {tokens.map(token => <input key={token} type="hidden" name="image_order" value={token} />)}
     {items.length > 0 && <ol className="grid grid-cols-2 gap-3 sm:grid-cols-4">{items.map((item, index) => <li key={item.key} className="relative overflow-hidden rounded-xl border border-border bg-muted">
       {/* eslint-disable-next-line @next/next/no-img-element -- vista previa local o imagen privada, fuera del cache de Next */}
-      <img src={item.url} alt={`${title || "Anuncio"}, foto ${index + 1}`} className="aspect-[4/3] w-full object-cover" />
-      {index === 0 && <span className="absolute left-2 top-2 rounded-full bg-primary px-2.5 py-1 text-xs leading-4 font-semibold text-primary-foreground">Portada</span>}
+      <img src={item.url} alt={`${title || "Foto"}, foto ${index + 1}`} className="aspect-[4/3] w-full object-cover" />
+      {cover && index === 0 && <span className="absolute left-2 top-2 rounded-full bg-primary px-2.5 py-1 text-xs leading-4 font-semibold text-primary-foreground">Portada</span>}
       <div className="absolute inset-x-2 bottom-2 flex justify-between gap-1">
         <span className="flex gap-1"><button type="button" className={control} onClick={() => move(index, -1)} disabled={index === 0} aria-label={`Mover la foto ${index + 1} antes`}><ArrowLeft className="size-4" /></button><button type="button" className={control} onClick={() => move(index, 1)} disabled={index === items.length - 1} aria-label={`Mover la foto ${index + 1} después`}><ArrowRight className="size-4" /></button></span>
         <button type="button" className={`${control} text-destructive`} onClick={() => remove(index)} aria-label={`Quitar la foto ${index + 1}`}><X className="size-4" /></button>

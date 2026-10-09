@@ -99,8 +99,9 @@ Los cambios de código se recargan solos. Hay que reiniciar solo al cambiar vari
    2. `202610070001_services.sql`: servicios de oficio.
    3. `202610070002_supabase_hardening.sql`: permisos explícitos para `service_role`, límite de imágenes en trámite y ajustes de funciones.
    4. `202610070003_marketplace_model.sql`: rubros, localidades y oficios en tablas; contacto, operación, vencimiento a 60 días y hasta 8 fotos por anuncio; matrícula solo para los oficios que la exigen; perfiles públicos con puntaje; y las tablas de comercios verificados, reseñas, denuncias y administración (todavía sin pantallas).
+   5. `202610090001_service_images.sql`: fotos de servicios (una de perfil y hasta 8 de trabajos realizados) con `set_service_images()`.
 
-   En un proyecto **nuevo** se puede pegar en cambio [`database/supabase_setup.sql`](database/supabase_setup.sql), que reúne las cuatro en una sola transacción. Si el proyecto ya tiene alguna aplicada, ejecutar solo las que falten, en orden.
+   En un proyecto **nuevo** se puede pegar en cambio [`database/supabase_setup.sql`](database/supabase_setup.sql), que reúne las cuatro primeras en una sola transacción, y después la 5. Si el proyecto ya tiene alguna aplicada, ejecutar solo las que falten, en orden.
 
    Cada una corre en una transacción. No repetirlas sobre el mismo proyecto: los cambios futuros van en migraciones nuevas. La cuarta cambia columnas que usa el código: requiere la versión 0.3.0 de la API y del frontend.
 3. En **Authentication → URL Configuration**, establecer Site URL en `http://localhost:3000` y permitir `http://localhost:3000/auth/confirm`. Al desplegar, agregar la URL de producción.
@@ -141,7 +142,7 @@ Si el profesional cambia el número, la entidad o el oficio, la verificación se
 - Perfil propio: nombre y localidad; el correo de acceso queda privado en Auth.
 - Anuncios propios: alta, edición, eliminación confirmada y estados activo, pausado y vendido. Hasta 8 fotos opcionales, convertidas a WebP, que se pueden quitar y reordenar (la primera es la portada). Teléfono o correo de contacto obligatorio para publicar.
 - Vencimiento: un anuncio activo deja de verse a los 60 días. *Mis anuncios* marca los vencidos y permite renovarlos.
-- **Servicios de oficio**: gasistas, plomeros, electricistas, pintores y más, con teléfono, botón de WhatsApp y correo opcional. La matrícula y su entidad emisora se piden solo en los oficios que la exigen. Búsqueda, filtro por oficio y gestión en *Mis servicios*.
+- **Servicios de oficio**: gasistas, plomeros, electricistas, pintores y más, con teléfono, botón de WhatsApp y correo opcional. La matrícula y su entidad emisora se piden solo en los oficios que la exigen. Foto de perfil y hasta 8 fotos de trabajos realizados, ambas opcionales. Búsqueda, filtro por oficio y gestión en *Mis servicios*.
 - **Estudios de higo**: 9 ilustraciones SVG para momentos vacíos o de espera (sin foto, sin resultados, 404, carga y guardado).
 - Eliminación de cuenta con confirmación escrita y borrado real del usuario de Auth.
 - Interfaz adaptable en español de Argentina, accesible y con preferencia de movimiento reducido.
