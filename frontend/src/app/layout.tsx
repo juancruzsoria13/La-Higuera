@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Figtree } from "next/font/google";
 import { Suspense } from "react";
 import Link from "next/link";
 import { LogOut, MapPin, Package, Wrench, Plus, UserRound } from "lucide-react";
@@ -16,10 +17,13 @@ export const metadata: Metadata = {
 };
 export const dynamic = "force-dynamic";
 
+// Única familia de la marca (variable: cubre los pesos 400 a 800 de la escala). globals.css la usa como --font-sans.
+const figtree = Figtree({ subsets: ["latin"], display: "swap", variable: "--font-figtree" });
+
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const [user, {categories}] = await Promise.all([currentUser(), getCatalog()]);
   return (
-    <html lang="es-AR">
+    <html lang="es-AR" className={figtree.variable}>
       <body className="flex min-h-screen flex-col antialiased">
         <a href="#contenido" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-4">Saltar al contenido</a>
         <header className="site-header">
