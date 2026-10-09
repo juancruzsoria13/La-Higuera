@@ -13,10 +13,10 @@ export function BrandMark({ className }: { className?: string }) {
 export function Brand({ inverted = false, compact = false }: { inverted?: boolean; compact?: boolean }) {
   return (
     <span className={cn("inline-flex items-center gap-2.5", inverted ? "text-white" : "text-foreground")}>
-      <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-11", inverted ? "bg-white text-primary" : "bg-primary text-white")}>
+      <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-11", inverted ? "bg-card text-primary" : "bg-primary text-primary-foreground")}>
         <BrandMark className="size-8" />
       </span>
-      {!compact && <span className="whitespace-nowrap text-[21px] font-bold tracking-[-.045em] sm:text-[25px]">la higuera<span className={inverted ? "text-[#5cddff]" : "text-primary"}>.</span></span>}
+      {!compact && <span className="whitespace-nowrap text-[21px] leading-7 font-extrabold tracking-[-.035em] sm:text-[25px]">la higuera<span className={inverted ? "text-sky" : "text-primary"}>.</span></span>}
     </span>
   );
 }
