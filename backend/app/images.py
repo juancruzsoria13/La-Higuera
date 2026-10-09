@@ -1,11 +1,15 @@
 """Normalización de imágenes de anuncios: se decodifican y se reescriben siempre como WebP."""
 
 import warnings
+from contextlib import suppress
 from io import BytesIO
 
+from fastapi import HTTPException
 from PIL import Image, ImageOps
+from starlette.datastructures import UploadFile
 
 from .config import BUCKET
+from .schemas import MAX_IMAGES
 from .supabase import Supabase, SupabaseError
 
 MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -80,3 +84,28 @@ async def clean_images(db: Supabase, owner_id: str) -> bool:
         except SupabaseError:
             complete = False
     return complete
+
+
+def image_order(order: list[str], current: list[str], files: list[UploadFile], noun: str) -> list[str]:
+    """Lista final de fotos: rutas que ya están guardadas o `new:<i>` para el archivo i de `images`."""
+    invalid = f"Revisá las fotos del {noun}: recargá la página y volvé a elegirlas."
+    if not order:
+        order = [*current, *(f"new:{index}" for index in range(len(files)))]
+    if len(order) > MAX_IMAGES or len(files) > MAX_IMAGES:
+        raise HTTPException(422, f"Podés subir hasta {MAX_IMAGES} fotos por {noun}.")
+    if len(set(order)) != len(order):
+        raise HTTPException(422, invalid)
+    for token in order:
+        index = token.removeprefix("new:")
+        if token.startswith("new:") and not (index.isdigit() and int(index) < len(files)):
+            raise HTTPException(422, invalid)
+        if not token.startswith("new:") and token not in current:
+            raise HTTPException(422, invalid)
+    return order
+
+
+async def abandon_images(db: Supabase, paths: list[str]) -> None:
+    # Si falla, la reserva vence a las 24 h y la reclama scripts/cleanup.py.
+    for path in paths:
+        with suppress(SupabaseError):
+            await db.rpc("abandon_image", {"image": path})

@@ -1,7 +1,7 @@
 """Prueba de integración contra un proyecto Supabase REAL de pruebas (crea y borra dos usuarios).
 
 Uso: ALLOW_INTEGRATION_TESTS=true python -m scripts.integration   (desde backend/, con backend/.env)
-Requiere las cuatro migraciones de database/migrations aplicadas.
+Requiere todas las migraciones de database/migrations aplicadas.
 """
 
 import asyncio
@@ -191,6 +191,18 @@ async def main() -> int:
             painter = (await A.insert("service_providers", {**service, "trade_id": "pintor"}))[0]
             assert painter["license_number"] is None and painter["license_body"] is None
 
+            # Fotos del servicio: perfil y trabajos, visibles mientras el servicio está activo.
+            avatar, work = await photo(A, "white"), await photo(A, "red")
+            await A.rpc("set_service_images", {"service_provider_id": sid, "avatar": avatar, "works": [work]})
+            assert await fails(B.rpc("set_service_images", {"service_provider_id": sid, "avatar": None, "works": []}))
+            columns = "id,images:service_images(kind,path,sort_order)"
+            embedded = (await anon.select("service_providers", [("id", f"eq.{sid}")], columns=columns))[0][0]["images"]
+            assert {(i["kind"], i["path"]) for i in embedded} == {("perfil", avatar), ("trabajo", work)}
+            assert await anon.download(BUCKET, avatar) is not None
+            await A.update("service_providers", [("id", f"eq.{sid}")], {"status": "pausado"})
+            assert await anon.download(BUCKET, work) is None
+            assert await A.download(BUCKET, work) is not None
+
             # El borrado en Auth debe arrastrar comercio, anuncio y servicio, no solo una cuenta vacía.
             own = await A.insert(
                 "businesses", {"owner_id": a["id"], "name": "Comercio Ana", "slug": f"test-{uuid.uuid4()}"}
@@ -209,7 +221,7 @@ async def main() -> int:
             assert await A.get_user() is None
             assert len((await B.select("profiles", [("id", f"eq.{b['id']}")]))[0]) == 1
             users.pop(0)
-            print("OK: Supabase real, dos usuarios, listas, anuncios con fotos y vencimiento, RLS, servicios y Auth.")
+            print("OK: Supabase real, dos usuarios, listas, anuncios y servicios con fotos, vencimiento, RLS y Auth.")
             return 0
         finally:
             for user in users:

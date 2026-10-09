@@ -8,7 +8,7 @@ const stranger = "77777777-7777-4777-8777-777777777777";
 // El id lo genera la base: products y businesses no tienen permiso de INSERT sobre esa columna.
 let product = "";
 let business = "";
-const migrations = ["202610020001_initial.sql", "202610070001_services.sql", "202610070002_supabase_hardening.sql", "202610070003_marketplace_model.sql"];
+const migrations = ["202610020001_initial.sql", "202610070001_services.sql", "202610070002_supabase_hardening.sql", "202610070003_marketplace_model.sql", "202610090001_service_images.sql"];
 const insertProduct = "insert into products(owner_id,title,description,price,currency,category_id,condition,locality_id,contact_phone) values($1,'Bicicleta','En perfecto estado',1200.50,'ARS','otros','usado','capital','2644123456') returning id";
 let db: PGlite;
 async function asUser<T>(id: string | null, run: () => Promise<T>) {
@@ -216,5 +216,58 @@ describe("Servicios de oficio", () => {
     await asUser(c, async () => {expect((await db.query("select * from service_providers where id=$1", [service])).rows).toHaveLength(1); await db.query("update service_providers set status='pausado' where id=$1", [service]);});
     await db.query("update service_providers set hidden=false where id=$1", [service]);
     await asUser(null, async () => {expect((await db.query("select * from service_providers where id=$1", [service])).rows).toHaveLength(0);});
+  });
+});
+describe("Fotos de servicios", () => {
+  const e = "88888888-8888-4888-8888-888888888888";
+  const f = "99999999-9999-4999-8999-999999999999";
+  let service = "";
+  const servicePhotos = async () => (await db.query<{kind: string; path: string; sort_order: number}>("select kind, path, sort_order from service_images where service_provider_id=$1 order by kind, sort_order", [service])).rows;
+  it("guarda foto de perfil y trabajos, y solo las ve quien ve el servicio", async () => {
+    await db.query("insert into auth.users(id, raw_user_meta_data) values ($1, $2), ($3, $4)", [e, {display_name: "Elena"}, f, {display_name: "Fede"}]);
+    await asUser(e, async () => {service = (await db.query<{id: string}>("insert into service_providers(owner_id,name,trade_id,description,phone,locality_id) values($1,'Elena Pinta','pintor','Pintura de interiores y exteriores','2644123456','capital') returning id", [e])).rows[0].id;});
+    const [avatar, first, second] = [await reserveUploaded(e), await reserveUploaded(e), await reserveUploaded(e)];
+    await asUser(e, async () => {
+      await db.query("select set_service_images($1, $2, $3)", [service, avatar, [first, second]]);
+      expect(await servicePhotos()).toEqual([{kind: "perfil", path: avatar, sort_order: 0}, {kind: "trabajo", path: first, sort_order: 0}, {kind: "trabajo", path: second, sort_order: 1}]);
+      await expect(db.query("select set_service_images($1, $2, $3)", [service, avatar, [avatar]])).rejects.toThrow();
+      await expect(db.query("select set_service_images($1, $2, $3)", [service, null, Array.from({length: 9}, (_, i) => `${e}/${String(i).repeat(8)}-0000-4000-8000-000000000000.webp`)])).rejects.toThrow();
+      await expect(db.query("select set_service_images($1, $2, $3)", [service, first, [second]])).rejects.toThrow();
+      await expect(db.query("insert into service_images(service_provider_id,owner_id,kind,path,sort_order) values($1,$2,'perfil',$3,1)", [service, e, `${e}/${stranger}.webp`])).rejects.toThrow();
+      expect((await db.query("delete from storage.objects where name=$1 returning name", [first])).rows).toHaveLength(0);
+      await db.query("select abandon_image($1)", [first]);
+      expect((await db.query("select * from storage_cleanup where path=$1", [first])).rows).toHaveLength(0);
+    });
+    await asUser(null, async () => {
+      expect((await db.query("select * from service_images where service_provider_id=$1", [service])).rows).toHaveLength(3);
+      expect((await db.query("select * from storage.objects where name = any($1)", [[avatar, first, second]])).rows).toHaveLength(3);
+    });
+    await asUser(f, async () => {
+      await expect(db.query("select set_service_images($1, $2, $3)", [service, null, []])).rejects.toThrow();
+      expect((await db.query("delete from service_images where service_provider_id=$1 returning path", [service])).rows).toHaveLength(0);
+      expect((await db.query("update service_images set sort_order=5 where service_provider_id=$1 returning path", [service])).rows).toHaveLength(0);
+    });
+    await asUser(e, async () => {await db.query("update service_providers set status='pausado' where id=$1", [service]);});
+    await asUser(null, async () => {
+      expect((await db.query("select * from service_images where service_provider_id=$1", [service])).rows).toHaveLength(0);
+      expect((await db.query("select * from storage.objects where name = any($1)", [[avatar, first, second]])).rows).toHaveLength(0);
+    });
+    await asUser(e, async () => {await db.query("update service_providers set status='activo' where id=$1", [service]);});
+  });
+  it("reordena, quita la foto de perfil y encola los archivos quitados", async () => {
+    const [avatar, first, second] = (await servicePhotos()).map(row => row.path);
+    await asUser(e, async () => {
+      await db.query("select set_service_images($1, $2, $3)", [service, null, [second]]);
+      expect(await servicePhotos()).toEqual([{kind: "trabajo", path: second, sort_order: 0}]);
+      expect((await db.query<{path: string}>("select path from storage_cleanup where ready")).rows.map(r => r.path).sort()).toEqual([avatar, first].sort());
+      await db.query("delete from storage.objects where name = any($1)", [[avatar, first]]);
+      await db.query("delete from storage_cleanup where path = any($1)", [[avatar, first]]);
+    });
+  });
+  it("la eliminación de cuenta arrastra las fotos y deja sus archivos para limpiar", async () => {
+    const [remaining] = (await servicePhotos()).map(row => row.path);
+    await db.query("delete from auth.users where id=$1", [e]);
+    expect((await db.query("select * from service_images where owner_id=$1", [e])).rows).toHaveLength(0);
+    expect((await db.query("select ready from storage_cleanup where path=$1", [remaining])).rows[0]).toEqual({ready: true});
   });
 });

@@ -75,6 +75,7 @@ class FakeDb:
             "products": [],
             "product_images": [],
             "service_providers": [],
+            "service_images": [],
             "profiles": [],
             "storage_cleanup": [],
             **{name: [dict(row) for row in rows] for name, rows in CATALOG.items()},
@@ -95,6 +96,8 @@ class FakeDb:
         """Imita el embebido de PostgREST que piden los routers."""
         if "product_images" in columns:
             row = {**row, "images": [i for i in self.tables["product_images"] if i["product_id"] == row["id"]]}
+        if "service_images" in columns:
+            row = {**row, "images": [i for i in self.tables["service_images"] if i["service_provider_id"] == row["id"]]}
         if "categories(" in columns:
             row = {**row, "category": self.named("categories", row["category_id"])}
         if "trades(" in columns:
@@ -125,10 +128,14 @@ class FakeDb:
     async def delete(self, table, filters):
         rows = [row for row in self.tables[table] if matches(row, filters)]
         self.tables[table] = [row for row in self.tables[table] if row not in rows]
-        if table == "products":
+        images, key = {
+            "products": ("product_images", "product_id"),
+            "service_providers": ("service_images", "service_provider_id"),
+        }.get(table, (None, None))
+        if images:
             ids = {row["id"] for row in rows}
-            gone = [i for i in self.tables["product_images"] if i["product_id"] in ids]
-            self.tables["product_images"] = [i for i in self.tables["product_images"] if i not in gone]
+            gone = [i for i in self.tables[images] if i[key] in ids]
+            self.tables[images] = [i for i in self.tables[images] if i not in gone]
             cleanup = [{"path": i["path"], "owner_id": i["owner_id"], "ready": True} for i in gone]
             self.tables["storage_cleanup"].extend(cleanup)
         return rows
@@ -153,6 +160,23 @@ class FakeDb:
                 for order, path in enumerate(args["paths"])
             ]
             self.tables["product_images"] = others + mine
+            return None
+        if function == "set_service_images":
+            if self.fail_images:
+                raise SupabaseError(400, "Image does not exist")
+            service = args["service_provider_id"]
+            owner = next(row["owner_id"] for row in self.tables["service_providers"] if row["id"] == service)
+            wanted = [("perfil", args["avatar"], 0)] if args["avatar"] else []
+            wanted += [("trabajo", path, order) for order, path in enumerate(args["works"])]
+            for image in self.tables["service_images"]:
+                if image["service_provider_id"] == service and image["path"] not in {path for _, path, _ in wanted}:
+                    self.tables["storage_cleanup"].append({"path": image["path"], "owner_id": owner, "ready": True})
+            others = [i for i in self.tables["service_images"] if i["service_provider_id"] != service]
+            mine = [
+                {"service_provider_id": service, "owner_id": owner, "kind": kind, "path": path, "sort_order": order}
+                for kind, path, order in wanted
+            ]
+            self.tables["service_images"] = others + mine
             return None
         if function == "abandon_image":
             self.tables["storage_cleanup"].append({"path": args["image"], "owner_id": A, "ready": True})
@@ -377,37 +401,82 @@ def test_ids_e_imagenes_con_formato_invalido(api):
 
 
 def test_servicios_no_aceptan_verified_y_usan_version(api, db):
-    created = api.post("/api/services", json={**SERVICE, "verified": True, "rating_score": 5}, headers=AS_A)
+    created = api.post("/api/services", data={**SERVICE, "verified": True, "rating_score": 5}, headers=AS_A)
     assert created.status_code == 201
     service = api.get(f"/api/services/{created.json()['id']}").json()
     assert service["verified"] is False and service["trade_name"] == "Gasista" and service["requires_license"]
     assert "rating_score" not in db.tables["service_providers"][0]
-    stale = api.put(f"/api/services/{service['id']}", json={**SERVICE, "version": "vieja"}, headers=AS_A)
+    stale = api.put(f"/api/services/{service['id']}", data={**SERVICE, "version": "vieja"}, headers=AS_A)
     assert stale.status_code == 409
-    fresh = api.put(f"/api/services/{service['id']}", json={**SERVICE, "version": service["updated_at"]}, headers=AS_A)
+    fresh = api.put(f"/api/services/{service['id']}", data={**SERVICE, "version": service["updated_at"]}, headers=AS_A)
     assert fresh.status_code == 200
     assert api.get("/api/services", params={"trade": "gasista"}).json()["count"] == 1
     assert api.get("/api/services", params={"trade": "pintor"}).json()["count"] == 0
     assert api.delete(f"/api/services/{service['id']}", headers=AS_B).status_code == 404
-    bad = api.post("/api/services", json={**SERVICE, "phone": "llamame"}, headers=AS_A)
+    bad = api.post("/api/services", data={**SERVICE, "phone": "llamame"}, headers=AS_A)
     assert bad.json()["detail"] == "Ingresá un teléfono válido, con código de área y sin letras."
 
 
 def test_matricula_solo_si_el_oficio_la_exige(api, db):
-    missing = api.post("/api/services", json={**SERVICE, "license_number": "", "license_body": ""}, headers=AS_A)
+    missing = api.post("/api/services", data={**SERVICE, "license_number": "", "license_body": ""}, headers=AS_A)
     assert missing.status_code == 422
     assert missing.json()["detail"] == "Este oficio exige matrícula: ingresá el número y la entidad que la emitió."
     painter = {**SERVICE, "trade_id": "pintor", "contact_email": "pintor@example.com"}
-    assert api.post("/api/services", json=painter, headers=AS_A).status_code == 201
+    assert api.post("/api/services", data=painter, headers=AS_A).status_code == 201
     row = db.tables["service_providers"][0]
     assert row["license_number"] is None and row["license_body"] is None
     assert row["contact_email"] == "pintor@example.com"
-    unknown = api.post("/api/services", json={**SERVICE, "trade_id": "astronauta"}, headers=AS_A)
+    unknown = api.post("/api/services", data={**SERVICE, "trade_id": "astronauta"}, headers=AS_A)
     assert unknown.json()["detail"] == "Elegí un oficio de la lista."
 
 
+def test_servicio_con_foto_de_perfil_y_trabajos(api, db):
+    files = [("avatar_file", ("yo.png", png("white"), "image/png")), *photos("red", "blue")]
+    created = api.post("/api/services", data={**SERVICE, "avatar": "new"}, files=files, headers=AS_A)
+    assert created.status_code == 201
+    service = api.get(f"/api/services/{created.json()['id']}").json()
+    assert service["avatar"] in db.files and len(service["work_images"]) == 2
+    assert all(path in db.files for path in service["work_images"])
+    assert "images" not in service
+
+    # Quita la foto de perfil, invierte el orden de los trabajos y agrega uno nuevo al final.
+    first, second = service["work_images"]
+    data = {**SERVICE, "version": service["updated_at"], "avatar": "", "image_order": [second, first, "new:0"]}
+    edit = api.put(f"/api/services/{service['id']}", data=data, files=photos("green"), headers=AS_A)
+    assert edit.status_code == 200
+    edited = api.get(f"/api/services/{service['id']}").json()
+    assert edited["avatar"] is None and edited["work_images"][:2] == [second, first] and len(edited["work_images"]) == 3
+    assert service["avatar"] not in db.files
+
+    db.calls.clear()
+    keep = {**SERVICE, "version": edited["updated_at"], "avatar": "", "image_order": edited["work_images"]}
+    assert api.put(f"/api/services/{service['id']}", data=keep, headers=AS_A).status_code == 200
+    assert "set_service_images" not in db.calls
+    assert api.delete(f"/api/services/{service['id']}", headers=AS_A).json() == {"deleted": True, "clean": True}
+    assert db.files == {}
+
+
+@pytest.mark.parametrize(
+    "change",
+    [{"avatar": "new"}, {"avatar": f"{A}/{uuid.uuid4()}.webp"}, {"image_order": [f"new:{i}" for i in range(9)]}],
+)
+def test_fotos_de_servicio_invalidas(api, db, change):
+    response = api.post("/api/services", data={**SERVICE, **change}, files=photos("red"), headers=AS_A)
+    assert response.status_code == 422
+    assert db.tables["service_providers"] == [] and db.files == {}
+
+
+def test_falla_de_fotos_deshace_el_alta_del_servicio(api, db):
+    db.fail_images = True
+    files = [("avatar_file", ("yo.png", png(), "image/png")), *photos("red")]
+    response = api.post("/api/services", data={**SERVICE, "avatar": "new"}, files=files, headers=AS_A)
+    assert response.status_code == 409
+    assert db.tables["service_providers"] == [] and db.files == {}
+    assert db.calls.count("abandon_image") == 2
+
+
 def test_listado_de_servicios_oculta_los_ocultos(api, db):
-    api.post("/api/services", json=SERVICE, headers=AS_A)
+    api.post("/api/services", data=SERVICE, headers=AS_A)
     db.tables["service_providers"][0]["hidden"] = True
     assert api.get("/api/services").json()["count"] == 0
     assert api.get("/api/services", params={"mine": "true"}, headers=AS_A).json()["count"] == 1

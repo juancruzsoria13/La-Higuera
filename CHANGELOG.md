@@ -4,6 +4,20 @@ Todos los cambios relevantes de La Higuera se registran en este archivo.
 
 El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y el proyecto usa [versionado semántico](https://semver.org/lang/es/).
 
+## [Sin publicar]
+
+### Agregado
+
+- **Fotos en servicios**, ambas opcionales: una foto de perfil de quien ofrece el servicio y hasta 8 fotos de trabajos realizados, que se agregan, quitan y reordenan. La tarjeta muestra la foto de perfil y el detalle, la foto y la galería de trabajos.
+- Migración `database/migrations/202610090001_service_images.sql`: tabla `service_images` con RLS (una foto se ve si se ve su servicio), función `set_service_images()` y políticas de Storage y `abandon_image()` ampliadas.
+
+### Cambiado
+
+- `POST` y `PUT /api/services` reciben multipart (como los anuncios) en lugar de JSON. `DELETE /api/services/{id}` limpia los archivos de las fotos.
+- La validación del orden de fotos y el abandono de cargas pasaron a `app/images.py`, compartidos por anuncios y servicios.
+- `scripts/cleanup.py` y `scripts/integration.py` contemplan las fotos de servicios.
+- Límite de cuerpo de las server actions: de 41 MB a 46 MB (foto de perfil + 8 de trabajos).
+
 ## [0.3.0] - 2026-10-08
 
 Adapta la API y el frontend al modelo de `database/migrations/202610070003_marketplace_model.sql`. Esta versión no funciona contra una base sin esa migración, y la anterior no funciona con ella.

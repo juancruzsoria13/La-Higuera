@@ -30,7 +30,7 @@ Documentación interactiva en `http://127.0.0.1:8000/docs` con la API corriendo.
 | `DELETE /api/products/{id}` | sí | Baja; devuelve si la limpieza de imágenes quedó completa |
 | `GET /api/services?q&trade&page&limit&mine` | opcional | Servicios activos y sin ocultar, o propios; ordenados por matrícula verificada, referencias, puntaje y fecha. `trade` es un `trade_id` |
 | `GET /api/services/{id}` | opcional | Detalle de un servicio |
-| `POST /api/services`, `PUT /api/services/{id}` | sí | Alta y edición (JSON; la edición exige `version`) |
+| `POST /api/services`, `PUT /api/services/{id}` | sí | Alta y edición (multipart: campos, `avatar` + `avatar_file`, `images` e `image_order`; la edición exige `version`). Las respuestas traen `avatar` y `work_images` |
 | `DELETE /api/services/{id}` | sí | Baja |
 | `GET /api/profile`, `PUT /api/profile` | sí | Perfil propio (`display_name`, `locality_id`) |
 | `POST /api/account/delete` | sí | Eliminación de cuenta con `{"confirmation": "ELIMINAR"}` |
@@ -73,4 +73,6 @@ Las migraciones están en `database/migrations/` y se aplican en orden:
 3. `202610070002_supabase_hardening.sql`: permisos explícitos para `service_role`, EXECUTE de funciones solo para quien lo necesita, alta de perfil tolerante, tope de imágenes en trámite y cola de limpieza que no deja huérfanos.
 4. `202610070003_marketplace_model.sql`: tablas `localities`, `categories` y `trades`; en `products`, `category_id`, `locality_id`, `operation`, `contact_phone`, `contact_email`, `expires_at` y `hidden` (sin `image_path`); `product_images` con `set_product_images()` y `renew_product()`; matrícula según `trades.requires_license`; perfiles públicos con puntaje; comercios verificados, reseñas, denuncias, referencias y funciones de administración. Restringe el INSERT de `products` y `businesses` a columnas listadas.
 
-`database/supabase_setup.sql` reúne las cuatro en una sola transacción para un proyecto nuevo; la fuente de verdad sigue siendo la carpeta de migraciones.
+5. `202610090001_service_images.sql`: `service_images` (una foto de `perfil` y hasta 8 de `trabajo` por servicio) con `set_service_images(service_provider_id, avatar, works)`; amplía `image_read`, `image_delete` y `abandon_image()` para que reconozcan estas fotos.
+
+`database/supabase_setup.sql` reúne las cuatro primeras en una sola transacción para un proyecto nuevo; la fuente de verdad sigue siendo la carpeta de migraciones.

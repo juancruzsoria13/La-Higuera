@@ -34,7 +34,11 @@ async def main() -> int:
             progress = 0
             for row in rows:
                 path = row["path"]
-                linked, _ = await admin.select("product_images", [("path", f"eq.{path}")], limit=1)
+                linked = [
+                    row
+                    for table in ("product_images", "service_images")
+                    for row in (await admin.select(table, [("path", f"eq.{path}")], limit=1))[0]
+                ]
                 if linked:
                     print("Archivo todavía asociado; se conserva:", path, file=sys.stderr)
                     continue
