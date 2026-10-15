@@ -17,6 +17,7 @@ describe("Validación de productos y perfiles", () => {
   });
   it("pide venta o alquiler solo para inmuebles", () => {
     expect(message(productSchema.safeParse({...valid, category_id: "inmuebles"}))).toBe("Indicá si el inmueble es para venta o alquiler.");
+    expect(productSchema.parse({...valid, category_id: "vehiculos", subcategory_id: "bicicletas"}).operation).toBeNull();
     expect(productSchema.parse({...valid, category_id: "inmuebles", operation: "alquiler"}).operation).toBe("alquiler");
     expect(productSchema.parse({...valid, operation: "venta"}).operation).toBeNull();
   });

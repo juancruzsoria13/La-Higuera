@@ -4,6 +4,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 
 from ..deps import DbDep
+from ..product_attributes import CATALOG
 from ..supabase import Supabase, SupabaseError
 
 router = APIRouter(prefix="/catalog", tags=["listas"])
@@ -30,4 +31,6 @@ def find(rows: list[dict[str, Any]], item_id: str) -> dict[str, Any] | None:
 
 @router.get("")
 async def get_catalog(db: DbDep) -> dict[str, list[dict[str, Any]]]:
-    return await load_catalog(db)
+    catalog = await load_catalog(db)
+    active = {row["id"] for row in catalog["categories"]}
+    return {**catalog, "subcategories": [item for item in CATALOG["subcategories"] if item["category_id"] in active]}

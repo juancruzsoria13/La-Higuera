@@ -9,6 +9,7 @@ from starlette.datastructures import UploadFile
 from ..config import PAGE_SIZE
 from ..deps import CurrentUser, DbDep, UserDep
 from ..images import ImageError, abandon_images, clean_images, image_order, upload_image
+from ..product_attributes import SUBCATEGORIES
 from ..schemas import ProductIn, is_slug
 from ..supabase import SupabaseError
 from .catalog import find, load_catalog
@@ -21,6 +22,8 @@ FIELDS = (
     "price",
     "currency",
     "category_id",
+    "subcategory_id",
+    "attributes",
     "condition",
     "locality_id",
     "operation",
@@ -57,6 +60,7 @@ async def list_products(
     user: CurrentUser,
     q: str = "",
     category: str = "",
+    subcategory: str = "",
     page: Annotated[int, Query(ge=1, le=10000)] = 1,
     mine: bool = False,
 ) -> dict[str, Any]:
@@ -73,6 +77,11 @@ async def list_products(
         filters.append(("title", pattern))
     if is_slug(category):
         filters.append(("category_id", f"eq.{category}"))
+    if subcategory:
+        selected = SUBCATEGORIES.get(subcategory)
+        if not selected or (category and selected["category_id"] != category):
+            raise HTTPException(422, "Elegí una subcategoría del rubro seleccionado.")
+        filters.append(("subcategory_id", f"eq.{subcategory}"))
     offset, limit = page_bounds(page, PAGE_SIZE)
     try:
         rows, count = await db.select(

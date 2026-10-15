@@ -7,7 +7,9 @@ los routers comprueban contra el catálogo que exista y esté activo.
 import re
 from typing import Any
 
-from pydantic import BaseModel, ValidationInfo, field_validator, model_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
+
+from .product_attributes import validate_attributes
 
 PRODUCT_STATUSES = ("activo", "pausado", "vendido")
 CURRENCIES = ("ARS", "USD")
@@ -80,6 +82,8 @@ class ProductIn(BaseModel):
     price: float
     currency: str
     category_id: str
+    subcategory_id: str | None = None
+    attributes: dict[str, str] = Field(default_factory=dict)
     condition: str
     locality_id: str
     operation: str | None = None
@@ -104,6 +108,10 @@ class ProductIn(BaseModel):
                 return _choice(value, CURRENCIES, "Elegí una moneda válida.")
             case "category_id":
                 return _slug(value, "Elegí un rubro de la lista.")
+            case "subcategory_id":
+                return _slug(value, "Elegí una subcategoría de la lista.") if value else None
+            case "attributes":
+                return validate_attributes(info.data.get("category_id", ""), info.data.get("subcategory_id"), value)
             case "condition":
                 return _choice(value, CONDITIONS, "Elegí si el producto es nuevo o usado.")
             case "locality_id":
@@ -121,6 +129,7 @@ class ProductIn(BaseModel):
 
     @model_validator(mode="after")
     def rules(self) -> "ProductIn":
+        self.attributes = validate_attributes(self.category_id, self.subcategory_id, self.attributes)
         # Mismas reglas que products_operation_by_category y products_active_contact.
         if self.category_id == REAL_ESTATE and not self.operation:
             raise ValueError("Indicá si el inmueble es para venta o alquiler.")

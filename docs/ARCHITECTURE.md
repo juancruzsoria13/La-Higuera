@@ -76,3 +76,17 @@ Las migraciones están en `database/migrations/` y se aplican en orden:
 5. `202610090001_service_images.sql`: `service_images` (una foto de `perfil` y hasta 8 de `trabajo` por servicio) con `set_service_images(service_provider_id, avatar, works)`; amplía `image_read`, `image_delete` y `abandon_image()` para que reconozcan estas fotos.
 
 `database/supabase_setup.sql` reúne las cuatro primeras en una sola transacción para un proyecto nuevo; la fuente de verdad sigue siendo la carpeta de migraciones.
+
+
+### Atributos de anuncios
+
+`202610150001_product_attributes.sql` agrega `product_subcategories`, `product_attribute_definitions`, `products.subcategory_id` y `products.attributes` (JSONB). Una clave foránea compuesta impide asociar una subcategoría a otro rubro. El trigger valida las claves permitidas, tipos, rangos, opciones y enlaces Google Maps; aplica también al acceso directo mediante Supabase y conserva las políticas RLS existentes. Los permisos de escritura del usuario se amplían únicamente a las dos columnas nuevas de su propio anuncio.
+
+FastAPI y la acción del frontend validan el mismo catálogo. El campo multipart `attributes` contiene un objeto JSON de valores de texto; las cadenas vacías se omiten y las superficies aceptan coma decimal. Los campos `subcategory_id` y `attributes` son opcionales en la API para compatibilidad con anuncios anteriores. La interfaz requiere subcategoría en los dos rubros nuevos y elimina los atributos incompatibles al cambiarla. La ficha muestra las características y el enlace a Maps.
+
+
+### Navegación por subcategorías
+
+La barra presenta Inmuebles, Vehículos, Artículos, Servicios y Tiendas Virtuales. Los primeros dos despliegan sus subcategorías; Artículos agrupa las demás categorías. Los menús admiten hover con mouse, toque y teclado, cierran con Escape o al salir/clic fuera, y la barra se desplaza horizontalmente en celulares. Tiendas Virtuales permanece visible y sin enlace hasta que exista su pantalla (el modelo `businesses` ya está definido).
+
+El listado y la API aceptan `subcategory` además de `category`. Búsqueda y paginación conservan ambos filtros; la API rechaza subcategorías inexistentes o de otro rubro. El filtrado depende de la migración `202610150001_product_attributes.sql`.

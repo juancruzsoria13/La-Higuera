@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { optionalEmail, optionalPhone, slug } from "@/lib/validation";
+import { validateAttributes } from "./attributes";
 export const statuses = ["activo", "pausado", "vendido"] as const;
 export const operations = ["venta", "alquiler"] as const;
 export const REAL_ESTATE = "inmuebles";
@@ -11,6 +12,8 @@ export const productSchema = z.object({
   price: z.string().trim().regex(/^\d{1,12}([.,]\d{1,2})?$/, "Ingresá un precio válido, sin miles y con hasta 2 decimales.").transform(v => Number(v.replace(",", "."))),
   currency: z.enum(["ARS", "USD"]),
   category_id: slug("Elegí un rubro de la lista."),
+  subcategory_id: z.string().nullish().transform(value => value || null),
+  attributes: z.unknown().optional(),
   condition: z.enum(["nuevo", "usado"]),
   locality_id: slug("Elegí una localidad de la lista."),
   operation: z.enum(["", ...operations], {error: "Elegí si es venta o alquiler."}),
@@ -21,7 +24,14 @@ export const productSchema = z.object({
   // Mismas reglas que products_operation_by_category y products_active_contact.
   if (value.category_id === REAL_ESTATE && !value.operation) context.addIssue({code: "custom", path: ["operation"], message: "Indicá si el inmueble es para venta o alquiler."});
   if (value.status === "activo" && !value.contact_phone && !value.contact_email) context.addIssue({code: "custom", path: ["contact_phone"], message: "Dejá un teléfono o un correo de contacto para publicar el anuncio."});
-}).transform(value => ({...value, operation: value.category_id === REAL_ESTATE && value.operation ? value.operation : null}));
+}).transform((value, context) => {
+  try {
+    return {...value, attributes: validateAttributes(value.category_id, value.subcategory_id, value.attributes ?? {}), operation: value.category_id === REAL_ESTATE && value.operation ? value.operation : null};
+  } catch (error) {
+    context.addIssue({code: "custom", message: error instanceof Error ? error.message : "Revisá las características del anuncio."});
+    return z.NEVER;
+  }
+});
 export const uuidSchema = z.string().uuid();
 export type Product = z.output<typeof productSchema> & {
   id: string; owner_id: string; business_id: string | null; images: string[]; category_name: string | null; locality_name: string | null;

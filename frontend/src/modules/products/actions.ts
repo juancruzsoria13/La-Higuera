@@ -5,7 +5,7 @@ import { requireUser } from "@/modules/users/session";
 import { type ActionState, fields } from "@/lib/action-state";
 import { api } from "@/lib/api";
 import { MAX_IMAGES, productSchema, uuidSchema } from "./schema";
-const names = ["title", "description", "price", "currency", "category_id", "condition", "locality_id", "operation", "contact_phone", "contact_email", "status"];
+const names = ["title", "description", "price", "currency", "category_id", "subcategory_id", "attributes", "condition", "locality_id", "operation", "contact_phone", "contact_email", "status"];
 
 export async function saveProduct(id: string | null, _previous: ActionState, form: FormData): Promise<ActionState> {
   await requireUser();

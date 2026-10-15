@@ -505,3 +505,64 @@ def test_eliminacion_de_cuenta_se_detiene_si_no_puede_bloquear(api, db):
     response = api.post("/api/account/delete", json={"confirmation": "ELIMINAR"}, headers=AS_A)
     assert response.status_code == 502
     assert not any(call.startswith("delete_user") for call in db.calls)
+
+
+def test_subcategory_attributes_round_trip_and_change(api, db):
+    import json
+
+    created = api.post(
+        "/api/products",
+        data={
+            **PRODUCT,
+            "category_id": "inmuebles",
+            "operation": "venta",
+            "subcategory_id": "casas",
+            "attributes": json.dumps({"age": "0", "bedrooms": "2", "surface": "125,50", "credit_eligible": "no"}),
+        },
+        headers=AS_A,
+    )
+    assert created.status_code == 201
+    product_id = created.json()["id"]
+    product = api.get(f"/api/products/{product_id}").json()
+    assert product["subcategory_id"] == "casas"
+    assert product["attributes"] == {"age": "0", "bedrooms": "2", "surface": "125.50", "credit_eligible": "no"}
+    updated = api.put(
+        f"/api/products/{product_id}",
+        data={
+            **PRODUCT,
+            "category_id": "inmuebles",
+            "operation": "venta",
+            "subcategory_id": "terrenos-lotes",
+            "attributes": json.dumps({"surface": "300"}),
+            "version": product["updated_at"],
+        },
+        headers=AS_A,
+    )
+    assert updated.status_code == 200
+    product = api.get(f"/api/products/{product_id}").json()
+    assert product["subcategory_id"] == "terrenos-lotes" and product["attributes"] == {"surface": "300"}
+    invalid = api.post(
+        "/api/products",
+        data={
+            **PRODUCT,
+            "category_id": "inmuebles",
+            "operation": "venta",
+            "subcategory_id": "terrenos-lotes",
+            "attributes": json.dumps({"bedrooms": "2"}),
+        },
+        headers=AS_A,
+    )
+    assert invalid.status_code == 422
+
+
+def test_listado_filtra_subcategoria_y_rechaza_rubros_incompatibles(api, db):
+    house = {**PRODUCT, "category_id": "inmuebles", "operation": "venta", "subcategory_id": "casas"}
+    for subcategory in ["casas", "departamentos", "terrenos-lotes"]:
+        assert api.post("/api/products", data={**house, "subcategory_id": subcategory}, headers=AS_A).status_code == 201
+    assert api.post("/api/products", data={**house, "status": "pausado"}, headers=AS_A).status_code == 201
+    result = api.get("/api/products", params={"category": "inmuebles", "subcategory": "casas"}).json()
+    assert result["count"] == 1 and result["items"][0]["subcategory_id"] == "casas"
+    assert api.get("/api/products", params={"subcategory": "departamentos"}).json()["count"] == 1
+    assert api.get("/api/products", params={"category": "inmuebles"}).json()["count"] == 3
+    for params in [{"category": "vehiculos", "subcategory": "casas"}, {"subcategory": "desconocida"}]:
+        assert api.get("/api/products", params=params).status_code == 422

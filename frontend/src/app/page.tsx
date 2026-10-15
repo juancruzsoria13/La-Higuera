@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getSubcategory } from "@/modules/products/attributes";
 import { ArrowUpRight, SlidersHorizontal } from "lucide-react";
 import { getCatalog } from "@/lib/catalog";
 import { listProducts } from "@/modules/products/queries";
@@ -18,12 +19,14 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   const {categories, trades} = await getCatalog();
   const selected = categories.find(c => c.id === params.category);
   const category = selected?.id ?? "";
+  const selectedSubcategory = getSubcategory(category, params.subcategory);
+  const subcategory = selectedSubcategory?.id ?? "";
   const page = Math.max(1, Math.min(10000, Number.parseInt(params.page ?? "1", 10) || 1));
   let result: Awaited<ReturnType<typeof listProducts>> = { products: [], count: 0 };
   let error = "";
   let featured: Awaited<ReturnType<typeof listServices>>["services"] = [];
   if (isConfigured()) {
-    try { result = await listProducts({ q, category, page }); }
+    try { result = await listProducts({ q, category, subcategory, page }); }
     catch { error = "No pudimos cargar los anuncios. Revisá la conexión e intentá nuevamente."; }
     try { featured = (await listServices({ limit: 3 })).services; } catch { featured = []; }
   }
@@ -37,7 +40,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
         <section className="flex flex-col gap-6" aria-labelledby="listado">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex min-w-0 flex-col gap-2">
-              <h2 id="listado" className="h2">{q ? `Resultados para “${q}”` : selected?.name || "Descubrí lo que hay cerca"}</h2>
+              <h2 id="listado" className="h2">{q ? `Resultados para “${q}”` : selectedSubcategory?.name || selected?.name || "Descubrí lo que hay cerca"}</h2>
               <p className="body-sm text-muted-foreground">{isConfigured() && !error ? `${result.count} ${result.count === 1 ? "anuncio disponible" : "anuncios disponibles"}` : "Encontrá algo para vos, acá en San Juan."}</p>
             </div>
             <span className="filter-chip gap-2 text-muted-foreground hover:border-border-strong"><SlidersHorizontal className="size-4" />Más recientes primero</span>
@@ -47,7 +50,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           ) : result.products.length ? (
             <>
               <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">{result.products.map(p => <ProductCard product={p} key={p.id} />)}</div>
-              <Pagination page={page} count={result.count} q={q} category={category} />
+              <Pagination page={page} count={result.count} q={q} category={category} subcategory={subcategory} />
             </>
           ) : (
             <div className="rounded-2xl border bg-card px-6 py-14 text-center">

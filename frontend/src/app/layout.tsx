@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Figtree } from "next/font/google";
 import { Suspense } from "react";
 import Link from "next/link";
-import { LogOut, MapPin, Package, Wrench, Plus, UserRound } from "lucide-react";
+import { LogOut, Package, Wrench, Plus, UserRound } from "lucide-react";
 import { currentUser } from "@/modules/users/session";
 import { logout } from "@/modules/users/actions";
 import { Brand } from "@/components/brand";
@@ -22,7 +22,7 @@ export const dynamic = "force-dynamic";
 const figtree = Figtree({ subsets: ["latin"], display: "swap", variable: "--font-figtree" });
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const [user, {categories}] = await Promise.all([currentUser(), getCatalog()]);
+  const [user, {categories, trades}] = await Promise.all([currentUser(), getCatalog()]);
   return (
     <html lang="es-AR" className={figtree.variable}>
       <body className="flex min-h-screen flex-col antialiased">
@@ -47,8 +47,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </div>
           <div className="hdr-sub relative">
             <div className="shell hdr-sub-in">
-              <Suspense fallback={<HeaderTabsFallback />}><HeaderTabs categories={categories} /></Suspense>
-              <span className="hdr-loc"><MapPin className="size-3.5" />San Juan, Argentina</span>
+              <Suspense fallback={<HeaderTabsFallback />}><HeaderTabs categories={categories} trades={trades} /></Suspense>
             </div>
           </div>
         </header>

@@ -30,6 +30,7 @@ test("CRUD real, recarga, privacidad con dos usuarios y eliminación de cuenta",
     await page.getByLabel("Descripción").fill("Una bicicleta de prueba para verificar la persistencia.");
     await page.getByLabel("Precio",{exact:true}).fill("15000,50");
     await expect(page.getByLabel("Localidad",{exact:true})).toHaveValue("rivadavia");
+    await page.getByRole("button",{name:"Siguiente"}).click();
     await page.getByLabel("Teléfono / WhatsApp").fill("2644123456");
     const photo = (background: string) => sharp({create:{width:32,height:32,channels:3,background}}).png().toBuffer();
     await page.getByLabel("Agregar fotos").setInputFiles([{name:"verde.png",mimeType:"image/png",buffer:await photo("green")},{name:"azul.png",mimeType:"image/png",buffer:await photo("blue")}]);
@@ -41,7 +42,7 @@ test("CRUD real, recarga, privacidad con dos usuarios y eliminación de cuenta",
     const imageUrl = await page.getByRole("img",{name:"Bicicleta de integración"}).getAttribute("src");
     await other.goto(productUrl); await expect(other.getByRole("heading",{name:"Bicicleta de integración"})).toBeVisible(); await expect(other.getByRole("link",{name:"Editar anuncio"})).toHaveCount(0); await expect(other.getByText(users[0].email)).toHaveCount(0);
     await other.goto(`${productUrl}/editar`); await expect(other.getByRole("heading",{name:"Este anuncio no está disponible"})).toBeVisible();
-    await page.getByRole("link",{name:"Editar anuncio"}).click(); await page.getByLabel("Estado del anuncio").selectOption("pausado"); await page.getByRole("button",{name:"Guardar cambios"}).click(); await expect(page).toHaveURL(/guardado/);
+    await page.getByRole("link",{name:"Editar anuncio"}).click(); await page.getByRole("button",{name:"Siguiente"}).click(); await page.getByLabel("Estado del anuncio").selectOption("pausado"); await page.getByRole("button",{name:"Guardar cambios"}).click(); await expect(page).toHaveURL(/guardado/);
     await other.goto(productUrl); await expect(other.getByRole("heading",{name:"Este anuncio no está disponible"})).toBeVisible(); expect((await other.request.get(`${baseURL}${imageUrl}`)).status()).toBe(404);
     // Delete through the actual server action; identity comes from the signed session.
     await page.goto("/mi-perfil"); await page.getByRole("button",{name:"Eliminar mi cuenta",exact:true}).click(); await page.getByLabel("Escribí ELIMINAR para confirmar").fill("ELIMINAR"); await page.getByRole("button",{name:"Eliminar definitivamente"}).click(); await expect(page).toHaveURL(/cuenta=eliminada/);

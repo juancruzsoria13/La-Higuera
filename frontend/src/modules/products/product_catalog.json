@@ -1,0 +1,362 @@
+{
+  "subcategories": [
+    {
+      "id": "casas",
+      "name": "Casas",
+      "category_id": "inmuebles",
+      "attributes": [
+        "address",
+        "neighborhood",
+        "surface",
+        "age",
+        "bedrooms",
+        "bathrooms",
+        "garages",
+        "credit_eligible",
+        "maps_url"
+      ]
+    },
+    {
+      "id": "departamentos",
+      "name": "Departamentos",
+      "category_id": "inmuebles",
+      "attributes": [
+        "address",
+        "neighborhood",
+        "surface",
+        "age",
+        "bedrooms",
+        "bathrooms",
+        "garages",
+        "credit_eligible",
+        "maps_url"
+      ]
+    },
+    {
+      "id": "cocheras",
+      "name": "Cocheras",
+      "category_id": "inmuebles",
+      "attributes": [
+        "address",
+        "neighborhood",
+        "surface",
+        "age",
+        "credit_eligible",
+        "maps_url"
+      ]
+    },
+    {
+      "id": "terrenos-lotes",
+      "name": "Terrenos y lotes",
+      "category_id": "inmuebles",
+      "attributes": [
+        "address",
+        "neighborhood",
+        "surface",
+        "credit_eligible",
+        "maps_url"
+      ]
+    },
+    {
+      "id": "locales-salones-oficinas",
+      "name": "Locales, salones y oficinas",
+      "category_id": "inmuebles",
+      "attributes": [
+        "address",
+        "neighborhood",
+        "surface",
+        "age",
+        "bathrooms",
+        "garages",
+        "credit_eligible",
+        "maps_url"
+      ]
+    },
+    {
+      "id": "galpones-depositos",
+      "name": "Galpones y depósitos",
+      "category_id": "inmuebles",
+      "attributes": [
+        "address",
+        "neighborhood",
+        "surface",
+        "age",
+        "bathrooms",
+        "garages",
+        "credit_eligible",
+        "maps_url"
+      ]
+    },
+    {
+      "id": "fincas-campos",
+      "name": "Fincas y campos",
+      "category_id": "inmuebles",
+      "attributes": [
+        "address",
+        "neighborhood",
+        "surface",
+        "age",
+        "bedrooms",
+        "bathrooms",
+        "garages",
+        "credit_eligible",
+        "maps_url"
+      ]
+    },
+    {
+      "id": "autos",
+      "name": "Autos",
+      "category_id": "vehiculos",
+      "attributes": [
+        "brand",
+        "model",
+        "year",
+        "mileage",
+        "fuel",
+        "transmission"
+      ]
+    },
+    {
+      "id": "motos",
+      "name": "Motos",
+      "category_id": "vehiculos",
+      "attributes": [
+        "brand",
+        "model",
+        "year",
+        "mileage",
+        "fuel",
+        "transmission"
+      ]
+    },
+    {
+      "id": "camionetas-utilitarios",
+      "name": "Camionetas y utilitarios",
+      "category_id": "vehiculos",
+      "attributes": [
+        "brand",
+        "model",
+        "year",
+        "mileage",
+        "fuel",
+        "transmission"
+      ]
+    },
+    {
+      "id": "camiones",
+      "name": "Camiones",
+      "category_id": "vehiculos",
+      "attributes": [
+        "brand",
+        "model",
+        "year",
+        "mileage",
+        "fuel",
+        "transmission"
+      ]
+    },
+    {
+      "id": "bicicletas",
+      "name": "Bicicletas",
+      "category_id": "vehiculos",
+      "attributes": [
+        "brand",
+        "bike_type",
+        "wheel_size"
+      ]
+    },
+    {
+      "id": "nautica",
+      "name": "Náutica",
+      "category_id": "vehiculos",
+      "attributes": [
+        "brand",
+        "model",
+        "year",
+        "mileage",
+        "fuel",
+        "transmission"
+      ]
+    },
+    {
+      "id": "repuestos-accesorios",
+      "name": "Repuestos y accesorios",
+      "category_id": "vehiculos",
+      "attributes": [
+        "compatible_brand",
+        "compatible_model"
+      ]
+    }
+  ],
+  "attributes": {
+    "address": {
+      "label": "Calle y número",
+      "type": "text",
+      "maxLength": 200
+    },
+    "neighborhood": {
+      "label": "Barrio",
+      "type": "text",
+      "maxLength": 100
+    },
+    "surface": {
+      "label": "Superficie (m²)",
+      "type": "number",
+      "min": 0.01,
+      "max": 100000000000,
+      "step": "0.01"
+    },
+    "age": {
+      "label": "Antigüedad (años)",
+      "type": "number",
+      "min": 0,
+      "max": 1000,
+      "step": "1"
+    },
+    "bedrooms": {
+      "label": "Dormitorios",
+      "type": "number",
+      "min": 0,
+      "max": 100,
+      "step": "1"
+    },
+    "bathrooms": {
+      "label": "Baños",
+      "type": "number",
+      "min": 0,
+      "max": 100,
+      "step": "1"
+    },
+    "garages": {
+      "label": "Cocheras",
+      "type": "number",
+      "min": 0,
+      "max": 100,
+      "step": "1"
+    },
+    "credit_eligible": {
+      "label": "Apto crédito",
+      "type": "select",
+      "options": [
+        {
+          "id": "si",
+          "name": "Sí"
+        },
+        {
+          "id": "no",
+          "name": "No"
+        }
+      ]
+    },
+    "maps_url": {
+      "label": "Ubicación en Google Maps",
+      "type": "url",
+      "maxLength": 2048
+    },
+    "brand": {
+      "label": "Marca",
+      "type": "text",
+      "maxLength": 80
+    },
+    "model": {
+      "label": "Modelo",
+      "type": "text",
+      "maxLength": 100
+    },
+    "year": {
+      "label": "Año",
+      "type": "number",
+      "min": 1886,
+      "max": 2100,
+      "step": "1"
+    },
+    "mileage": {
+      "label": "Kilometraje (km)",
+      "type": "number",
+      "min": 0,
+      "max": 10000000,
+      "step": "1"
+    },
+    "fuel": {
+      "label": "Combustible",
+      "type": "select",
+      "options": [
+        {
+          "id": "nafta",
+          "name": "Nafta"
+        },
+        {
+          "id": "diesel",
+          "name": "Diésel"
+        },
+        {
+          "id": "gnc",
+          "name": "GNC"
+        },
+        {
+          "id": "nafta-gnc",
+          "name": "Nafta / GNC"
+        },
+        {
+          "id": "electrico",
+          "name": "Eléctrico"
+        },
+        {
+          "id": "hibrido",
+          "name": "Híbrido"
+        },
+        {
+          "id": "otro",
+          "name": "Otro"
+        }
+      ]
+    },
+    "transmission": {
+      "label": "Transmisión",
+      "type": "select",
+      "options": [
+        {
+          "id": "manual",
+          "name": "Manual"
+        },
+        {
+          "id": "automatica",
+          "name": "Automática"
+        }
+      ]
+    },
+    "bike_type": {
+      "label": "Tipo de bicicleta",
+      "type": "select",
+      "options": [
+        {
+          "id": "urbana",
+          "name": "Urbana"
+        },
+        {
+          "id": "montana",
+          "name": "Montaña"
+        },
+        {
+          "id": "ruta",
+          "name": "Ruta"
+        }
+      ]
+    },
+    "wheel_size": {
+      "label": "Rodado",
+      "type": "text",
+      "maxLength": 20
+    },
+    "compatible_brand": {
+      "label": "Marca de vehículo compatible",
+      "type": "text",
+      "maxLength": 80
+    },
+    "compatible_model": {
+      "label": "Modelo de vehículo compatible",
+      "type": "text",
+      "maxLength": 100
+    }
+  }
+}

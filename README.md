@@ -101,7 +101,9 @@ Los cambios de código se recargan solos. Hay que reiniciar solo al cambiar vari
    4. `202610070003_marketplace_model.sql`: rubros, localidades y oficios en tablas; contacto, operación, vencimiento a 60 días y hasta 8 fotos por anuncio; matrícula solo para los oficios que la exigen; perfiles públicos con puntaje; y las tablas de comercios verificados, reseñas, denuncias y administración (todavía sin pantallas).
    5. `202610090001_service_images.sql`: fotos de servicios (una de perfil y hasta 8 de trabajos realizados) con `set_service_images()`.
 
-   En un proyecto **nuevo** se puede pegar en cambio [`database/supabase_setup.sql`](database/supabase_setup.sql), que reúne las cuatro primeras en una sola transacción, y después la 5. Si el proyecto ya tiene alguna aplicada, ejecutar solo las que falten, en orden.
+   6. `202610150001_product_attributes.sql`: siete subcategorías de Inmuebles y siete de Vehículos, características opcionales, validación por subcategoría y permisos de escritura. Aplicar antes de utilizar el nuevo formulario.
+
+   En un proyecto **nuevo** se puede pegar en cambio [`database/supabase_setup.sql`](database/supabase_setup.sql), que reúne las cuatro primeras en una sola transacción, y después la 5 y la 6. Si el proyecto ya tiene alguna aplicada, ejecutar solo las que falten, en orden.
 
    Cada una corre en una transacción. No repetirlas sobre el mismo proyecto: los cambios futuros van en migraciones nuevas. La cuarta cambia columnas que usa el código: requiere la versión 0.3.0 de la API y del frontend.
 3. En **Authentication → URL Configuration**, establecer Site URL en `http://localhost:3000` y permitir `http://localhost:3000/auth/confirm`. Al desplegar, agregar la URL de producción.
@@ -229,3 +231,14 @@ No hay despliegue automático.
 - [Supabase: Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security)
 - [Supabase: control de acceso a Storage](https://supabase.com/docs/guides/storage/security/access-control)
 - [Supabase: claves de API](https://supabase.com/docs/guides/api/api-keys)
+
+
+### Subcategorías de inmuebles y vehículos
+
+El formulario muestra campos según la subcategoría y los conserva al editar. Los anuncios anteriores siguen siendo legibles sin subcategoría ni atributos; al editar desde el formulario se pide elegir una subcategoría. Los atributos específicos son opcionales. Título, descripción, precio, moneda, operación y departamento/localidad usan los campos existentes.
+
+En inmuebles, calle y número y barrio son texto libre; departamento/localidad utiliza los 19 departamentos de San Juan. Google Maps se carga pegando un enlace de Compartir. Superficie se expresa en m² y antigüedad en años (0 = a estrenar). Dormitorios aparece en casas, departamentos y fincas/campos; baños y cantidad de cocheras también en locales/salones/oficinas y galpones/depósitos. Terrenos no muestran esos tres campos. La subcategoría Cocheras no pide cantidad de cocheras.
+
+Vehículos motorizados (incluida Náutica) admiten marca, modelo, año, kilometraje, combustible y transmisión; se pueden dejar vacíos los datos que no correspondan. Bicicletas tiene marca, tipo y rodado. Repuestos y accesorios tiene marca y modelo compatibles.
+
+La fuente del catálogo es `backend/app/product_catalog.json`. Para actualizar su copia de frontend: desde `backend`, ejecutar `python -m scripts.export_product_catalog`. Las pruebas comprueban que ambas copias y las definiciones SQL coincidan. Cualquier modificación posterior de la base requiere una migración nueva.

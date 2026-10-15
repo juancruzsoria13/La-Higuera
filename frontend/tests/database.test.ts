@@ -8,7 +8,7 @@ const stranger = "77777777-7777-4777-8777-777777777777";
 // El id lo genera la base: products y businesses no tienen permiso de INSERT sobre esa columna.
 let product = "";
 let business = "";
-const migrations = ["202610020001_initial.sql", "202610070001_services.sql", "202610070002_supabase_hardening.sql", "202610070003_marketplace_model.sql", "202610090001_service_images.sql"];
+const migrations = ["202610020001_initial.sql", "202610070001_services.sql", "202610070002_supabase_hardening.sql", "202610070003_marketplace_model.sql", "202610090001_service_images.sql", "202610150001_product_attributes.sql"];
 const insertProduct = "insert into products(owner_id,title,description,price,currency,category_id,condition,locality_id,contact_phone) values($1,'Bicicleta','En perfecto estado',1200.50,'ARS','otros','usado','capital','2644123456') returning id";
 let db: PGlite;
 async function asUser<T>(id: string | null, run: () => Promise<T>) {
@@ -269,5 +269,39 @@ describe("Fotos de servicios", () => {
     await db.query("delete from auth.users where id=$1", [e]);
     expect((await db.query("select * from service_images where owner_id=$1", [e])).rows).toHaveLength(0);
     expect((await db.query("select ready from storage_cleanup where path=$1", [remaining])).rows[0]).toEqual({ready: true});
+  });
+});
+
+
+describe("Subcategorías y atributos en PostgreSQL", () => {
+  const owner = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
+  let id = "";
+  it("carga el mismo catálogo que usa el formulario y permite lectura pública", async () => {
+    const catalog = JSON.parse(readFileSync("src/modules/products/product_catalog.json", "utf8"));
+    await asUser(null, async () => {
+      const rows = (await db.query<{id: string; category_id: string; name: string; attribute_keys: string[]}>("select * from product_subcategories order by sort_order")).rows;
+      expect(rows.map(row => ({id: row.id, name: row.name, category_id: row.category_id, attributes: row.attribute_keys}))).toEqual(catalog.subcategories);
+      const definitions = (await db.query<{id: string; definition: unknown}>("select * from product_attribute_definitions")).rows;
+      expect(Object.fromEntries(definitions.map(row => [row.id, row.definition]))).toEqual(catalog.attributes);
+    });
+  });
+  it("guarda y normaliza atributos con permisos de usuario y permite editar", async () => {
+    await db.query("insert into auth.users(id, raw_user_meta_data) values ($1, $2)", [owner, {display_name: "Prueba"}]);
+    await asUser(owner, async () => {
+      id = (await db.query<{id: string}>("insert into products(owner_id,title,description,price,currency,category_id,subcategory_id,condition,locality_id,operation,contact_phone,attributes) values($1,'Casa nueva','Casa con patio amplio',100,'USD','inmuebles','casas','nuevo','capital','venta','2644123456',$2) returning id", [owner, {age: "0", surface: "120,50", credit_eligible: "no"}])).rows[0].id;
+      expect((await db.query("select attributes from products where id=$1", [id])).rows[0]).toEqual({attributes: {age: "0", surface: "120.50", credit_eligible: "no"}});
+      await db.query("update products set subcategory_id='terrenos-lotes',attributes=$2 where id=$1", [id, {surface: "300"}]);
+      expect((await db.query("select subcategory_id from products where id=$1", [id])).rows[0]).toEqual({subcategory_id: "terrenos-lotes"});
+    });
+  });
+  it("impide saltarse la validación con escrituras directas", async () => {
+    await asUser(owner, async () => {
+      for (const attrs of [{bedrooms: "2"}, {surface: "-1"}, {surface: true}, {surface: "1e3"}, {maps_url: "javascript:alert(1)"}, {maps_url: "https://google.com.evil.test/maps"}, {credit_eligible: "quizas"}]) {
+        await expect(db.query("update products set attributes=$2 where id=$1", [id, attrs])).rejects.toThrow();
+      }
+      await expect(db.query("update products set subcategory_id='autos',attributes='{}' where id=$1", [id])).rejects.toThrow();
+      await expect(db.query("update product_subcategories set name='Otro' where id='casas'")).rejects.toThrow();
+      await expect(db.query("update product_attribute_definitions set definition='{}' where id='surface'")).rejects.toThrow();
+    });
   });
 });
