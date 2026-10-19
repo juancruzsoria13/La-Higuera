@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({page}, testInfo) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", {name: /Conseguí tu gasista/})).toBeVisible();
+  await expect(page.getByRole("heading", {name: /Conseguí tu electricista/})).toBeVisible();
   await expect(page.getByRole("button", {name: "Pausar carrusel"})).toBeVisible();
   await page.screenshot({path: testInfo.outputPath("inicio.png"), fullPage: true, animations: "disabled"});
   const search = page.getByRole("textbox", {name: "Qué buscás"});

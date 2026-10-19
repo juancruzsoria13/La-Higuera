@@ -14,7 +14,7 @@ Todo lo que sea diseño (pantallas, banners, componentes, textos de interfaz) se
 - **Referencia: Mercado Libre.** Ante la duda sobre layout, jerarquía o patrones (banners, cards, filtros, precios), mirar cómo lo resuelve Mercado Libre y adaptarlo a nuestra marca.
 - **Producto primero.** Cada pieza muestra qué se ofrece (producto, inmueble, servicio) con imagen real o de muestra, no ilustraciones abstractas ni frases de marca.
 - **Promos con atención extra.** Gratis, sin comisión, apto crédito, matriculado, descuentos: van en un badge de alto contraste (`--promo`), arriba del titular y nunca escondidos en el cuerpo del texto. Solo prometer lo que la plataforma cumple.
-- **Un CTA claro por pieza.** Verbo + destino concreto ("Ver gasistas", "Publicar gratis"), que lleve al listado ya filtrado. En banners, toda la pieza es clickeable.
+- **Un CTA claro por pieza.** Verbo + destino concreto ("Ver electricistas", "Publicar gratis"), que lleve al listado ya filtrado. En banners, toda la pieza es clickeable.
 - **Textos cortos y directos.** Titular de beneficio en una o dos líneas; voseo rioplatense.
 - **Sin perder accesibilidad.** Contraste AA, foco visible, objetivos táctiles de 44px y respeto a `prefers-reduced-motion`.
 
