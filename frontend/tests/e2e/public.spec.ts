@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({page}, testInfo) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", {name: /Lo que buscás/})).toBeVisible();
+  await expect(page.getByRole("heading", {name: /Conseguí tu gasista/})).toBeVisible();
   await expect(page.getByRole("button", {name: "Pausar carrusel"})).toBeVisible();
   await page.screenshot({path: testInfo.outputPath("inicio.png"), fullPage: true, animations: "disabled"});
   const search = page.getByRole("textbox", {name: "Qué buscás"});
@@ -50,7 +50,7 @@ test("carrusel automático, pausa y navegación manual", async ({page}, testInfo
   await page.clock.fastForward(13000);
   await expect(second).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", {name: "Mensaje siguiente"}).click();
-  await expect(page.getByRole("heading", {name: /Tu próximo hallazgo/})).toBeVisible();
+  await expect(page.getByRole("heading", {name: /Vendé lo que ya no usás/})).toBeVisible();
   await page.screenshot({path: testInfo.outputPath("carrusel-mensaje-3.png"), fullPage: true, animations: "disabled"});
   await page.getByRole("button", {name: "Mensaje siguiente"}).press("ArrowRight");
   await expect(first).toHaveAttribute("aria-pressed", "true");
@@ -66,7 +66,7 @@ test("el carrusel respeta la preferencia de movimiento reducido", async ({page})
   await page.clock.fastForward(20000);
   await expect(page.getByRole("button", {name: "Mostrar mensaje 1"})).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", {name: "Mostrar mensaje 3"}).click();
-  await expect(page.getByRole("heading", {name: /Tu próximo hallazgo/})).toBeVisible();
+  await expect(page.getByRole("heading", {name: /Vendé lo que ya no usás/})).toBeVisible();
 });
 test("publicar requiere sesión y una URL inexistente no revela datos", async ({page}) => {
   await page.goto("/productos/nuevo");
