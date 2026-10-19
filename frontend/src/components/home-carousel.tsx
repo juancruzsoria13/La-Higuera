@@ -7,12 +7,12 @@ import { ArrowLeft, ArrowRight, Pause, Play, Tag } from "lucide-react";
 import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
 
-// Banners de venta (ver "Diseño" en CLAUDE.md). `photo` recorta la imagen en una tarjeta; sin él, la imagen (con fondo transparente) se muestra entera.
+// Banners de venta (ver "Diseño" en CLAUDE.md). Las fotos se recortan en una tarjeta: vertical en mobile y 5:4 desde 640px.
 // La promo solo puede prometer lo que la plataforma cumple: los electricistas cargan matrícula y publicar no tiene costo.
 const slides = [
-  { promo: "Con matrícula", first: "Conseguí tu electricista", second: "matriculado.", description: "Instalaciones, reparaciones y tableros en San Juan. Hablá directo con el profesional.", cta: "Ver electricistas", href: "/servicios?category=electricista", image: "/banners/electricista.jpg", photo: true, theme: "blue" },
-  { promo: "Opciones apto crédito", first: "Tu nueva casa", second: "te espera.", description: "Casas, departamentos y terrenos en venta y alquiler en todo San Juan.", cta: "Ver inmuebles", href: "/?category=inmuebles#listado", image: "/banners/casa.jpg", photo: true, theme: "ice" },
-  { promo: "Sin comisiones", first: "Vendé lo que ya no usás.", second: "Publicá gratis.", description: "Subí fotos, poné tu precio y recibí consultas de compradores cerca tuyo.", cta: "Publicar gratis", href: "/productos/nuevo", image: "/banners/vender.svg", photo: false, theme: "sky" },
+  { promo: "Con matrícula", first: "Conseguí tu electricista", second: "matriculado.", description: "Instalaciones, reparaciones y tableros en San Juan. Hablá directo con el profesional.", cta: "Ver electricistas", href: "/servicios?category=electricista", image: "/banners/electricista.jpg", theme: "blue" },
+  { promo: "Opciones apto crédito", first: "Tu nueva casa", second: "te espera.", description: "Casas, departamentos y terrenos en venta y alquiler en todo San Juan.", cta: "Ver inmuebles", href: "/?category=inmuebles#listado", image: "/banners/casa.jpg", theme: "ice" },
+  { promo: "Sin comisiones", first: "Vendé lo que ya no usás.", second: "Publicá gratis.", description: "Subí fotos, poné tu precio y recibí consultas de compradores cerca tuyo.", cta: "Publicar gratis", href: "/productos/nuevo", image: "/banners/vender.jpg", theme: "sky" },
 ] as const;
 
 function subscribeMotion(callback: () => void) {
@@ -73,7 +73,7 @@ export function HomeCarousel() {
                 {/* El ::after de .carousel-cta cubre el banner entero: toda la pieza es clickeable. */}
                 <Link href={slide.href} className={cn(buttonVariants({ variant: slide.theme === "ice" ? "default" : "onDark" }), "carousel-cta")}>{slide.cta}<ArrowRight className="size-4" /></Link>
               </div>
-              <div className={cn("carousel-media", slide.photo && "carousel-photo")}><Image src={slide.image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 240px, 112px" preload={index === 0} /></div>
+              <div className="carousel-media"><Image src={slide.image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 240px, 112px" preload={index === 0} /></div>
             </div>
           ))}
         </div>
