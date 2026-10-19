@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
-import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
-import { BrandMark } from "./brand";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { ArrowLeft, ArrowRight, Pause, Play, Tag } from "lucide-react";
+import { buttonVariants } from "./ui/button";
+import { cn } from "@/lib/utils";
 
+// Banners de venta (ver "Diseño" en CLAUDE.md). Las fotos se recortan en una tarjeta: vertical en mobile y 5:4 desde 640px.
+// La promo solo puede prometer lo que la plataforma cumple: los electricistas cargan matrícula y publicar no tiene costo.
 const slides = [
-  { eyebrow: "De acá, para vos", first: "Lo que buscás,", second: "más cerca.", description: "Encontrá tu próximo producto en San Juan.", theme: "sky" },
-  { eyebrow: "Eso que ya no usás", first: "Nueva historia.", second: "Nuevo dueño.", description: "Publicalo y hacé lugar para lo que viene.", theme: "blue" },
-  { eyebrow: "San Juan nos encuentra", first: "Tu próximo hallazgo", second: "está por acá.", description: "Explorá, descubrí y encontrá eso que te faltaba.", theme: "ice" },
+  { promo: "Con matrícula", first: "Conseguí tu electricista", second: "matriculado.", description: "Instalaciones, reparaciones y tableros en San Juan. Hablá directo con el profesional.", cta: "Ver electricistas", href: "/servicios?category=electricista", image: "/banners/electricista.jpg", theme: "blue" },
+  { promo: "Opciones apto crédito", first: "Tu nueva casa", second: "te espera.", description: "Casas, departamentos y terrenos en venta y alquiler en todo San Juan.", cta: "Ver inmuebles", href: "/?category=inmuebles#listado", image: "/banners/casa.jpg", theme: "ice" },
+  { promo: "Sin comisiones", first: "Vendé lo que ya no usás.", second: "Publicá gratis.", description: "Subí fotos, poné tu precio y recibí consultas de compradores cerca tuyo.", cta: "Publicar gratis", href: "/productos/nuevo", image: "/banners/vender.jpg", theme: "sky" },
 ] as const;
 
 function subscribeMotion(callback: () => void) {
@@ -22,6 +27,7 @@ export function HomeCarousel() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [hovered, setHovered] = useState(false);
+  const touchStart = useRef<number | null>(null);
   const reducedMotion = useSyncExternalStore(subscribeMotion, motionSnapshot, serverMotionSnapshot);
   const rotating = !paused && !hovered && !reducedMotion;
 
@@ -37,8 +43,15 @@ export function HomeCarousel() {
   }
 
   return (
-    <section className={`home-carousel carousel-${slides[active].theme}`} aria-label="Novedades de La Higuera" aria-roledescription="carrusel"
+    <section className={`home-carousel carousel-${slides[active].theme}`} aria-label="Promociones destacadas" aria-roledescription="carrusel"
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+      onTouchStart={event => { touchStart.current = event.touches[0].clientX; }}
+      onTouchEnd={event => {
+        if (touchStart.current === null) return;
+        const distance = event.changedTouches[0].clientX - touchStart.current;
+        touchStart.current = null;
+        if (Math.abs(distance) > 50) showSlide(active + (distance > 0 ? -1 : 1));
+      }}
       onFocusCapture={event => {
         if (!event.currentTarget.contains(event.relatedTarget) && !(event.target instanceof Element && event.target.closest(".carousel-play"))) setPaused(true);
       }}
@@ -49,32 +62,29 @@ export function HomeCarousel() {
         }
       }}
     >
-      <div className="shell relative">
+      <div className="shell">
         <div className="carousel-slides" aria-live={rotating ? "off" : "polite"}>
           {slides.map((slide, index) => (
-            <div key={slide.eyebrow} className="carousel-slide" data-active={index === active} aria-hidden={index !== active} inert={index !== active} role="group" aria-roledescription="mensaje" aria-label={`${index + 1} de ${slides.length}`}>
-              <div className="relative z-10 flex max-w-[720px] flex-col gap-4">
-                <p className="eyebrow">{slide.eyebrow}</p>
-                <h2 className="display carousel-title">{slide.first}<br /><span>{slide.second}</span></h2>
-                <p className="lead max-w-[440px]">{slide.description}</p>
+            <div key={slide.href} className="carousel-slide" data-active={index === active} aria-hidden={index !== active} inert={index !== active} role="group" aria-roledescription="mensaje" aria-label={`${index + 1} de ${slides.length}`}>
+              <div className="carousel-copy">
+                <p className="carousel-promo"><Tag className="size-3.5" aria-hidden="true" />{slide.promo}</p>
+                <h2 className="carousel-title">{slide.first}{" "}<br /><span>{slide.second}</span></h2>
+                <p className="carousel-description">{slide.description}</p>
+                {/* El ::after de .carousel-cta cubre el banner entero: toda la pieza es clickeable. */}
+                <Link href={slide.href} className={cn(buttonVariants({ variant: slide.theme === "ice" ? "default" : "onDark" }), "carousel-cta")}>{slide.cta}<ArrowRight className="size-4" /></Link>
               </div>
+              <div className="carousel-media"><Image src={slide.image} alt="" fill sizes="(min-width: 1024px) 400px, (min-width: 640px) 240px, 112px" preload={index === 0} /></div>
             </div>
           ))}
         </div>
-        <div className="carousel-art" aria-hidden="true">
-          <div className="carousel-orbit carousel-orbit-outer" /><div className="carousel-orbit carousel-orbit-inner" />
-          <div className="carousel-brand"><BrandMark className="h-full w-full" /></div>
-          <span className="carousel-spark">+</span><span className="carousel-bubble" />
-        </div>
         <div className="carousel-controls">
           <div className="flex items-center gap-1">
-            {slides.map((slide, index) => <button key={slide.eyebrow} aria-label={`Mostrar mensaje ${index + 1}`} aria-pressed={active === index} onClick={() => showSlide(index)} className="carousel-dot"><span /></button>)}
+            {slides.map((slide, index) => <button key={slide.href} aria-label={`Mostrar mensaje ${index + 1}`} aria-pressed={active === index} onClick={() => showSlide(index)} className="carousel-dot"><span /></button>)}
             {!reducedMotion && <button className="carousel-play" onClick={() => setPaused(value => !value)} aria-label={paused ? "Reanudar carrusel" : "Pausar carrusel"}>{paused ? <Play className="size-3.5" /> : <Pause className="size-3.5" />}</button>}
           </div>
           <div className="flex items-center gap-2">
-            <span className="carousel-count">0{active + 1} <span className="opacity-55">/ 03</span></span>
-            <button className="carousel-arrow" aria-label="Mensaje anterior" onClick={() => showSlide(active - 1)}><ArrowLeft className="size-4" /></button>
-            <button className="carousel-arrow" aria-label="Mensaje siguiente" onClick={() => showSlide(active + 1)}><ArrowRight className="size-4" /></button>
+            <button className="carousel-arrow carousel-arrow-prev" aria-label="Mensaje anterior" onClick={() => showSlide(active - 1)}><ArrowLeft className="size-4" /></button>
+            <button className="carousel-arrow carousel-arrow-next" aria-label="Mensaje siguiente" onClick={() => showSlide(active + 1)}><ArrowRight className="size-4" /></button>
           </div>
         </div>
       </div>

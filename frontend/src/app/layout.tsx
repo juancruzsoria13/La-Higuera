@@ -44,9 +44,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 <Link href="/productos/nuevo" className={buttonVariants({ variant: "onDark", className: "hdr-publish" })}><Plus className="size-4" />Publicar</Link>
               </nav>
             </div>
-          </div>
-          <div className="hdr-sub relative">
-            <div className="shell hdr-sub-in">
+            {/* Segunda fila dentro de la misma barra, como Mercado Libre. El menú se posiciona contra .site-header. */}
+            <div className="shell">
               <Suspense fallback={<HeaderTabsFallback />}><HeaderTabs categories={categories} trades={trades} /></Suspense>
             </div>
           </div>
