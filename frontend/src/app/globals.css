@@ -186,6 +186,8 @@ button:not(:disabled), select { cursor: pointer; }
 .carousel-cta::after { content: ""; position: absolute; inset: 0; }
 .carousel-media { position: relative; aspect-ratio: 6 / 5; width: 100%; pointer-events: none; }
 .carousel-media img { object-fit: contain; }
+.carousel-photo { aspect-ratio: 4 / 5; overflow: hidden; border-radius: 12px; box-shadow: 0 10px 28px rgba(9, 37, 117, .28); }
+.carousel-photo img { object-fit: cover; }
 .carousel-controls { display: flex; position: relative; z-index: 3; justify-content: space-between; align-items: center; padding-block: 16px 24px; }
 .carousel-dot { display: flex; align-items: center; justify-content: center; width: 28px; height: 44px; }
 .carousel-dot span { width: 7px; height: 7px; border-radius: 20px; background: currentColor; opacity: .35; transition: width .2s, opacity .2s; }
@@ -198,6 +200,7 @@ button:not(:disabled), select { cursor: pointer; }
   .carousel-slide { grid-template-columns: minmax(0, 1fr) 240px; gap: 24px; padding-top: 36px; }
   .carousel-title { font-size: 38px; line-height: 42px; }
   .carousel-description { font-size: 16px; line-height: 24px; }
+  .carousel-photo { aspect-ratio: 5 / 4; border-radius: 20px; }
 }
 @media (min-width: 1024px) {
   /* Flechas a los costados (como Mercado Libre); el padding evita que tapen el texto. */
