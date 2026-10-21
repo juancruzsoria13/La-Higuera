@@ -1,0 +1,432 @@
+{
+  "sellers": [
+    {
+      "slug": "lucia",
+      "name": "Lucía Fernández",
+      "locality_id": "capital"
+    },
+    {
+      "slug": "martin",
+      "name": "Martín Quiroga",
+      "locality_id": "rivadavia"
+    },
+    {
+      "slug": "sofia",
+      "name": "Sofía Godoy",
+      "locality_id": "rawson"
+    },
+    {
+      "slug": "diego",
+      "name": "Diego Castro",
+      "locality_id": "chimbas"
+    },
+    {
+      "slug": "valentina",
+      "name": "Valentina Paredes",
+      "locality_id": "santa-lucia"
+    },
+    {
+      "slug": "nicolas",
+      "name": "Nicolás Aguilera",
+      "locality_id": "pocito"
+    }
+  ],
+  "products": [
+    {
+      "seller": "martin",
+      "title": "Casa 3 dormitorios con pileta en Rivadavia",
+      "price": 145000,
+      "currency": "USD",
+      "category_id": "inmuebles",
+      "subcategory_id": "casas",
+      "operation": "venta",
+      "condition": "usado",
+      "photos": [
+        "frontend/public/banners/casa.jpg"
+      ],
+      "description": "Casa moderna en barrio tranquilo: living comedor integrado, cocina con isla, 3 dormitorios (uno en suite), galería, pileta y parque. Escritura al día.",
+      "attributes": {
+        "neighborhood": "Marquesado",
+        "surface": "240",
+        "age": "8",
+        "bedrooms": "3",
+        "bathrooms": "2",
+        "garages": "2",
+        "credit_eligible": "si"
+      }
+    },
+    {
+      "seller": "lucia",
+      "title": "Departamento a estrenar, 1 dormitorio, Capital",
+      "price": 380000,
+      "currency": "ARS",
+      "category_id": "inmuebles",
+      "subcategory_id": "departamentos",
+      "operation": "alquiler",
+      "condition": "nuevo",
+      "description": "Departamento luminoso a tres cuadras de la plaza 25 de Mayo. Balcón al frente, cocina equipada y aire acondicionado. Expensas bajas.",
+      "attributes": {
+        "neighborhood": "Centro",
+        "surface": "48",
+        "age": "0",
+        "bedrooms": "1",
+        "bathrooms": "1",
+        "garages": "0",
+        "credit_eligible": "no"
+      },
+      "photos": [
+        "backend/scripts/demo_photos/depto.jpg"
+      ]
+    },
+    {
+      "seller": "sofia",
+      "title": "Terreno de 300 m² con servicios en Rawson",
+      "price": 28000,
+      "currency": "USD",
+      "category_id": "inmuebles",
+      "subcategory_id": "terrenos-lotes",
+      "operation": "venta",
+      "condition": "usado",
+      "description": "Lote en barrio consolidado, con agua, luz y gas en la puerta. Ideal para construir tu primera casa.",
+      "attributes": {
+        "neighborhood": "Villa Krause",
+        "surface": "300",
+        "credit_eligible": "si"
+      },
+      "photos": [
+        "backend/scripts/demo_photos/terreno.jpg"
+      ]
+    },
+    {
+      "seller": "valentina",
+      "title": "Local comercial de 80 m² sobre avenida",
+      "price": 650000,
+      "currency": "ARS",
+      "category_id": "inmuebles",
+      "subcategory_id": "locales-salones-oficinas",
+      "operation": "alquiler",
+      "condition": "usado",
+      "description": "Local a la calle con vidriera amplia, baño y depósito. Zona de mucho movimiento, apto para cualquier rubro.",
+      "attributes": {
+        "neighborhood": "Santa Lucía centro",
+        "surface": "80",
+        "age": "15",
+        "bathrooms": "1",
+        "garages": "0"
+      },
+      "photos": [
+        "backend/scripts/demo_photos/local.jpg"
+      ]
+    },
+    {
+      "seller": "diego",
+      "title": "Volkswagen Gol Trend 1.6 2016",
+      "price": 9800000,
+      "currency": "ARS",
+      "category_id": "vehiculos",
+      "subcategory_id": "autos",
+      "condition": "usado",
+      "description": "Único dueño, service al día, cubiertas nuevas. Aire, dirección y levantavidrios eléctricos. Papeles listos para transferir.",
+      "attributes": {
+        "brand": "Volkswagen",
+        "model": "Gol Trend",
+        "year": "2016",
+        "mileage": "98000",
+        "fuel": "nafta",
+        "transmission": "manual"
+      },
+      "photos": [
+        "backend/scripts/demo_photos/gol.jpg"
+      ]
+    },
+    {
+      "seller": "nicolas",
+      "title": "Toyota Hilux SRV 4x4 automática 2019",
+      "price": 32000,
+      "currency": "USD",
+      "category_id": "vehiculos",
+      "subcategory_id": "camionetas-utilitarios",
+      "condition": "usado",
+      "description": "Impecable, siempre en garaje. Services oficiales, cuero, cámara de retroceso y enganche.",
+      "attributes": {
+        "brand": "Toyota",
+        "model": "Hilux SRV",
+        "year": "2019",
+        "mileage": "85000",
+        "fuel": "diesel",
+        "transmission": "automatica"
+      },
+      "photos": [
+        "backend/scripts/demo_photos/hilux.jpg"
+      ]
+    },
+    {
+      "seller": "sofia",
+      "title": "Honda Wave 110 2022",
+      "price": 1650000,
+      "currency": "ARS",
+      "category_id": "vehiculos",
+      "subcategory_id": "motos",
+      "condition": "usado",
+      "description": "Poco uso, 6.000 km reales. Con casco de regalo. Lista para transferir.",
+      "attributes": {
+        "brand": "Honda",
+        "model": "Wave 110",
+        "year": "2022",
+        "mileage": "6000",
+        "fuel": "nafta",
+        "transmission": "manual"
+      },
+      "photos": [
+        "backend/scripts/demo_photos/wave.jpg"
+      ]
+    },
+    {
+      "seller": "lucia",
+      "title": "Bicicleta de montaña rodado 29",
+      "price": 420000,
+      "currency": "ARS",
+      "category_id": "vehiculos",
+      "subcategory_id": "bicicletas",
+      "condition": "usado",
+      "description": "Cuadro de aluminio, 21 cambios, frenos a disco. Ideal para salir al dique de Ullum.",
+      "attributes": {
+        "brand": "Venzo",
+        "bike_type": "montana",
+        "wheel_size": "29"
+      },
+      "photos": [
+        "backend/scripts/demo_photos/bici.jpg"
+      ]
+    },
+    {
+      "seller": "diego",
+      "title": "Juego de 4 cubiertas 175/65 R14",
+      "price": 280000,
+      "currency": "ARS",
+      "category_id": "vehiculos",
+      "subcategory_id": "repuestos-accesorios",
+      "condition": "nuevo",
+      "description": "Cubiertas nuevas sin uso, con factura. Sirven para Gol, Corsa, Fiesta y similares.",
+      "attributes": {
+        "compatible_brand": "Volkswagen",
+        "compatible_model": "Gol"
+      },
+      "photos": [
+        "backend/scripts/demo_photos/cubiertas.jpg"
+      ]
+    },
+    {
+      "seller": "valentina",
+      "title": "Smart TV 50\" 4K Samsung",
+      "price": 690000,
+      "currency": "ARS",
+      "category_id": "tecnologia",
+      "condition": "nuevo",
+      "description": "En caja cerrada, con garantía oficial de 12 meses. Netflix, YouTube y Disney+ integrados.",
+      "photos": [
+        "backend/scripts/demo_photos/tv.jpg"
+      ]
+    },
+    {
+      "seller": "martin",
+      "title": "iPhone 13 128 GB, batería al 89%",
+      "price": 520,
+      "currency": "USD",
+      "category_id": "tecnologia",
+      "condition": "usado",
+      "description": "Sin marcas, siempre con funda y vidrio templado. Con cargador y caja original.",
+      "photos": [
+        "backend/scripts/demo_photos/iphone.jpg"
+      ]
+    },
+    {
+      "seller": "nicolas",
+      "title": "Notebook Lenovo IdeaPad i5, 8 GB, SSD 512 GB",
+      "price": 850000,
+      "currency": "ARS",
+      "category_id": "tecnologia",
+      "condition": "usado",
+      "description": "Ideal para estudiar o trabajar. Batería en buen estado, teclado en español.",
+      "photos": [
+        "backend/scripts/demo_photos/notebook.jpg"
+      ]
+    },
+    {
+      "seller": "sofia",
+      "title": "Colección de discos de vinilo: rock nacional y clásicos",
+      "price": 95000,
+      "currency": "ARS",
+      "category_id": "otros",
+      "condition": "usado",
+      "photos": [
+        "frontend/public/banners/vender.jpg"
+      ],
+      "description": "Más de 40 discos en muy buen estado: Charly, Spinetta, Soda, Beatles y más. Se venden juntos o por separado."
+    },
+    {
+      "seller": "lucia",
+      "title": "Juego de living 3 + 2 cuerpos",
+      "price": 520000,
+      "currency": "ARS",
+      "category_id": "muebles",
+      "condition": "usado",
+      "description": "Tapizado en pana gris, estructura de madera maciza. Sin manchas ni roturas.",
+      "photos": [
+        "backend/scripts/demo_photos/living.jpg"
+      ]
+    },
+    {
+      "seller": "diego",
+      "title": "Mesa de algarrobo para 6 personas",
+      "price": 380000,
+      "currency": "ARS",
+      "category_id": "muebles",
+      "condition": "usado",
+      "description": "Mesa artesanal de algarrobo macizo, 1,80 x 0,90 m. Se entrega lustrada.",
+      "photos": [
+        "backend/scripts/demo_photos/mesa.jpg"
+      ]
+    },
+    {
+      "seller": "valentina",
+      "title": "Heladera No Frost 364 L",
+      "price": 790000,
+      "currency": "ARS",
+      "category_id": "electrodomesticos",
+      "condition": "usado",
+      "description": "Funciona perfecto, 3 años de uso. Freezer arriba, dispenser de agua.",
+      "photos": [
+        "backend/scripts/demo_photos/heladera.jpg"
+      ]
+    },
+    {
+      "seller": "nicolas",
+      "title": "Aire acondicionado split 3000 frigorías",
+      "price": 620000,
+      "currency": "ARS",
+      "category_id": "electrodomesticos",
+      "condition": "nuevo",
+      "description": "Frío/calor, clase A, en caja. Instalación con matriculado a convenir.",
+      "photos": [
+        "backend/scripts/demo_photos/aire.jpg"
+      ]
+    },
+    {
+      "seller": "martin",
+      "title": "Campera de jean talle M",
+      "price": 85000,
+      "currency": "ARS",
+      "category_id": "ropa",
+      "condition": "usado",
+      "description": "Campera de jean clásica, usada pocas veces. Sin roturas ni manchas.",
+      "photos": [
+        "backend/scripts/demo_photos/campera.jpg"
+      ]
+    },
+    {
+      "seller": "sofia",
+      "title": "Zapatillas running talle 42, sin uso",
+      "price": 110000,
+      "currency": "ARS",
+      "category_id": "ropa",
+      "condition": "nuevo",
+      "description": "Me quedaron chicas, nunca usadas. Con caja y etiqueta.",
+      "photos": [
+        "backend/scripts/demo_photos/zapatillas.jpg"
+      ]
+    },
+    {
+      "seller": "valentina",
+      "title": "Ladrillos huecos 12x18x33, por mil",
+      "price": 480000,
+      "currency": "ARS",
+      "category_id": "materiales-construccion",
+      "condition": "nuevo",
+      "description": "Sobrante de obra, entrega en Gran San Juan con costo de flete aparte.",
+      "photos": [
+        "backend/scripts/demo_photos/ladrillos.jpg"
+      ]
+    }
+  ],
+  "services": [
+    {
+      "seller": "martin",
+      "name": "Martín Quiroga",
+      "trade_id": "gasista",
+      "license_number": "MG-4821",
+      "license_body": "ENARGAS",
+      "locality_id": "rivadavia",
+      "description": "Instalaciones de gas nuevas y reformas, pruebas de hermeticidad, conexión de cocinas, calefones y estufas. Presupuesto sin cargo.",
+      "avatar": "backend/scripts/demo_photos/gasista.jpg"
+    },
+    {
+      "seller": "nicolas",
+      "name": "Electricidad Aguilera",
+      "trade_id": "electricista",
+      "license_number": "E-2290",
+      "license_body": "EPRE San Juan",
+      "locality_id": "pocito",
+      "description": "Instalaciones domiciliarias y comerciales, tableros, puesta a tierra y certificados. Urgencias en el día.",
+      "avatar": "frontend/public/banners/electricista.jpg"
+    },
+    {
+      "seller": "diego",
+      "name": "Plomería Castro",
+      "trade_id": "plomero",
+      "license_number": "P-1187",
+      "license_body": "OSSE",
+      "locality_id": "chimbas",
+      "description": "Destapaciones, pérdidas, termotanques y cambio de cañerías. Trabajo prolijo y con garantía.",
+      "avatar": "backend/scripts/demo_photos/plomero.jpg"
+    },
+    {
+      "seller": "lucia",
+      "name": "Pinturas Fernández",
+      "trade_id": "pintor",
+      "locality_id": "capital",
+      "description": "Pintura de interiores y exteriores, impermeabilización de techos y durlock. Presupuesto por WhatsApp.",
+      "avatar": "backend/scripts/demo_photos/pintor.jpg"
+    },
+    {
+      "seller": "sofia",
+      "name": "Construcciones Godoy",
+      "trade_id": "albanil",
+      "locality_id": "rawson",
+      "description": "Ampliaciones, contrapisos, revoques y cerámicos. Equipo propio y cumplimiento de plazos.",
+      "avatar": "backend/scripts/demo_photos/albanil.jpg"
+    },
+    {
+      "seller": "valentina",
+      "name": "Frío Total",
+      "trade_id": "refrigeracion",
+      "locality_id": "santa-lucia",
+      "description": "Instalación y service de aires acondicionados, carga de gas y mantenimiento de heladeras.",
+      "avatar": "backend/scripts/demo_photos/refrigeracion.jpg"
+    },
+    {
+      "seller": "diego",
+      "name": "Cerrajería 24 h",
+      "trade_id": "cerrajero",
+      "locality_id": "capital",
+      "description": "Aperturas de puertas y autos, cambio de combinación y cerraduras de seguridad. Atención las 24 horas.",
+      "avatar": "backend/scripts/demo_photos/cerrajero.jpg"
+    },
+    {
+      "seller": "nicolas",
+      "name": "Verde Zonda Jardines",
+      "trade_id": "jardineria",
+      "locality_id": "zonda",
+      "description": "Mantenimiento de parques, poda, riego por goteo y diseño de jardines con especies de bajo consumo de agua.",
+      "avatar": "backend/scripts/demo_photos/jardineria.jpg"
+    },
+    {
+      "seller": "martin",
+      "name": "Fletes El Zonda",
+      "trade_id": "fletes-mudanzas",
+      "locality_id": "rivadavia",
+      "description": "Fletes y mudanzas en todo San Juan, con ayudantes. Precios por hora o por viaje.",
+      "avatar": "backend/scripts/demo_photos/fletes.jpg"
+    }
+  ]
+}

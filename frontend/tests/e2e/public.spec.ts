@@ -1,4 +1,11 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Locator } from "@playwright/test";
+/** Abre "Categorías". Reintenta porque, tras una recarga, un click antes de que hidrate React no hace nada. */
+async function openMenu(button: Locator) {
+  await expect(async () => {
+    if (await button.getAttribute("aria-expanded") !== "true") await button.click();
+    await expect(button).toHaveAttribute("aria-expanded", "true", {timeout: 1000});
+  }).toPass();
+}
 test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({page}, testInfo) => {
   await page.goto("/");
   await expect(page.getByRole("heading", {name: /Conseguí tu electricista/})).toBeVisible();
@@ -10,7 +17,7 @@ test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({p
   await expect(page).toHaveURL(/q=bicicleta/);
   // Categorías abre el menú en Servicios; la pestaña Artículos lista el resto de los rubros. Escape cierra y devuelve el foco.
   const menuButton = page.getByRole("button", {name: "Categorías", exact: true});
-  await menuButton.click();
+  await openMenu(menuButton);
   await expect(menuButton).toHaveAttribute("aria-expanded", "true");
   await expect(page.getByRole("tab", {name: "Servicios"})).toHaveAttribute("aria-selected", "true");
   await page.getByRole("tab", {name: "Artículos"}).click();
@@ -19,7 +26,7 @@ test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({p
   await expect(menuButton).toHaveAttribute("aria-expanded", "false");
   await expect(menuButton).toBeFocused();
   const term = "bicicleta";
-  await menuButton.click();
+  await openMenu(menuButton);
   await page.getByRole("tab", {name: "Artículos"}).click();
   const articles = page.getByRole("navigation", {name: "Categorías de artículos"});
   for (const name of ["Tecnología", "Ropa", "Muebles", "Electrodomésticos", "Materiales de construcción", "Otros"]) {
@@ -39,6 +46,22 @@ test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({p
   await expect(menuButton).toHaveAttribute("aria-expanded", "false");
   const overflowing = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflowing).toBe(false);
+});
+test("vidriera: rubros y servicios antes que los anuncios; con filtros, solo resultados", async ({page}) => {
+  await page.goto("/");
+  const shortcuts = page.getByRole("navigation", {name: "Rubros", exact: true});
+  await expect(shortcuts.getByRole("link").first()).toHaveText("Servicios");
+  await expect(shortcuts.getByRole("link").first()).toHaveAttribute("href", "/servicios");
+  const services = page.getByRole("heading", {name: "Profesionales de oficio en San Juan"});
+  const listing = page.getByRole("heading", {name: "Recién publicado en San Juan"});
+  await expect(services).toBeVisible();
+  expect((await services.boundingBox())!.y).toBeLessThan((await listing.boundingBox())!.y);
+  await shortcuts.getByRole("link", {name: "Muebles", exact: true}).click();
+  await expect(page).toHaveURL(/category=muebles/);
+  await expect(page.getByRole("heading", {name: "Muebles", exact: true, level: 2})).toBeVisible();
+  await expect(shortcuts).toHaveCount(0);
+  await expect(services).toHaveCount(0);
+  await expect(page.getByRole("button", {name: "Pausar carrusel"})).toHaveCount(0);
 });
 test("carrusel automático, pausa y navegación manual", async ({page}, testInfo) => {
   await page.clock.install();
@@ -86,7 +109,7 @@ test("barra de categorías, búsqueda conservada y tiendas sin enlace", async ({
   const sections = page.getByRole("navigation", {name: "Secciones", exact: true});
   await expect(sections.locator("a, button")).toHaveText(["Categorías", "Servicios", "Inmuebles", "Vehículos", /Tiendas Virtuales/, "Ayuda"]);
   const menuButton = sections.getByRole("button", {name: "Categorías", exact: true});
-  await menuButton.click();
+  await openMenu(menuButton);
   // Servicios tiene prioridad: es la pestaña con la que abre el menú.
   await expect(page.getByRole("tab", {name: "Servicios"})).toHaveAttribute("aria-selected", "true");
   await page.getByRole("tab", {name: "Inmuebles"}).click();
@@ -103,7 +126,7 @@ test("barra de categorías, búsqueda conservada y tiendas sin enlace", async ({
   await expect(page).toHaveURL(/q=patio/);
   await expect(page.getByRole("heading", {name: "Resultados para “patio”", exact: true})).toBeVisible();
   // Con un rubro elegido el menú abre en su pestaña, y las flechas recorren las pestañas.
-  await menuButton.click();
+  await openMenu(menuButton);
   const houseTab = page.getByRole("tab", {name: "Inmuebles"});
   await expect(houseTab).toHaveAttribute("aria-selected", "true");
   await houseTab.press("ArrowDown");
@@ -129,7 +152,7 @@ test("barra de categorías, búsqueda conservada y tiendas sin enlace", async ({
   await sections.getByRole("link", {name: "Vehículos", exact: true}).click();
   await expect(page).toHaveURL(/q=patio&category=vehiculos/);
   const services = sections.getByRole("link", {name: "Servicios", exact: true});
-  await menuButton.click();
+  await openMenu(menuButton);
   await page.getByRole("tab", {name: "Servicios"}).click();
   const serviceMenu = page.getByRole("navigation", {name: "Oficios disponibles", exact: true});
   await expect(serviceMenu).toBeVisible();
