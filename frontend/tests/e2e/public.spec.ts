@@ -93,10 +93,18 @@ test("publicar requiere sesión y una URL inexistente no revela datos", async ({
 });
 
 
+test("la barra marca una sección solo si hay un rubro elegido", async ({page}) => {
+  await page.goto("/");
+  const sections = page.getByRole("navigation", {name: "Secciones", exact: true});
+  await expect(sections.getByRole("link", {name: "Inmuebles", exact: true})).toBeVisible();
+  await expect(sections.locator("[data-active='true']")).toHaveCount(0);
+  await page.goto("/?category=tecnologia");
+  await expect(sections.getByRole("button", {name: "Artículos", exact: true})).toHaveAttribute("data-active", "true");
+});
 test("barra con subcategorías, búsqueda conservada y tiendas sin enlace", async ({page, isMobile}, testInfo) => {
   await page.goto("/");
   const sections = page.getByRole("navigation", {name: "Secciones", exact: true});
-  await expect(sections.locator("a, button:not(.hdr-tab-toggle)")).toHaveText(["Inmuebles", "Vehículos", "Artículos", "Servicios", "Tiendas Virtuales", "Ayuda"]);
+  await expect(sections.locator("a, button:not(.hdr-tab-toggle)")).toHaveText(["Inmuebles", "Vehículos", "Artículos", "Servicios", "Tiendas Virtuales Pronto", "Ayuda"]);
   const houses = sections.getByRole("link", {name: "Inmuebles", exact: true});
   if (isMobile) await sections.getByRole("button", {name: "Mostrar subcategorías de inmuebles", exact: true}).click(); else await houses.hover();
   const menu = page.getByRole("navigation", {name: "Subcategorías de inmuebles", exact: true});
@@ -150,7 +158,7 @@ test("barra con subcategorías, búsqueda conservada y tiendas sin enlace", asyn
   await services.click();
   await expect(page).toHaveURL(/\/servicios$/);
   await expect(serviceMenu).not.toBeVisible();
-  const stores = sections.getByRole("button", {name: "Tiendas Virtuales", exact: true});
+  const stores = sections.getByRole("button", {name: "Tiendas Virtuales Pronto", exact: true});
   await expect(stores).toHaveAttribute("aria-disabled", "true");
   await expect(stores).not.toHaveAttribute("href");
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);

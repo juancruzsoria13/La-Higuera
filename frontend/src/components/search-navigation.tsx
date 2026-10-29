@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { CarFront, ChevronDown, CircleHelp, House, Search, Store, Tag, Wrench } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 import type { Option } from "@/lib/catalog";
 import { getSubcategory, subcategories } from "@/modules/products/attributes";
 
@@ -31,10 +31,10 @@ export function HeaderSearch({ categories }: { categories: Option[] }) {
 
 type MenuId = "inmuebles" | "vehiculos" | "articulos" | "servicios";
 const sections = [
-  {id: "inmuebles", name: "Inmuebles", icon: House},
-  {id: "vehiculos", name: "Vehículos", icon: CarFront},
-  {id: "articulos", name: "Artículos", icon: Tag},
-  {id: "servicios", name: "Servicios", icon: Wrench},
+  {id: "inmuebles", name: "Inmuebles"},
+  {id: "vehiculos", name: "Vehículos"},
+  {id: "articulos", name: "Artículos"},
+  {id: "servicios", name: "Servicios"},
 ] as const;
 
 export function HeaderTabs({ categories, trades }: { categories: Option[]; trades: Option[] }) {
@@ -82,18 +82,18 @@ export function HeaderTabs({ categories, trades }: { categories: Option[]; trade
     <div ref={container} className="hdr-navigation" onPointerEnter={cancelClose} onPointerLeave={event => { if (event.pointerType === "mouse" && window.matchMedia("(hover: hover)").matches) scheduleClose(); }}
       onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(null); }}>
       <nav aria-label="Secciones" className="hdr-tabs">
-        {sections.map(({id, name, icon: Icon}) => {
-          const active = id === "servicios" ? services : isHome && (id === "articulos" ? !["inmuebles", "vehiculos"].includes(category) : category === id);
+        {sections.map(({id, name}) => {
+          const active = id === "servicios" ? services : isHome && (id === "articulos" ? !!category && !["inmuebles", "vehiculos"].includes(category) : category === id);
           const toggle = (event: React.MouseEvent<HTMLButtonElement>) => { cancelClose(); setOpen(current => event.detail > 0 && window.matchMedia("(hover: hover)").matches ? id : current === id ? null : id); };
           const hover = (event: React.PointerEvent) => { if (event.pointerType === "mouse" && window.matchMedia("(hover: hover)").matches) show(id); };
           if (id === "articulos") return <button key={id} ref={element => { buttons.current[id] = element; }} type="button" className="hdr-tab"
             data-active={active} aria-expanded={open === id} aria-controls={`menu-${id}`} onPointerEnter={hover} onClick={toggle}>
-            <Icon className="size-[18px]" aria-hidden="true" />{name}<ChevronDown className="size-3.5" aria-hidden="true" />
+            {name}<ChevronDown className="size-3.5" aria-hidden="true" />
           </button>;
           return <div key={id} className="hdr-tab-group" onPointerEnter={hover}>
             <Link href={id === "servicios" ? "/servicios" : href(id)} className="hdr-tab hdr-tab-link" data-active={active} aria-current={active ? "page" : undefined}
               onClick={() => { cancelClose(); setOpen(null); }}>
-              <Icon className="size-[18px]" aria-hidden="true" />{name}
+              {name}
             </Link>
             <button ref={element => { buttons.current[id] = element; }} type="button" className="hdr-tab hdr-tab-toggle" data-active={active}
               aria-label={id === "servicios" ? "Mostrar oficios" : `Mostrar subcategorías de ${name.toLowerCase()}`} aria-expanded={open === id} aria-controls={`menu-${id}`} onClick={toggle}>
@@ -101,12 +101,15 @@ export function HeaderTabs({ categories, trades }: { categories: Option[]; trade
             </button>
           </div>;
         })}
-        <button type="button" className="hdr-tab hdr-tab--pending" aria-disabled="true" title="Próximamente" onPointerEnter={() => setOpen(null)}>
-          <Store className="size-[18px]" aria-hidden="true" />Tiendas Virtuales
-        </button>
-        <Link href="/ayuda" className="hdr-tab" aria-current={pathname === "/ayuda" ? "page" : undefined} onPointerEnter={() => setOpen(null)} onClick={() => setOpen(null)}>
-          <CircleHelp className="size-[18px]" aria-hidden="true" />Ayuda
-        </Link>
+        {/* Secundarias a la derecha, para que las categorías no queden amontonadas solas a la izquierda. */}
+        <div className="hdr-aside">
+          <button type="button" className="hdr-tab hdr-tab--pending" aria-disabled="true" title="Próximamente" onPointerEnter={() => setOpen(null)}>
+            Tiendas Virtuales <span className="hdr-soon">Pronto</span>
+          </button>
+          <Link href="/ayuda" className="hdr-tab" aria-current={pathname === "/ayuda" ? "page" : undefined} onPointerEnter={() => setOpen(null)} onClick={() => setOpen(null)}>
+            Ayuda
+          </Link>
+        </div>
       </nav>
       {open && <div className="cat-dropdown" onPointerEnter={cancelClose}>
         <div className="shell relative">
