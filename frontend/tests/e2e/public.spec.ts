@@ -1,11 +1,4 @@
-import { test, expect, type Locator } from "@playwright/test";
-/** Abre "Categorías". Reintenta porque, tras una recarga, un click antes de que hidrate React no hace nada. */
-async function openMenu(button: Locator) {
-  await expect(async () => {
-    if (await button.getAttribute("aria-expanded") !== "true") await button.click();
-    await expect(button).toHaveAttribute("aria-expanded", "true", {timeout: 1000});
-  }).toPass();
-}
+import { test, expect } from "@playwright/test";
 test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({page}, testInfo) => {
   await page.goto("/");
   await expect(page.getByRole("heading", {name: /Conseguí tu electricista/})).toBeVisible();
@@ -15,24 +8,20 @@ test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({p
   await search.fill("bicicleta");
   await page.getByRole("button", {name: "Buscar", exact: true}).click();
   await expect(page).toHaveURL(/q=bicicleta/);
-  // Categorías abre el menú en Servicios; la pestaña Artículos lista el resto de los rubros. Escape cierra y devuelve el foco.
-  const menuButton = page.getByRole("button", {name: "Categorías", exact: true});
-  await openMenu(menuButton);
-  await expect(menuButton).toHaveAttribute("aria-expanded", "true");
-  await expect(page.getByRole("tab", {name: "Servicios"})).toHaveAttribute("aria-selected", "true");
-  await page.getByRole("tab", {name: "Artículos"}).click();
+  // Artículos abre las categorías restantes; Escape cierra y devuelve el foco.
+  const ads = page.getByRole("button", {name: "Artículos"});
+  await ads.click();
+  await expect(ads).toHaveAttribute("aria-expanded", "true");
   await expect(page.getByRole("navigation", {name: "Categorías de artículos"})).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(menuButton).toHaveAttribute("aria-expanded", "false");
-  await expect(menuButton).toBeFocused();
+  await expect(ads).toHaveAttribute("aria-expanded", "false");
+  await expect(ads).toBeFocused();
   const term = "bicicleta";
-  await openMenu(menuButton);
-  await page.getByRole("tab", {name: "Artículos"}).click();
-  const articles = page.getByRole("navigation", {name: "Categorías de artículos"});
+  await ads.click();
   for (const name of ["Tecnología", "Ropa", "Muebles", "Electrodomésticos", "Materiales de construcción", "Otros"]) {
-    await expect(articles.getByRole("link", {name, exact: true})).toBeVisible();
+    await expect(page.getByRole("link", {name, exact: true})).toBeVisible();
   }
-  const furniture = articles.getByRole("link", {name: "Muebles", exact: true});
+  const furniture = page.getByRole("link", {name: "Muebles", exact: true});
   await furniture.click();
   await expect(page).toHaveURL(/category=muebles/);
   await expect(search).toHaveValue(term);
@@ -43,7 +32,7 @@ test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({p
   await page.getByRole("link", {name: "La Higuera, inicio", exact: true}).click();
   await expect(page).not.toHaveURL(/category=/);
   await expect(search).toHaveValue("");
-  await expect(menuButton).toHaveAttribute("aria-expanded", "false");
+  await expect(ads).toHaveAttribute("aria-expanded", "false");
   const overflowing = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflowing).toBe(false);
 });
@@ -104,60 +93,51 @@ test("publicar requiere sesión y una URL inexistente no revela datos", async ({
 });
 
 
-test("barra de categorías, búsqueda conservada y tiendas sin enlace", async ({page}, testInfo) => {
+test("barra con subcategorías, búsqueda conservada y tiendas sin enlace", async ({page, isMobile}, testInfo) => {
   await page.goto("/");
   const sections = page.getByRole("navigation", {name: "Secciones", exact: true});
-  await expect(sections.locator("a, button")).toHaveText(["Categorías", "Servicios", "Inmuebles", "Vehículos", /Tiendas Virtuales/, "Ayuda"]);
-  const menuButton = sections.getByRole("button", {name: "Categorías", exact: true});
-  await openMenu(menuButton);
-  // Servicios tiene prioridad: es la pestaña con la que abre el menú.
-  await expect(page.getByRole("tab", {name: "Servicios"})).toHaveAttribute("aria-selected", "true");
-  await page.getByRole("tab", {name: "Inmuebles"}).click();
+  await expect(sections.locator("a, button:not(.hdr-tab-toggle)")).toHaveText(["Inmuebles", "Vehículos", "Artículos", "Servicios", "Tiendas Virtuales", "Ayuda"]);
+  const houses = sections.getByRole("link", {name: "Inmuebles", exact: true});
+  if (isMobile) await sections.getByRole("button", {name: "Mostrar subcategorías de inmuebles", exact: true}).click(); else await houses.hover();
   const menu = page.getByRole("navigation", {name: "Subcategorías de inmuebles", exact: true});
   await expect(menu).toBeVisible();
   await expect(menu.getByRole("link")).toHaveCount(8);
   await menu.getByRole("link", {name: "Casas", exact: true}).click();
   await expect(page).toHaveURL(/category=inmuebles&subcategory=casas/);
-  await expect(menu).not.toBeVisible();
   await expect(page.getByRole("heading", {name: "Casas", exact: true})).toBeVisible();
   await page.getByRole("textbox", {name: "Qué buscás"}).fill("patio");
   await page.getByRole("button", {name: "Buscar", exact: true}).click();
   await expect(page).toHaveURL(/subcategory=casas/);
   await expect(page).toHaveURL(/q=patio/);
   await expect(page.getByRole("heading", {name: "Resultados para “patio”", exact: true})).toBeVisible();
-  // Con un rubro elegido el menú abre en su pestaña, y las flechas recorren las pestañas.
-  await openMenu(menuButton);
-  const houseTab = page.getByRole("tab", {name: "Inmuebles"});
-  await expect(houseTab).toHaveAttribute("aria-selected", "true");
-  await houseTab.press("ArrowDown");
-  await expect(page.getByRole("tab", {name: "Vehículos"})).toBeFocused();
+  const vehicles = sections.getByRole("link", {name: "Vehículos", exact: true});
+  const vehicleToggle = sections.getByRole("button", {name: "Mostrar subcategorías de vehículos", exact: true});
+  if (isMobile) await vehicleToggle.click(); else await vehicles.hover();
   const vehicleMenu = page.getByRole("navigation", {name: "Subcategorías de vehículos", exact: true});
   await expect(vehicleMenu).toBeVisible();
   await expect(vehicleMenu.getByRole("link")).toHaveCount(8);
   await expect(vehicleMenu.getByRole("link", {name: "Bicicletas", exact: true})).toHaveAttribute("href", "/?q=patio&category=vehiculos&subcategory=bicicletas");
-  await page.screenshot({path: testInfo.outputPath("barra-categorias.png"), fullPage: false, animations: "disabled"});
+  await page.screenshot({path: testInfo.outputPath("barra-subcategorias.png"), fullPage: false, animations: "disabled"});
   await page.keyboard.press("Escape");
-  await expect(menuButton).toHaveAttribute("aria-expanded", "false");
-  await expect(menuButton).toBeFocused();
-  await menuButton.press("Enter");
-  await expect(page.getByRole("tabpanel")).toBeVisible();
-  // Un click fuera del menú lo cierra (el buscador queda arriba del menú también en mobile).
+  await expect(vehicleToggle).toHaveAttribute("aria-expanded", "false");
+  await expect(vehicleToggle).toBeFocused();
+  await vehicleToggle.press("Enter");
+  await expect(vehicleMenu).toBeVisible();
+  // Un click fuera del menú lo cierra. Sin carrusel, el título de resultados queda debajo del menú: se usa el buscador, que está arriba.
   await page.getByRole("textbox", {name: "Qué buscás"}).click();
-  await expect(menuButton).toHaveAttribute("aria-expanded", "false");
-  const houses = sections.getByRole("link", {name: "Inmuebles", exact: true});
+  await expect(vehicleToggle).toHaveAttribute("aria-expanded", "false");
   await houses.click();
   await expect(page).toHaveURL(/q=patio&category=inmuebles/);
   await expect(page).not.toHaveURL(/subcategory=/);
-  await expect(houses).toHaveAttribute("aria-current", "page");
-  await sections.getByRole("link", {name: "Vehículos", exact: true}).click();
+  await vehicles.click();
   await expect(page).toHaveURL(/q=patio&category=vehiculos/);
+  await expect(vehicleMenu).not.toBeVisible();
   const services = sections.getByRole("link", {name: "Servicios", exact: true});
-  await openMenu(menuButton);
-  await page.getByRole("tab", {name: "Servicios"}).click();
+  const serviceToggle = sections.getByRole("button", {name: "Mostrar oficios", exact: true});
+  if (isMobile) await serviceToggle.click(); else await services.hover();
   const serviceMenu = page.getByRole("navigation", {name: "Oficios disponibles", exact: true});
   await expect(serviceMenu).toBeVisible();
   await expect(serviceMenu.getByRole("link", {name: "Ver todos los servicios", exact: true})).toHaveAttribute("href", "/servicios");
-  await expect(page.getByRole("link", {name: /Sumá tu perfil/})).toHaveAttribute("href", "/servicios/nuevo");
   const tradeLinks = serviceMenu.getByRole("link");
   if (await tradeLinks.count() > 1) {
     const trade = tradeLinks.nth(1);
@@ -170,8 +150,7 @@ test("barra de categorías, búsqueda conservada y tiendas sin enlace", async ({
   await services.click();
   await expect(page).toHaveURL(/\/servicios$/);
   await expect(serviceMenu).not.toBeVisible();
-  await expect(services).toHaveAttribute("aria-current", "page");
-  const stores = sections.getByRole("button", {name: /Tiendas Virtuales/});
+  const stores = sections.getByRole("button", {name: "Tiendas Virtuales", exact: true});
   await expect(stores).toHaveAttribute("aria-disabled", "true");
   await expect(stores).not.toHaveAttribute("href");
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
