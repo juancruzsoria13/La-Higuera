@@ -1,5 +1,5 @@
 # Atajos de desarrollo. Ejecutar desde la raíz del repositorio.
-.PHONY: install install-frontend install-backend dev-frontend dev-backend lint test check
+.PHONY: install install-frontend install-backend dev-frontend dev-backend seed-demo lint test check
 
 install: install-frontend install-backend
 
@@ -15,6 +15,10 @@ dev-frontend:
 
 dev-backend:
 	cd backend && .venv/bin/uvicorn app.main:app --reload --port 8000
+
+# Anuncios y servicios de ejemplo en el Supabase LOCAL (borra y recrea los usuarios demo; no corre contra otro host).
+seed-demo:
+	cd backend && .venv/bin/python -m scripts.seed_demo
 
 lint:
 	cd frontend && npm run lint && npm run typecheck
