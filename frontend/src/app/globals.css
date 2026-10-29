@@ -78,6 +78,7 @@ button:not(:disabled), select { cursor: pointer; }
 ::selection { background: var(--selection); color: var(--selection-foreground); }
 :focus-visible { outline: 3px solid var(--ring); outline-offset: 3px; }
 .hdr-bar :focus-visible { outline-color: var(--ring-on-primary); }
+.hdr-bar .menu-sheet :focus-visible { outline-color: var(--ring); }
 
 @layer components {
   .shell { @apply mx-auto w-full max-w-[1280px] px-5 sm:px-8; }
@@ -129,7 +130,7 @@ button:not(:disabled), select { cursor: pointer; }
 .site-header { position: relative; z-index: 20; }
 .hdr-bar { background: var(--primary); color: var(--primary-foreground); }
 .hdr-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "logo actions" "search search"; gap: 14px 16px; align-items: center; padding-block: 16px; }
-.hdr-logo { grid-area: logo; width: fit-content; }
+.hdr-logo { grid-area: logo; display: flex; width: fit-content; align-items: center; gap: 2px; }
 .hdr-search { grid-area: search; display: flex; height: 52px; min-width: 0; overflow: hidden; border-radius: 12px; background: var(--card); box-shadow: 0 3px 12px rgba(9, 37, 117, .09); }
 .hdr-search:focus-within { outline: 3px solid var(--ring-on-primary); outline-offset: 3px; }
 .hdr-search input { min-width: 0; flex: 1; border: 0; background: transparent; padding: 14px 20px; font: 400 16px/24px var(--font-sans); color: var(--foreground); outline: none; }
@@ -139,7 +140,8 @@ button:not(:disabled), select { cursor: pointer; }
 .hdr-account { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; font: 500 14px/20px var(--font-sans); color: var(--primary-foreground); }
 .hdr-account-text { display: none; }
 .hdr-publish { min-height: 40px; padding-inline: 12px; border-radius: 8px; }
-.hdr-sub { background: var(--card); border-bottom: 1px solid var(--border); }
+/* Por debajo de 1024px la barra de secciones se reemplaza por el menú ☰. */
+.hdr-sub { display: none; background: var(--card); border-bottom: 1px solid var(--border); }
 .hdr-sub-in { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .hdr-navigation { min-width: 0; flex: 1; }
 .cat-dropdown { position: absolute; inset-inline: 0; top: 100%; padding-top: 8px; }
@@ -153,6 +155,28 @@ button:not(:disabled), select { cursor: pointer; }
 /* Tiendas Virtuales y Ayuda: a la derecha y más chicas que las categorías. */
 .hdr-aside { display: flex; flex-shrink: 0; gap: 4px; margin-left: auto; }
 .hdr-aside .hdr-tab { font: 500 14px/20px var(--font-sans); }
+/* Menú ☰: panel desde la izquierda, como el de Mercado Libre. */
+.hdr-menu-button { display: inline-flex; width: 44px; height: 44px; flex-shrink: 0; align-items: center; justify-content: center; margin-left: -10px; border-radius: 10px; color: var(--primary-foreground); }
+.hdr-menu-button:hover { background: rgba(255, 255, 255, .14); }
+/* En celulares muy angostos (360px) el ☰ no deja lugar para el nombre: queda solo la marca. */
+@media (max-width: 379.98px) { .hdr-logo .brand-name { display: none; } }
+.menu-sheet { position: fixed; inset: 0 auto 0 0; width: min(88vw, 360px); max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; background: var(--card); color: var(--foreground); box-shadow: 0 20px 40px rgba(9, 37, 117, .25); }
+.menu-sheet::backdrop { background: rgba(9, 20, 60, .5); }
+html:has(.menu-sheet[open]) { overflow: hidden; }
+.menu-sheet-in { display: flex; height: 100%; flex-direction: column; gap: 2px; overflow-y: auto; padding: 8px 12px 24px; }
+.menu-sheet-head { display: flex; min-height: 60px; align-items: center; justify-content: space-between; margin-bottom: 6px; padding-left: 8px; border-bottom: 1px solid var(--border); }
+.menu-close { display: inline-flex; width: 44px; height: 44px; align-items: center; justify-content: center; border-radius: 10px; color: var(--muted-foreground); }
+.menu-close:hover { background: var(--muted); color: var(--foreground); }
+.menu-section { display: flex; width: 100%; min-height: 52px; align-items: center; justify-content: space-between; gap: 8px; padding: 0 8px; border-radius: 10px; font: 600 16px/22px var(--font-sans); text-align: left; }
+.menu-section:not([aria-disabled="true"]):hover { background: var(--muted); }
+.menu-section[aria-expanded="true"], .menu-section[aria-current="page"] { color: var(--primary); }
+.menu-section[aria-expanded="true"] > svg { transform: rotate(180deg); }
+.menu-section[aria-disabled="true"] { opacity: .6; cursor: default; }
+.menu-links { display: grid; gap: 2px; padding: 0 0 8px 8px; }
+.menu-link { display: flex; min-height: 44px; align-items: center; padding: 0 12px; border-radius: 10px; color: var(--muted-foreground); font: 500 15px/20px var(--font-sans); }
+.menu-link:hover, .menu-link[aria-current="page"] { background: var(--muted); color: var(--foreground); }
+.menu-link--all { color: var(--primary); font-weight: 600; }
+.menu-aside { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
 .hdr-soon { padding: 2px 6px; border-radius: 6px; background: var(--muted); font: 700 10px/12px var(--font-sans); letter-spacing: .06em; text-transform: uppercase; }
 .hdr-tab:not([aria-disabled="true"]):hover { color: var(--foreground); }
 .hdr-tab[aria-current="page"], .hdr-tab[data-active="true"] { color: var(--foreground); box-shadow: inset 0 -3px var(--primary); }
@@ -167,6 +191,8 @@ button:not(:disabled), select { cursor: pointer; }
   .hdr-publish { min-height: 44px; padding-inline: 16px; }
 }
 @media (min-width: 1024px) {
+  .hdr-sub { display: block; }
+  .hdr-menu-button { display: none; }
   .hdr-row { grid-template-columns: 220px minmax(0, 1fr) auto; grid-template-areas: "logo search actions"; gap: 28px; padding-block: 18px; }
   .cat-menu { left: 24px; right: auto; width: 720px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }

@@ -1,5 +1,14 @@
-import { test, expect } from "@playwright/test";
-test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({page}, testInfo) => {
+import { test, expect, type Locator } from "@playwright/test";
+/** Abre el menú ☰ del celular. Reintenta porque, tras una recarga, un toque antes de que hidrate React no hace nada. */
+async function openSheet(button: Locator) {
+  const sheet = button.page().getByRole("dialog", {name: "Categorías"});
+  await expect(async () => {
+    if (!await sheet.isVisible()) await button.click();
+    await expect(sheet).toBeVisible({timeout: 1000});
+  }).toPass();
+  return sheet;
+}
+test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({page, isMobile}, testInfo) => {
   await page.goto("/");
   await expect(page.getByRole("heading", {name: /Conseguí tu electricista/})).toBeVisible();
   await expect(page.getByRole("button", {name: "Pausar carrusel"})).toBeVisible();
@@ -8,20 +17,29 @@ test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({p
   await search.fill("bicicleta");
   await page.getByRole("button", {name: "Buscar", exact: true}).click();
   await expect(page).toHaveURL(/q=bicicleta/);
-  // Artículos abre las categorías restantes; Escape cierra y devuelve el foco.
-  const ads = page.getByRole("button", {name: "Artículos"});
+  // Artículos abre las categorías restantes (en el celular, dentro del menú ☰); Escape cierra y devuelve el foco.
+  const menuButton = page.getByRole("button", {name: "Abrir menú de categorías", exact: true});
+  const ads = page.getByRole("button", {name: "Artículos", exact: true});
+  const articles = page.getByRole("navigation", {name: "Categorías de artículos"});
+  if (isMobile) await openSheet(menuButton);
   await ads.click();
   await expect(ads).toHaveAttribute("aria-expanded", "true");
-  await expect(page.getByRole("navigation", {name: "Categorías de artículos"})).toBeVisible();
+  await expect(articles).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(ads).toHaveAttribute("aria-expanded", "false");
-  await expect(ads).toBeFocused();
+  if (isMobile) {
+    await expect(page.getByRole("dialog", {name: "Categorías"})).toBeHidden();
+    await expect(menuButton).toBeFocused();
+    await openSheet(menuButton);
+  } else {
+    await expect(ads).toHaveAttribute("aria-expanded", "false");
+    await expect(ads).toBeFocused();
+  }
   const term = "bicicleta";
   await ads.click();
   for (const name of ["Tecnología", "Ropa", "Muebles", "Electrodomésticos", "Materiales de construcción", "Otros"]) {
-    await expect(page.getByRole("link", {name, exact: true})).toBeVisible();
+    await expect(articles.getByRole("link", {name, exact: true})).toBeVisible();
   }
-  const furniture = page.getByRole("link", {name: "Muebles", exact: true});
+  const furniture = articles.getByRole("link", {name: "Muebles", exact: true});
   await furniture.click();
   await expect(page).toHaveURL(/category=muebles/);
   await expect(search).toHaveValue(term);
@@ -32,7 +50,7 @@ test("inicio, búsqueda y categorías funcionan sin datos inventados", async ({p
   await page.getByRole("link", {name: "La Higuera, inicio", exact: true}).click();
   await expect(page).not.toHaveURL(/category=/);
   await expect(search).toHaveValue("");
-  await expect(ads).toHaveAttribute("aria-expanded", "false");
+  if (!isMobile) await expect(ads).toHaveAttribute("aria-expanded", "false");
   const overflowing = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   expect(overflowing).toBe(false);
 });
@@ -93,7 +111,8 @@ test("publicar requiere sesión y una URL inexistente no revela datos", async ({
 });
 
 
-test("la barra marca una sección solo si hay un rubro elegido", async ({page}) => {
+test("la barra marca una sección solo si hay un rubro elegido", async ({page, isMobile}) => {
+  test.skip(isMobile, "En el celular la barra se reemplaza por el menú ☰.");
   await page.goto("/");
   const sections = page.getByRole("navigation", {name: "Secciones", exact: true});
   await expect(sections.getByRole("link", {name: "Inmuebles", exact: true})).toBeVisible();
@@ -102,11 +121,12 @@ test("la barra marca una sección solo si hay un rubro elegido", async ({page}) 
   await expect(sections.getByRole("button", {name: "Artículos", exact: true})).toHaveAttribute("data-active", "true");
 });
 test("barra con subcategorías, búsqueda conservada y tiendas sin enlace", async ({page, isMobile}, testInfo) => {
+  test.skip(isMobile, "En el celular la barra se reemplaza por el menú ☰.");
   await page.goto("/");
   const sections = page.getByRole("navigation", {name: "Secciones", exact: true});
   await expect(sections.locator("a, button:not(.hdr-tab-toggle)")).toHaveText(["Inmuebles", "Vehículos", "Artículos", "Servicios", "Tiendas Virtuales Pronto", "Ayuda"]);
   const houses = sections.getByRole("link", {name: "Inmuebles", exact: true});
-  if (isMobile) await sections.getByRole("button", {name: "Mostrar subcategorías de inmuebles", exact: true}).click(); else await houses.hover();
+  await houses.hover();
   const menu = page.getByRole("navigation", {name: "Subcategorías de inmuebles", exact: true});
   await expect(menu).toBeVisible();
   await expect(menu.getByRole("link")).toHaveCount(8);
@@ -120,7 +140,7 @@ test("barra con subcategorías, búsqueda conservada y tiendas sin enlace", asyn
   await expect(page.getByRole("heading", {name: "Resultados para “patio”", exact: true})).toBeVisible();
   const vehicles = sections.getByRole("link", {name: "Vehículos", exact: true});
   const vehicleToggle = sections.getByRole("button", {name: "Mostrar subcategorías de vehículos", exact: true});
-  if (isMobile) await vehicleToggle.click(); else await vehicles.hover();
+  await vehicles.hover();
   const vehicleMenu = page.getByRole("navigation", {name: "Subcategorías de vehículos", exact: true});
   await expect(vehicleMenu).toBeVisible();
   await expect(vehicleMenu.getByRole("link")).toHaveCount(8);
@@ -141,8 +161,7 @@ test("barra con subcategorías, búsqueda conservada y tiendas sin enlace", asyn
   await expect(page).toHaveURL(/q=patio&category=vehiculos/);
   await expect(vehicleMenu).not.toBeVisible();
   const services = sections.getByRole("link", {name: "Servicios", exact: true});
-  const serviceToggle = sections.getByRole("button", {name: "Mostrar oficios", exact: true});
-  if (isMobile) await serviceToggle.click(); else await services.hover();
+  await services.hover();
   const serviceMenu = page.getByRole("navigation", {name: "Oficios disponibles", exact: true});
   await expect(serviceMenu).toBeVisible();
   await expect(serviceMenu.getByRole("link", {name: "Ver todos los servicios", exact: true})).toHaveAttribute("href", "/servicios");
@@ -161,5 +180,35 @@ test("barra con subcategorías, búsqueda conservada y tiendas sin enlace", asyn
   const stores = sections.getByRole("button", {name: "Tiendas Virtuales Pronto", exact: true});
   await expect(stores).toHaveAttribute("aria-disabled", "true");
   await expect(stores).not.toHaveAttribute("href");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
+});
+test("en el celular, el menú ☰ reemplaza la barra de secciones", async ({page, isMobile}) => {
+  test.skip(!isMobile, "El menú ☰ solo aparece por debajo de 1024px.");
+  await page.goto("/");
+  await expect(page.getByRole("navigation", {name: "Secciones", exact: true})).toBeHidden();
+  const menuButton = page.getByRole("button", {name: "Abrir menú de categorías", exact: true});
+  const sheet = await openSheet(menuButton);
+  for (const name of ["Inmuebles", "Vehículos", "Artículos", "Servicios"]) await expect(sheet.getByRole("button", {name, exact: true})).toHaveAttribute("aria-expanded", "false");
+  await expect(sheet.getByRole("button", {name: "Tiendas Virtuales Pronto", exact: true})).toHaveAttribute("aria-disabled", "true");
+  await expect(sheet.getByRole("link", {name: "Ayuda", exact: true})).toHaveAttribute("href", "/ayuda");
+  await sheet.getByRole("button", {name: "Inmuebles", exact: true}).click();
+  const houses = sheet.getByRole("navigation", {name: "Subcategorías de inmuebles", exact: true});
+  await expect(houses.getByRole("link")).toHaveCount(8);
+  await houses.getByRole("link", {name: "Casas", exact: true}).click();
+  await expect(page).toHaveURL(/category=inmuebles&subcategory=casas/);
+  await expect(sheet).toBeHidden();
+  // Escape cierra y devuelve el foco al botón; tocar fuera del panel también cierra. Al volver a abrir, las secciones arrancan cerradas.
+  await openSheet(menuButton);
+  await expect(sheet.getByRole("button", {name: "Inmuebles", exact: true})).toHaveAttribute("aria-expanded", "false");
+  await page.keyboard.press("Escape");
+  await expect(sheet).toBeHidden();
+  await expect(menuButton).toBeFocused();
+  await openSheet(menuButton);
+  const viewport = page.viewportSize()!;
+  await page.touchscreen.tap(viewport.width - 10, viewport.height / 2);
+  await expect(sheet).toBeHidden();
+  await openSheet(menuButton);
+  await sheet.getByRole("button", {name: "Servicios", exact: true}).click();
+  await expect(sheet.getByRole("navigation", {name: "Oficios disponibles", exact: true}).getByRole("link", {name: "Ver todos los servicios", exact: true})).toHaveAttribute("href", "/servicios");
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
 });

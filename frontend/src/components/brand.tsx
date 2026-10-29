@@ -16,7 +16,7 @@ export function Brand({ inverted = false, compact = false }: { inverted?: boolea
       <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-11", inverted ? "bg-card text-primary" : "bg-primary text-primary-foreground")}>
         <BrandMark className="size-8" />
       </span>
-      {!compact && <span className="whitespace-nowrap text-[21px] leading-7 font-extrabold tracking-[-.035em] sm:text-[25px]">la higuera<span className={inverted ? "text-sky" : "text-primary"}>.</span></span>}
+      {!compact && <span className="brand-name whitespace-nowrap text-[21px] leading-7 font-extrabold tracking-[-.035em] sm:text-[25px]">la higuera<span className={inverted ? "text-sky" : "text-primary"}>.</span></span>}
     </span>
   );
 }

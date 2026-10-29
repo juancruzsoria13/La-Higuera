@@ -7,7 +7,7 @@ import { currentUser } from "@/modules/users/session";
 import { logout } from "@/modules/users/actions";
 import { Brand } from "@/components/brand";
 import { AccountMenu } from "@/components/account-menu";
-import { HeaderSearch, HeaderSearchFallback, HeaderTabs, HeaderTabsFallback } from "@/components/search-navigation";
+import { HeaderMenu, HeaderMenuFallback, HeaderSearch, HeaderSearchFallback, HeaderTabs, HeaderTabsFallback } from "@/components/search-navigation";
 import { buttonVariants } from "@/components/ui/button";
 import { getCatalog } from "@/lib/catalog";
 import "./globals.css";
@@ -30,7 +30,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <header className="site-header">
           <div className="hdr-bar">
             <div className="shell hdr-row">
-              <Link href="/" className="hdr-logo" aria-label="La Higuera, inicio"><Brand inverted /></Link>
+              <div className="hdr-logo">
+                <Suspense fallback={<HeaderMenuFallback />}><HeaderMenu categories={categories} trades={trades} /></Suspense>
+                <Link href="/" aria-label="La Higuera, inicio"><Brand inverted /></Link>
+              </div>
               <Suspense fallback={<HeaderSearchFallback />}><HeaderSearch categories={categories} /></Suspense>
               <nav aria-label="Tu cuenta" className="hdr-actions">
                 {user ? (
