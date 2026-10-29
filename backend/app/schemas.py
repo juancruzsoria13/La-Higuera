@@ -90,6 +90,9 @@ class ProductIn(BaseModel):
     contact_phone: str | None = None
     contact_email: str | None = None
     status: str
+    # Porcentaje que el vendedor ofrece a quien llega desde La Higuera. El precio anterior no se recibe:
+    # lo calcula la base al bajar el precio.
+    exclusive_discount: int | None = None
 
     @field_validator("*", mode="before")
     @classmethod
@@ -125,6 +128,13 @@ class ProductIn(BaseModel):
                 return _email(value)
             case "status":
                 return _choice(value, PRODUCT_STATUSES, "Elegí un estado válido.")
+            case "exclusive_discount":
+                text = str(value or "").strip()
+                if not text:
+                    return None
+                if not re.fullmatch(r"\d{1,2}", text) or not 1 <= int(text) <= 90:
+                    raise ValueError("Ingresá un descuento exclusivo entre 1 y 90 %, o dejalo vacío.")
+                return int(text)
         return value
 
     @model_validator(mode="after")

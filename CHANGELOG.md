@@ -8,11 +8,19 @@ El formato sigue [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y e
 
 ### Agregado
 
+- **Ofertas**: un anuncio es oferta si el vendedor le bajó el precio (el anterior queda tachado) o si ofrece un descuento exclusivo para quien llega desde La Higuera. La tarjeta y el detalle muestran el porcentaje en badge, el precio tachado y el final, que baja con una animación al aparecer (sin animación con movimiento reducido). En la home, la franja de Ofertas va antes que Servicios y solo aparece si hay; `/?ofertas=1` lista todas.
+- Migración `database/migrations/202610290001_offers.sql`: `products.previous_price`, que solo completa el trigger `products_previous_price` al bajar el precio, y `products.exclusive_discount` (1 a 90 %), con permiso de escritura del dueño.
+- `GET /api/products?offers=true`, y `exclusive_discount` en el alta y la edición.
+- **Menú ☰** por debajo de 1024px: reemplaza a la barra de secciones, que no entraba en celulares.
+
 - **Fotos en servicios**, ambas opcionales: una foto de perfil de quien ofrece el servicio y hasta 8 fotos de trabajos realizados, que se agregan, quitan y reordenan. La tarjeta muestra la foto de perfil y el detalle, la foto y la galería de trabajos.
 - Migración `database/migrations/202610090001_service_images.sql`: tabla `service_images` con RLS (una foto se ve si se ve su servicio), función `set_service_images()` y políticas de Storage y `abandon_image()` ampliadas.
 
 ### Cambiado
 
+- El botón de WhatsApp del anuncio abre con un mensaje que dice que el contacto viene de La Higuera, y menciona el descuento exclusivo si lo hay.
+- Barra de secciones: sin íconos, con Tiendas Virtuales ("Pronto") y Ayuda a la derecha. Con el menú abierto, la sección se marca en azul y la flecha gira. En la home sin rubro ya no queda marcada "Artículos".
+- Tarjeta de servicio con foto grande: la primera de trabajos o, si no hay, la de perfil; la matrícula va en badge sobre la foto.
 - `POST` y `PUT /api/services` reciben multipart (como los anuncios) en lugar de JSON. `DELETE /api/services/{id}` limpia los archivos de las fotos.
 - La validación del orden de fotos y el abandono de cargas pasaron a `app/images.py`, compartidos por anuncios y servicios.
 - `scripts/cleanup.py` y `scripts/integration.py` contemplan las fotos de servicios.

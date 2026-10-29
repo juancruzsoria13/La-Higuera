@@ -212,3 +212,18 @@ test("en el celular, el menú ☰ reemplaza la barra de secciones", async ({page
   await expect(sheet.getByRole("navigation", {name: "Oficios disponibles", exact: true}).getByRole("link", {name: "Ver todos los servicios", exact: true})).toHaveAttribute("href", "/servicios");
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
 });
+test("ofertas: van antes que servicios si hay, y tienen su listado sin portada", async ({page}) => {
+  await page.goto("/");
+  const offers = page.getByRole("heading", {name: "Ofertas en San Juan"});
+  const services = page.getByRole("heading", {name: "Profesionales de oficio en San Juan"});
+  await expect(services).toBeVisible();
+  // Sin ofertas (por ejemplo, sin Supabase) la franja no aparece y Servicios queda primero.
+  if (await offers.count()) {
+    expect((await offers.boundingBox())!.y).toBeLessThan((await services.boundingBox())!.y);
+    await page.getByRole("link", {name: "Ver todas las ofertas"}).click();
+    await expect(page).toHaveURL(/ofertas=1/);
+  } else await page.goto("/?ofertas=1");
+  await expect(page.getByRole("heading", {name: "Ofertas", exact: true, level: 2})).toBeVisible();
+  await expect(page.getByRole("button", {name: "Pausar carrusel"})).toHaveCount(0);
+  await expect(services).toHaveCount(0);
+});

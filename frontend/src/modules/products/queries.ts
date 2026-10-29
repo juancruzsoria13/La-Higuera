@@ -3,8 +3,8 @@ import { api, ApiError, query } from "@/lib/api";
 import type { Product } from "./schema";
 export const PAGE_SIZE = 12;
 type Page<T> = {items: T[]; count: number};
-export async function listProducts({q = "", category = "", subcategory = "", page = 1, mine = false}: {q?: string; category?: string; subcategory?: string; page?: number; mine?: boolean}) {
-  const result = await api<Page<Product>>(`/products?${query({q: q.trim().slice(0, 120), category, subcategory, page, mine: mine || undefined})}`);
+export async function listProducts({q = "", category = "", subcategory = "", page = 1, mine = false, offers = false}: {q?: string; category?: string; subcategory?: string; page?: number; mine?: boolean; offers?: boolean}) {
+  const result = await api<Page<Product>>(`/products?${query({q: q.trim().slice(0, 120), category, subcategory, page, mine: mine || undefined, offers: offers || undefined})}`);
   return {products: result.items, count: result.count};
 }
 export async function getProduct(id: string) {

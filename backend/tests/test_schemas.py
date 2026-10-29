@@ -126,3 +126,15 @@ def test_uuid_y_slug():
     assert not is_uuid("../etc/passwd")
     assert is_slug("9-de-julio") and is_slug("materiales-construccion")
     assert not is_slug("") and not is_slug("Capital") and not is_slug("a--b") and not is_slug("x" * 41)
+
+
+def test_descuento_exclusivo_es_opcional_y_entre_1_y_90():
+    assert ProductIn.model_validate(VALID).exclusive_discount is None
+    assert ProductIn.model_validate({**VALID, "exclusive_discount": ""}).exclusive_discount is None
+    assert ProductIn.model_validate({**VALID, "exclusive_discount": " 15 "}).exclusive_discount == 15
+
+
+@pytest.mark.parametrize("discount", ["0", "91", "-5", "10.5", "diez"])
+def test_rechaza_descuentos_exclusivos_invalidos(discount):
+    with pytest.raises(ValidationError, match="entre 1 y 90"):
+        ProductIn.model_validate({**VALID, "exclusive_discount": discount})

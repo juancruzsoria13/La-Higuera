@@ -179,7 +179,8 @@
       },
       "photos": [
         "backend/scripts/demo_photos/wave.jpg"
-      ]
+      ],
+      "offer_price": 1490000
     },
     {
       "seller": "lucia",
@@ -226,7 +227,8 @@
       "description": "En caja cerrada, con garantía oficial de 12 meses. Netflix, YouTube y Disney+ integrados.",
       "photos": [
         "backend/scripts/demo_photos/tv.jpg"
-      ]
+      ],
+      "offer_price": 590000
     },
     {
       "seller": "martin",
@@ -250,7 +252,8 @@
       "description": "Ideal para estudiar o trabajar. Batería en buen estado, teclado en español.",
       "photos": [
         "backend/scripts/demo_photos/notebook.jpg"
-      ]
+      ],
+      "offer_price": 720000
     },
     {
       "seller": "sofia",
@@ -286,7 +289,9 @@
       "description": "Mesa artesanal de algarrobo macizo, 1,80 x 0,90 m. Se entrega lustrada.",
       "photos": [
         "backend/scripts/demo_photos/mesa.jpg"
-      ]
+      ],
+      "offer_price": 340000,
+      "exclusive_discount": 10
     },
     {
       "seller": "valentina",
@@ -298,7 +303,8 @@
       "description": "Funciona perfecto, 3 años de uso. Freezer arriba, dispenser de agua.",
       "photos": [
         "backend/scripts/demo_photos/heladera.jpg"
-      ]
+      ],
+      "exclusive_discount": 15
     },
     {
       "seller": "nicolas",
@@ -322,7 +328,8 @@
       "description": "Campera de jean clásica, usada pocas veces. Sin roturas ni manchas.",
       "photos": [
         "backend/scripts/demo_photos/campera.jpg"
-      ]
+      ],
+      "exclusive_discount": 10
     },
     {
       "seller": "sofia",

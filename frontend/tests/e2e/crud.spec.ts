@@ -38,10 +38,15 @@ test("CRUD real, recarga, privacidad con dos usuarios y eliminación de cuenta",
     await page.getByRole("button",{name:"Publicar anuncio"}).click();
     await expect(page).toHaveURL(/productos\/[0-9a-f-]+\?guardado/); const productUrl = page.url().split("?")[0];
     await page.reload(); await expect(page.getByRole("heading",{name:"Bicicleta de integración"})).toBeVisible();
-    await expect(page.getByRole("button",{name:/Ver foto \d de 2/})).toHaveCount(2); await expect(page.getByRole("link",{name:"WhatsApp"})).toHaveAttribute("href","https://wa.me/2644123456");
+    await expect(page.getByRole("button",{name:/Ver foto \d de 2/})).toHaveCount(2); await expect(page.getByRole("link",{name:"WhatsApp"})).toHaveAttribute("href",`https://wa.me/2644123456?text=${encodeURIComponent("Hola, vi tu anuncio “Bicicleta de integración” en La Higuera.")}`);
     const imageUrl = await page.getByRole("img",{name:"Bicicleta de integración"}).getAttribute("src");
     await other.goto(productUrl); await expect(other.getByRole("heading",{name:"Bicicleta de integración"})).toBeVisible(); await expect(other.getByRole("link",{name:"Editar anuncio"})).toHaveCount(0); await expect(other.getByText(users[0].email)).toHaveCount(0);
     await other.goto(`${productUrl}/editar`); await expect(other.getByRole("heading",{name:"Este anuncio no está disponible"})).toBeVisible();
+    // Ofertas desde el formulario: bajar el precio (la base guarda el anterior) y sumar un descuento exclusivo.
+    await page.getByRole("link",{name:"Editar anuncio"}).click(); await page.getByLabel("Precio",{exact:true}).fill("12000"); await page.getByLabel("Descuento exclusivo La Higuera (opcional)").fill("10");
+    await page.getByRole("button",{name:"Siguiente"}).click(); await page.getByRole("button",{name:"Guardar cambios"}).click(); await expect(page).toHaveURL(/guardado/);
+    await expect(page.getByText("20% OFF",{exact:true})).toBeVisible(); await expect(page.getByText(/^10% exclusivo/)).toBeVisible(); await expect(page.getByText("$ 15.000,5",{exact:true})).toBeVisible(); await expect(page.getByText("$ 10.800").first()).toBeVisible();
+    await expect(page.getByRole("link",{name:"WhatsApp"})).toHaveAttribute("href",/descuento%20exclusivo/);
     await page.getByRole("link",{name:"Editar anuncio"}).click(); await page.getByRole("button",{name:"Siguiente"}).click(); await page.getByLabel("Estado del anuncio").selectOption("pausado"); await page.getByRole("button",{name:"Guardar cambios"}).click(); await expect(page).toHaveURL(/guardado/);
     await other.goto(productUrl); await expect(other.getByRole("heading",{name:"Este anuncio no está disponible"})).toBeVisible(); expect((await other.request.get(`${baseURL}${imageUrl}`)).status()).toBe(404);
     // Delete through the actual server action; identity comes from the signed session.

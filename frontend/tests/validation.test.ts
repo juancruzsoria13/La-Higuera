@@ -22,8 +22,14 @@ describe("Validación de productos y perfiles", () => {
     expect(productSchema.parse({...valid, operation: "venta"}).operation).toBeNull();
   });
   it("descarta columnas que el cliente no puede escribir", () => {
-    const parsed = productSchema.parse({...valid, owner_id: "attacker", business_id: "other", hidden: false, expires_at: "2099-01-01"});
-    for (const key of ["owner_id", "business_id", "hidden", "expires_at", "image_path"]) expect(parsed).not.toHaveProperty(key);
+    const parsed = productSchema.parse({...valid, owner_id: "attacker", business_id: "other", hidden: false, expires_at: "2099-01-01", previous_price: "999999"});
+    for (const key of ["owner_id", "business_id", "hidden", "expires_at", "image_path", "previous_price"]) expect(parsed).not.toHaveProperty(key);
+  });
+  it("acepta un descuento exclusivo opcional entre 1 y 90", () => {
+    expect(productSchema.parse(valid).exclusive_discount).toBeNull();
+    expect(productSchema.parse({...valid, exclusive_discount: ""}).exclusive_discount).toBeNull();
+    expect(productSchema.parse({...valid, exclusive_discount: " 15 "}).exclusive_discount).toBe(15);
+    for (const exclusive_discount of ["0", "91", "-5", "10.5", "diez"]) expect(message(productSchema.safeParse({...valid, exclusive_discount}))).toBe("Ingresá un descuento exclusivo entre 1 y 90 %, o dejalo vacío.");
   });
   it("marca vencido solo un anuncio activo con la fecha pasada", () => {
     const now = Date.parse("2026-10-08T12:00:00Z");

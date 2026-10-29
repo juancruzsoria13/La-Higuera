@@ -22,7 +22,7 @@ Documentación interactiva en `http://127.0.0.1:8000/docs` con la API corriendo.
 | --- | --- | --- |
 | `GET /api/health` | no | Estado y si Supabase está configurado |
 | `GET /api/catalog` | no | Rubros, localidades y oficios activos (`requires_license` en los oficios) para los formularios |
-| `GET /api/products?q&category&page&mine` | opcional (`mine` la requiere) | Anuncios visibles (activos, sin ocultar y sin vencer) o propios, 12 por página; `category` es un `category_id` |
+| `GET /api/products?q&category&offers&page&mine` | opcional (`mine` la requiere) | Anuncios visibles (activos, sin ocultar y sin vencer) o propios, 12 por página; `category` es un `category_id`; `offers=true` deja solo las ofertas |
 | `GET /api/products/{id}` | opcional | Anuncio con `images` (rutas, portada primero), `category_name`, `locality_name` y nombre público del vendedor |
 | `POST /api/products` | sí | Alta (multipart: campos, `images` y `image_order`) |
 | `PUT /api/products/{id}` | sí | Edición con `version` (= `updated_at`); `image_order` es la lista final de fotos |
@@ -87,6 +87,15 @@ FastAPI y la acción del frontend validan el mismo catálogo. El campo multipart
 
 ### Navegación por subcategorías
 
-La barra presenta Inmuebles, Vehículos, Artículos, Servicios y Tiendas Virtuales. Los primeros dos despliegan sus subcategorías; Artículos agrupa las demás categorías. Los menús admiten hover con mouse, toque y teclado, cierran con Escape o al salir/clic fuera, y la barra se desplaza horizontalmente en celulares. Tiendas Virtuales permanece visible y sin enlace hasta que exista su pantalla (el modelo `businesses` ya está definido).
+La barra presenta Inmuebles, Vehículos, Artículos, Servicios y Tiendas Virtuales. Los primeros dos despliegan sus subcategorías; Artículos agrupa las demás categorías. Los menús admiten hover con mouse, toque y teclado, y cierran con Escape o al salir/clic fuera. Por debajo de 1024px la barra se reemplaza por el menú ☰: un `<dialog>` modal con las mismas secciones (`useSections` las comparte), que encierra el foco y lo devuelve al botón al cerrar. Tiendas Virtuales permanece visible y sin enlace hasta que exista su pantalla (el modelo `businesses` ya está definido).
 
 El listado y la API aceptan `subcategory` además de `category`. Búsqueda y paginación conservan ambos filtros; la API rechaza subcategorías inexistentes o de otro rubro. El filtrado depende de la migración `202610150001_product_attributes.sql`.
+
+### Ofertas
+
+`202610290001_offers.sql` agrega `products.previous_price` y `products.exclusive_discount`. Un anuncio es oferta si tiene cualquiera de los dos.
+
+- **Precio rebajado:** `previous_price` no tiene permiso de escritura. Lo completa el trigger `products_previous_price` cuando el dueño baja el precio en la misma moneda, conserva el más alto si lo baja varias veces y lo borra si el precio vuelve a llegar al anterior o si cambia la moneda. Así nadie puede inventar un precio anterior inflado.
+- **Descuento exclusivo:** porcentaje de 1 a 90 que el vendedor ofrece a quien llega desde La Higuera. El mensaje de WhatsApp del detalle avisa que el contacto viene de La Higuera y menciona el descuento.
+
+`offerOf()` (`frontend/src/modules/products/offers.ts`) calcula el precio tachado, el final (con el descuento exclusivo aplicado) y los porcentajes. En la home, la franja de Ofertas va antes que Servicios y solo aparece si hay ofertas; `/?ofertas=1` es el listado completo. El precio final se anima desde el tachado al entrar en pantalla (`OfferPrice`), salvo con `prefers-reduced-motion`; los lectores de pantalla y el HTML del servidor siempre reciben el precio final.

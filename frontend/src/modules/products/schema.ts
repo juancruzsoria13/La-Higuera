@@ -20,6 +20,10 @@ export const productSchema = z.object({
   contact_phone: optionalPhone,
   contact_email: optionalEmail,
   status: z.enum(statuses),
+  // Lo ofrece el vendedor a quien llega desde La Higuera. El precio anterior no se envía: lo guarda la base al bajar el precio.
+  exclusive_discount: z.string().nullish().transform(value => (value ?? "").trim())
+    .refine(value => value === "" || (/^\d{1,2}$/.test(value) && Number(value) >= 1 && Number(value) <= 90), "Ingresá un descuento exclusivo entre 1 y 90 %, o dejalo vacío.")
+    .transform(value => value ? Number(value) : null),
 }).superRefine((value, context) => {
   // Mismas reglas que products_operation_by_category y products_active_contact.
   if (value.category_id === REAL_ESTATE && !value.operation) context.addIssue({code: "custom", path: ["operation"], message: "Indicá si el inmueble es para venta o alquiler."});
@@ -34,7 +38,7 @@ export const productSchema = z.object({
 });
 export const uuidSchema = z.string().uuid();
 export type Product = z.output<typeof productSchema> & {
-  id: string; owner_id: string; business_id: string | null; images: string[]; category_name: string | null; locality_name: string | null;
+  id: string; owner_id: string; business_id: string | null; images: string[]; category_name: string | null; locality_name: string | null; previous_price: number | null;
   expires_at: string; hidden: boolean; created_at: string; updated_at: string;
 };
 /** Activo pero fuera del listado público por vencimiento: solo lo ve su dueño hasta renovarlo. */

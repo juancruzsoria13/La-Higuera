@@ -55,6 +55,11 @@ CATALOG = {
 
 def matches(row, filters):
     for column, rule in filters:
+        # PostgREST `or=(a.not.is.null,b.not.is.null)`: alcanza con que una columna tenga valor.
+        if column == "or":
+            if not any(row.get(condition.split(".")[0]) is not None for condition in rule.strip("()").split(",")):
+                return False
+            continue
         op, _, value = rule.partition(".")
         if op == "eq" and str(row.get(column)).lower() != value.lower():
             return False
@@ -566,3 +571,20 @@ def test_listado_filtra_subcategoria_y_rechaza_rubros_incompatibles(api, db):
     assert api.get("/api/products", params={"category": "inmuebles"}).json()["count"] == 3
     for params in [{"category": "vehiculos", "subcategory": "casas"}, {"subcategory": "desconocida"}]:
         assert api.get("/api/products", params=params).status_code == 422
+
+
+def test_ofertas_guardan_descuento_exclusivo_y_se_filtran(api, db):
+    assert api.post("/api/products", data=PRODUCT, headers=AS_A).status_code == 201
+    exclusive = api.post("/api/products", data={**PRODUCT, "title": "Mesa", "exclusive_discount": "10"}, headers=AS_A)
+    assert exclusive.status_code == 201
+    assert api.post("/api/products", data={**PRODUCT, "title": "Silla"}, headers=AS_A).status_code == 201
+    # El precio anterior lo pone el trigger de la base al bajar el precio; acá se simula su resultado.
+    db.tables["products"][2]["previous_price"] = 200000
+    assert db.tables["products"][1]["exclusive_discount"] == 10
+    offers = api.get("/api/products", params={"offers": "true"}).json()
+    assert offers["count"] == 2
+    assert {item["title"] for item in offers["items"]} == {"Mesa", "Silla"}
+    assert api.get("/api/products").json()["count"] == 3
+    response = api.post("/api/products", data={**PRODUCT, "exclusive_discount": "95"}, headers=AS_A)
+    assert response.status_code == 422
+    assert "entre 1 y 90" in response.json()["detail"]

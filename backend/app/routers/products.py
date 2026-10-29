@@ -30,6 +30,7 @@ FIELDS = (
     "contact_phone",
     "contact_email",
     "status",
+    "exclusive_discount",
 )
 # Fotos embebidas y nombres de rubro y localidad, en una sola consulta (RLS se aplica a cada tabla).
 COLUMNS = "*,images:product_images(path,sort_order),category:categories(name),locality:localities(name)"
@@ -63,6 +64,7 @@ async def list_products(
     subcategory: str = "",
     page: Annotated[int, Query(ge=1, le=10000)] = 1,
     mine: bool = False,
+    offers: bool = False,
 ) -> dict[str, Any]:
     if mine and not user:
         raise HTTPException(401, "Ingresá a tu cuenta para continuar.")
@@ -82,6 +84,9 @@ async def list_products(
         if not selected or (category and selected["category_id"] != category):
             raise HTTPException(422, "Elegí una subcategoría del rubro seleccionado.")
         filters.append(("subcategory_id", f"eq.{subcategory}"))
+    if offers:
+        # Oferta: precio rebajado (lo deja la base al bajar el precio) o descuento exclusivo del vendedor.
+        filters.append(("or", "(previous_price.not.is.null,exclusive_discount.not.is.null)"))
     offset, limit = page_bounds(page, PAGE_SIZE)
     try:
         rows, count = await db.select(

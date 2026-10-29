@@ -102,8 +102,10 @@ Los cambios de código se recargan solos. Hay que reiniciar solo al cambiar vari
    5. `202610090001_service_images.sql`: fotos de servicios (una de perfil y hasta 8 de trabajos realizados) con `set_service_images()`.
 
    6. `202610150001_product_attributes.sql`: siete subcategorías de Inmuebles y siete de Vehículos, características opcionales, validación por subcategoría y permisos de escritura. Aplicar antes de utilizar el nuevo formulario.
+   7. `202610150002_backfill_missing_profiles.sql`: crea el perfil de las cuentas que quedaron sin él.
+   8. `202610290001_offers.sql`: ofertas. Precio anterior automático al bajar el precio (lo escribe un trigger) y descuento exclusivo de La Higuera que carga el vendedor.
 
-   En un proyecto **nuevo** se puede pegar en cambio [`database/supabase_setup.sql`](database/supabase_setup.sql), que reúne las cuatro primeras en una sola transacción, y después la 5 y la 6. Si el proyecto ya tiene alguna aplicada, ejecutar solo las que falten, en orden.
+   En un proyecto **nuevo** se puede pegar en cambio [`database/supabase_setup.sql`](database/supabase_setup.sql), que reúne las cuatro primeras en una sola transacción, y después de la 5 en adelante. Si el proyecto ya tiene alguna aplicada, ejecutar solo las que falten, en orden.
 
    Cada una corre en una transacción. No repetirlas sobre el mismo proyecto: los cambios futuros van en migraciones nuevas. La cuarta cambia columnas que usa el código: requiere la versión 0.3.0 de la API y del frontend.
 3. En **Authentication → URL Configuration**, establecer Site URL en `http://localhost:3000` y permitir `http://localhost:3000/auth/confirm`. Al desplegar, agregar la URL de producción.
@@ -143,6 +145,7 @@ Si el profesional cambia el número, la entidad o el oficio, la verificación se
 - Registro, confirmación de correo, ingreso y cierre de sesión.
 - Perfil propio: nombre y localidad; el correo de acceso queda privado en Auth.
 - Anuncios propios: alta, edición, eliminación confirmada y estados activo, pausado y vendido. Hasta 8 fotos opcionales, convertidas a WebP, que se pueden quitar y reordenar (la primera es la portada). Teléfono o correo de contacto obligatorio para publicar.
+- **Ofertas**: si el vendedor baja el precio, el anterior queda tachado y el anuncio entra en Ofertas. También puede ofrecer un descuento exclusivo para quien llega desde La Higuera. En la home van antes que Servicios (solo si hay) y tienen su listado en `/?ofertas=1`.
 - Vencimiento: un anuncio activo deja de verse a los 60 días. *Mis anuncios* marca los vencidos y permite renovarlos.
 - **Servicios de oficio**: gasistas, plomeros, electricistas, pintores y más, con teléfono, botón de WhatsApp y correo opcional. La matrícula y su entidad emisora se piden solo en los oficios que la exigen. Foto de perfil y hasta 8 fotos de trabajos realizados, ambas opcionales. Búsqueda, filtro por oficio y gestión en *Mis servicios*.
 - **Estudios de higo**: 9 ilustraciones SVG para momentos vacíos o de espera (sin foto, sin resultados, 404, carga y guardado).

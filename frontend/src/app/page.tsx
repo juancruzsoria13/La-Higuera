@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getSubcategory } from "@/modules/products/attributes";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Percent } from "lucide-react";
 import { getCatalog } from "@/lib/catalog";
 import { listProducts } from "@/modules/products/queries";
 import { HomeCarousel } from "@/components/home-carousel";
@@ -23,15 +23,19 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
   const selectedSubcategory = getSubcategory(category, params.subcategory);
   const subcategory = selectedSubcategory?.id ?? "";
   const page = Math.max(1, Math.min(10000, Number.parseInt(params.page ?? "1", 10) || 1));
-  // Portada solo en la primera página sin filtros; con búsqueda o rubro, primero los resultados (como Mercado Libre).
-  const storefront = !q && !category && page === 1;
+  const onlyOffers = params.ofertas === "1";
+  const filtered = Boolean(q || category || onlyOffers);
+  // Portada solo en la primera página sin filtros; con búsqueda, rubro u ofertas, primero los resultados (como Mercado Libre).
+  const storefront = !filtered && page === 1;
   let result: Awaited<ReturnType<typeof listProducts>> = { products: [], count: 0 };
   let error = "";
   let featured: Awaited<ReturnType<typeof listServices>>["services"] = [];
+  let offers: typeof result.products = [];
   if (isConfigured()) {
-    try { result = await listProducts({ q, category, subcategory, page }); }
+    try { result = await listProducts({ q, category, subcategory, page, offers: onlyOffers }); }
     catch { error = "No pudimos cargar los anuncios. Revisá la conexión e intentá nuevamente."; }
     if (storefront) try { featured = (await listServices({ limit: 4 })).services; } catch { featured = []; }
+    if (storefront) try { offers = (await listProducts({ offers: true })).products.slice(0, 4); } catch { offers = []; }
   }
 
   return (
@@ -41,7 +45,18 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
       <div className="shell flex flex-col gap-9 pt-6 sm:gap-11 sm:pt-8">
         {params.cuenta === "eliminada" && <p role="status" className="notice notice-success">Tu cuenta y sus datos se eliminaron.</p>}
         {storefront && <CategoryShortcuts categories={categories} />}
-        {/* Servicios tiene prioridad: va antes que los anuncios (ver "Diseño" en CLAUDE.md). */}
+        {/* Ofertas primero, solo si hay: precios rebajados y descuentos exclusivos de La Higuera. */}
+        {storefront && offers.length > 0 && <section className="flex flex-col gap-5" aria-labelledby="ofertas-titulo">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="flex min-w-0 flex-col gap-1.5">
+              <h2 id="ofertas-titulo" className="h2 flex items-center gap-2.5"><span className="offer-icon" aria-hidden="true"><Percent className="size-5" /></span>Ofertas en San Juan</h2>
+              <p className="body-sm text-muted-foreground">Precios rebajados y descuentos exclusivos para quien llega desde La Higuera.</p>
+            </div>
+            <Link href="/?ofertas=1" className={buttonVariants({ variant: "outline" })}>Ver todas las ofertas <ArrowRight className="size-4" /></Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">{offers.map(p => <ProductCard product={p} key={p.id} />)}</div>
+        </section>}
+        {/* Después Servicios, que tiene prioridad sobre el resto de los anuncios (ver "Diseño" en CLAUDE.md). */}
         {storefront && <section className="band-navy" aria-labelledby="servicios-titulo">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div className="flex max-w-[640px] flex-col gap-2">
@@ -56,7 +71,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
         </section>}
         <section className="flex flex-col gap-5" aria-labelledby="listado">
           <div className="flex min-w-0 flex-col gap-1.5">
-            <h2 id="listado" className="h2">{q ? `Resultados para “${q}”` : selectedSubcategory?.name || selected?.name || "Recién publicado en San Juan"}</h2>
+            <h2 id="listado" className="h2">{q ? `Resultados para “${q}”` : onlyOffers ? "Ofertas" : selectedSubcategory?.name || selected?.name || "Recién publicado en San Juan"}</h2>
             <p className="body-sm text-muted-foreground">{isConfigured() && !error ? `${result.count} ${result.count === 1 ? "anuncio disponible" : "anuncios disponibles"}` : "Encontrá algo para vos, acá en San Juan."}</p>
           </div>
           {!isConfigured() ? <SetupNotice /> : error ? (
@@ -64,15 +79,15 @@ export default async function Home({ searchParams }: { searchParams: Promise<Rec
           ) : result.products.length ? (
             <>
               <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">{result.products.map(p => <ProductCard product={p} key={p.id} />)}</div>
-              <Pagination page={page} count={result.count} q={q} category={category} subcategory={subcategory} />
+              <Pagination page={page} count={result.count} q={q} category={category} subcategory={subcategory} offers={onlyOffers} />
             </>
           ) : (
             <div className="rounded-2xl border bg-card px-6 py-14 text-center">
-              <Fig variant={q || category ? 5 : 1} className="mx-auto mb-4 size-36" />
-              <h3 className="h3">{q || category ? "Todavía no hay coincidencias" : "El próximo anuncio puede ser el tuyo"}</h3>
-              <p className="body-sm mt-2 text-muted-foreground">{q || category ? "Probá con otra palabra o explorá todas las categorías." : "Publicá tu primer producto y compartilo con San Juan."}</p>
-              {(q || category) && <div className="mt-5 flex flex-wrap justify-center gap-2">{categories.map(item => <Link key={item.id} href={`/?${new URLSearchParams({ category: item.id })}`} className="filter-chip">{item.name}</Link>)}</div>}
-              <Link className="label mt-5 inline-flex items-center gap-2 text-primary" href={q || category || page > 1 ? "/" : "/productos/nuevo"}>{q || category || page > 1 ? "Ver todos los anuncios" : "Crear un anuncio"}<ArrowUpRight className="size-4" /></Link>
+              <Fig variant={filtered ? 5 : 1} className="mx-auto mb-4 size-36" />
+              <h3 className="h3">{filtered ? "Todavía no hay coincidencias" : "El próximo anuncio puede ser el tuyo"}</h3>
+              <p className="body-sm mt-2 text-muted-foreground">{filtered ? "Probá con otra palabra o explorá todas las categorías." : "Publicá tu primer producto y compartilo con San Juan."}</p>
+              {filtered && <div className="mt-5 flex flex-wrap justify-center gap-2">{categories.map(item => <Link key={item.id} href={`/?${new URLSearchParams({ category: item.id })}`} className="filter-chip">{item.name}</Link>)}</div>}
+              <Link className="label mt-5 inline-flex items-center gap-2 text-primary" href={filtered || page > 1 ? "/" : "/productos/nuevo"}>{filtered || page > 1 ? "Ver todos los anuncios" : "Crear un anuncio"}<ArrowUpRight className="size-4" /></Link>
             </div>
           )}
         </section>

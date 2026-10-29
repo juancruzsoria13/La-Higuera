@@ -74,9 +74,12 @@ async def seed(http: httpx.AsyncClient, admin: Supabase, url: str, key: str, dat
     # Se insertan en orden: el último queda primero en "Más recientes".
     for index, item in enumerate(data["products"]):
         user_id, locality, db = sellers[item["seller"]]
-        row = {field: value for field, value in item.items() if field not in {"seller", "photos"}}
+        row = {field: value for field, value in item.items() if field not in {"seller", "photos", "offer_price"}}
         row |= {"owner_id": user_id, "locality_id": locality, "contact_phone": phone(index), "status": "activo"}
         product = (await db.insert("products", row))[0]
+        if item.get("offer_price"):
+            # Se baja el precio como lo haría el vendedor: la base guarda el anterior y el anuncio pasa a Ofertas.
+            await db.update("products", [("id", f"eq.{product['id']}")], {"price": item["offer_price"]})
         if item.get("photos"):
             paths = [await photo(db, relative) for relative in item["photos"]]
             await db.rpc("set_product_images", {"product_id": product["id"], "paths": paths})

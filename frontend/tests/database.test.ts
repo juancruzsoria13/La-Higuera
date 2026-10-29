@@ -8,7 +8,7 @@ const stranger = "77777777-7777-4777-8777-777777777777";
 // El id lo genera la base: products y businesses no tienen permiso de INSERT sobre esa columna.
 let product = "";
 let business = "";
-const migrations = ["202610020001_initial.sql", "202610070001_services.sql", "202610070002_supabase_hardening.sql", "202610070003_marketplace_model.sql", "202610090001_service_images.sql", "202610150001_product_attributes.sql"];
+const migrations = ["202610020001_initial.sql", "202610070001_services.sql", "202610070002_supabase_hardening.sql", "202610070003_marketplace_model.sql", "202610090001_service_images.sql", "202610150001_product_attributes.sql", "202610290001_offers.sql"];
 const insertProduct = "insert into products(owner_id,title,description,price,currency,category_id,condition,locality_id,contact_phone) values($1,'Bicicleta','En perfecto estado',1200.50,'ARS','otros','usado','capital','2644123456') returning id";
 let db: PGlite;
 async function asUser<T>(id: string | null, run: () => Promise<T>) {
@@ -302,6 +302,41 @@ describe("Subcategorías y atributos en PostgreSQL", () => {
       await expect(db.query("update products set subcategory_id='autos',attributes='{}' where id=$1", [id])).rejects.toThrow();
       await expect(db.query("update product_subcategories set name='Otro' where id='casas'")).rejects.toThrow();
       await expect(db.query("update product_attribute_definitions set definition='{}' where id='surface'")).rejects.toThrow();
+    });
+  });
+});
+describe("Ofertas: precio rebajado y descuento exclusivo", () => {
+  const owner = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+  let id = "";
+  const offer = async () => (await db.query("select price, previous_price from products where id=$1", [id])).rows[0];
+  it("guarda el precio anterior solo al bajar el precio y lo borra al volver a subirlo o cambiar de moneda", async () => {
+    await db.query("insert into auth.users(id, raw_user_meta_data) values ($1, $2)", [owner, {display_name: "Oferta"}]);
+    await asUser(owner, async () => {
+      id = (await db.query<{id: string}>("insert into products(owner_id,title,description,price,currency,category_id,condition,locality_id,contact_phone) values($1,'Notebook','Notebook en buen estado',1000,'ARS','tecnologia','usado','capital','2644123456') returning id", [owner])).rows[0].id;
+      expect(await offer()).toEqual({price: "1000.00", previous_price: null});
+      await db.query("update products set price=850 where id=$1", [id]);
+      expect(await offer()).toEqual({price: "850.00", previous_price: "1000.00"});
+      // Una segunda baja conserva el precio más alto como referencia.
+      await db.query("update products set price=800 where id=$1", [id]);
+      expect(await offer()).toEqual({price: "800.00", previous_price: "1000.00"});
+      // Subir sin llegar al anterior la mantiene en oferta; llegar al anterior la saca.
+      await db.query("update products set price=900 where id=$1", [id]);
+      expect(await offer()).toEqual({price: "900.00", previous_price: "1000.00"});
+      await db.query("update products set price=1000 where id=$1", [id]);
+      expect(await offer()).toEqual({price: "1000.00", previous_price: null});
+      // Otra moneda no es comparable: deja de ser oferta.
+      await db.query("update products set price=700 where id=$1", [id]);
+      await db.query("update products set currency='USD', price=600 where id=$1", [id]);
+      expect(await offer()).toEqual({price: "600.00", previous_price: null});
+    });
+  });
+  it("no deja escribir el precio anterior a mano y limita el descuento exclusivo", async () => {
+    await asUser(owner, async () => {
+      await expect(db.query("update products set previous_price=99999 where id=$1", [id])).rejects.toThrow();
+      await expect(db.query("insert into products(owner_id,title,description,price,currency,category_id,condition,locality_id,contact_phone,previous_price) values($1,'Notebook','Notebook en buen estado',10,'ARS','tecnologia','usado','capital','2644123456',9999)", [owner])).rejects.toThrow();
+      expect((await db.query("update products set exclusive_discount=10 where id=$1 returning exclusive_discount", [id])).rows[0]).toEqual({exclusive_discount: 10});
+      for (const value of [0, 91, -5]) await expect(db.query("update products set exclusive_discount=$2 where id=$1", [id, value])).rejects.toThrow();
+      expect((await db.query("update products set exclusive_discount=null where id=$1 returning exclusive_discount", [id])).rows[0]).toEqual({exclusive_discount: null});
     });
   });
 });
